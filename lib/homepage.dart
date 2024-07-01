@@ -12,7 +12,7 @@ class _HomePageState extends State<HomePage>{
       appBar: AppBar(
         title: Text("Map Tracker App"),
         centerTitle: true,
-        automaticallyImplyLeading: false, // Geri tuşunu kaldırır
+        automaticallyImplyLeading: true, // Geri tuşunu kaldırır
       ),
          body: Center(
       child: Text("Map will be here!",
