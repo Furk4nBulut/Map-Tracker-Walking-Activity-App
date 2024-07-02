@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:map_tracker/homepage.dart';
 import '../../../screens/second_screen.dart';
 
 class AuthService {
@@ -16,7 +17,7 @@ class AuthService {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null )  {
         await _registerUser(name: name, surname: surname ,email: email, password: password);
-        navigator.push(MaterialPageRoute(builder: (context) => SecondScreen(),));
+        navigator.push(MaterialPageRoute(builder: (context) => HomePage(),));
       }
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
@@ -28,7 +29,7 @@ class AuthService {
     try {
       final UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-        navigator.push(MaterialPageRoute(builder: (context) => SecondScreen(),));
+        navigator.push(MaterialPageRoute(builder: (context) => HomePage(),));
       }
     } on FirebaseAuthException catch(e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
