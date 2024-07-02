@@ -27,30 +27,33 @@ class _LoginContentState extends State<LoginContent>
 
   final _tName = TextEditingController();
   final _tEmail = TextEditingController();
+  final _tSurname = TextEditingController(); // Added surname controller
   final _tPassword = TextEditingController();
 
   Widget inputField(TextEditingController controller, String hint, IconData iconData) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 8),
-      child: SizedBox(
-        height: 50,
-        child: Material(
-          elevation: 8,
-          shadowColor: Colors.black87,
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-          child: TextField(
-            controller: controller,
-            textAlignVertical: TextAlignVertical.bottom,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
+    return Expanded( // Wrap with Expanded
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8), // Adjusted padding
+        child: SizedBox(
+          height: 50,
+          child: Material(
+            elevation: 8,
+            shadowColor: Colors.black87,
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(30),
+            child: TextField(
+              controller: controller,
+              textAlignVertical: TextAlignVertical.bottom,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                hintText: hint,
+                prefixIcon: Icon(iconData),
               ),
-              filled: true,
-              fillColor: Colors.white,
-              hintText: hint,
-              prefixIcon: Icon(iconData),
             ),
           ),
         ),
@@ -123,8 +126,6 @@ class _LoginContentState extends State<LoginContent>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset('assets/images/facebook.png'),
-          const SizedBox(width: 24),
           Image.asset('assets/images/google.png'),
         ],
       ),
@@ -151,10 +152,15 @@ class _LoginContentState extends State<LoginContent>
   @override
   void initState() {
     createAccountContent = [
-      inputField(_tName, 'İsim', Ionicons.person_outline),
+      Row(
+        children: [
+          inputField(_tName, 'İsim', Ionicons.person_outline),
+          inputField(_tSurname, 'Soyisim', Ionicons.people_outline), // Added surname field
+        ],
+      ),
       inputField(_tEmail, 'Email', Ionicons.mail_outline),
       inputField(_tPassword, 'Şifre', Ionicons.lock_closed_outline),
-      actionButton('Kayıt Ol', onTap: () => locator.get<AuthService>().signUp(context, name: _tName.text, email: _tEmail.text, password: _tPassword.text),),
+      actionButton('Kayıt Ol', onTap: () => locator.get<AuthService>().signUp(context, name: _tName.text, surname: _tSurname.text, email: _tEmail.text, password: _tPassword.text),),
       orDivider(),
       logos(),
     ];

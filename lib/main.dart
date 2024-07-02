@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       title: 'Firebase Auth',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: kBackgroundColor,
+        scaffoldBackgroundColor: Colors.white,
         textTheme: Theme.of(context).textTheme.apply(
           bodyColor: kPrimaryColor,
           fontFamily: 'Montserrat',
@@ -70,7 +70,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/Furkan_Bulut.jpg"),
+            image: AssetImage("assets/images/trb.png"),
             fit: BoxFit.cover,
           ),
         ),

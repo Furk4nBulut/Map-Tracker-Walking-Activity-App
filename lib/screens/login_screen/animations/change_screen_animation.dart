@@ -38,7 +38,7 @@ class ChangeScreenAnimation {
   }) {
     topTextController = AnimationController(
       vsync: vsync,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 100),
     );
 
     topTextAnimation = _createAnimation(
@@ -49,7 +49,7 @@ class ChangeScreenAnimation {
 
     bottomTextController = AnimationController(
       vsync: vsync,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 100),
     );
 
     bottomTextAnimation = _createAnimation(
@@ -62,7 +62,7 @@ class ChangeScreenAnimation {
       createAccountControllers.add(
         AnimationController(
           vsync: vsync,
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 100),
         ),
       );
 

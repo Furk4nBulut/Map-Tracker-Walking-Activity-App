@@ -29,20 +29,14 @@ class _TopTextState extends State<TopText> {
       animation: ChangeScreenAnimation.topTextAnimation,
       child: Text(
         ChangeScreenAnimation.currentScreen == Screens.signUp
-            ? ' Map Tracker\nHesap Oluştur'
+            ? 'Map Tracker'
             : 'Tekrar\nHoşgeldin',
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.roboto(
           textStyle: TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w900,
             color: Colors.black,
-            shadows: [
-              Shadow(
-                offset: Offset(2.0, 2.0),
-                blurRadius: 3.0,
-                color: Color.fromARGB(128, 0, 0, 0),
-              ),
-            ],
+
           ),
         ),
       ),

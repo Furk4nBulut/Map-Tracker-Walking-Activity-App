@@ -10,12 +10,12 @@ class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("users");
   final firebaseAuth = FirebaseAuth.instance;
 
-  Future<void> signUp(BuildContext context, {required String name, required String email, required String password}) async {
+  Future<void> signUp(BuildContext context, {required String name,required String surname, required String email, required String password}) async {
     final navigator = Navigator.of(context);
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null )  {
-        await _registerUser(name: name, email: email, password: password);
+        await _registerUser(name: name, surname: surname ,email: email, password: password);
         navigator.push(MaterialPageRoute(builder: (context) => SecondScreen(),));
       }
     } on FirebaseAuthException catch (e) {
@@ -35,10 +35,11 @@ class AuthService {
     }
   }
 
-  Future<void> _registerUser({required String name, required String email, required String password}) async {
+  Future<void> _registerUser({required String name,required String surname, required String email, required String password}) async {
     await userCollection.doc().set({
       "email" : email,
       "name": name,
+      "surname": surname,
       "password": password
     });
   }
