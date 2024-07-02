@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/services/auth_service.dart';
 import 'profile_screen.dart';
+import 'package:map_tracker/services/weather_service.dart';
+import 'package:map_tracker/models/weather_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,6 +13,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  List<WeatherModel> _weathers = [];
+
+  void _getWeatherData() async {
+    _weathers = await WeatherService().getWeatherData();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _getWeatherData();
+    super.initState();
+  }
+
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   int _selectedIndex = 0;
 
@@ -41,21 +57,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Genel Profil ve Spor Durumu", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 8.0),
-                          Text("Toplam Yapılan Mesafe: 120 km"),
-                          Text("Toplam Süre: 10 saat"),
-                          Text("Aktivite Sayısı: 25"),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               ),
             if (user == null)
@@ -102,7 +103,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body:
+
+      _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
