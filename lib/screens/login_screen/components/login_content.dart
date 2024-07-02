@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:map_tracker/screens/homepage.dart';
 import '../../../locator.dart';
 import '../../../services/auth_service.dart';
 import '../../../utils/helper_functions.dart';
@@ -125,8 +126,12 @@ class _LoginContentState extends State<LoginContent>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset('assets/images/google.png'),
-        ],
+          InkWell(
+              onTap: () async{
+                locator.get<AuthService>().signInWithGoogle().then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(), settings: RouteSettings(arguments: value))));
+              },
+              child: Image.asset('assets/images/google.png')),
+                ],
       ),
     );
   }
