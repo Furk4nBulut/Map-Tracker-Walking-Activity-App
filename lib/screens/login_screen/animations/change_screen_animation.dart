@@ -97,8 +97,9 @@ class ChangeScreenAnimation {
     for (final controller in [
       topTextController,
       bottomTextController,
-      ...createAccountControllers,
       ...loginControllers,
+      ...createAccountControllers,
+
     ]) {
       controller.dispose();
     }

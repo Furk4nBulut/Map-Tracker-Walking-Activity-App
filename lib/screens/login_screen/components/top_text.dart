@@ -30,7 +30,7 @@ class _TopTextState extends State<TopText> {
       child: Text(
         ChangeScreenAnimation.currentScreen == Screens.signUp
             ? 'Map Tracker'
-            : 'Tekrar\nHoşgeldin',
+            : 'Map Tracker \n Oturum Aç',
         style: GoogleFonts.roboto(
           textStyle: TextStyle(
             fontSize: 40,

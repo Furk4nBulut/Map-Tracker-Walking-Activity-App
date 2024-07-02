@@ -8,10 +8,8 @@ import '../animations/change_screen_animation.dart';
 import 'bottom_text.dart';
 import 'top_text.dart';
 
-enum Screens {
-  signUp,
-  signIn,
-}
+enum Screens { signUp, signIn }
+
 
 class LoginContent extends StatefulWidget {
   const LoginContent({Key? key}) : super(key: key);
@@ -22,8 +20,9 @@ class LoginContent extends StatefulWidget {
 
 class _LoginContentState extends State<LoginContent>
     with TickerProviderStateMixin {
-  late final List<Widget> createAccountContent;
   late final List<Widget> loginContent;
+
+  late final List<Widget> createAccountContent;
 
   final _tName = TextEditingController();
   final _tEmail = TextEditingController();
@@ -151,6 +150,14 @@ class _LoginContentState extends State<LoginContent>
 
   @override
   void initState() {
+    loginContent = [
+      inputField(_tEmail, 'Email', Ionicons.mail_outline),
+      inputField(_tPassword, 'Şifre', Ionicons.lock_closed_outline),
+      actionButton('Giriş Yap', onTap: () => locator.get<AuthService>().signIn(context, email: _tEmail.text, password: _tPassword.text),),
+      forgotPassword(),
+      orDivider(),
+      logos(),
+    ];
     createAccountContent = [
       Row(
         children: [
@@ -165,18 +172,20 @@ class _LoginContentState extends State<LoginContent>
       logos(),
     ];
 
-    loginContent = [
-      inputField(_tEmail, 'Email', Ionicons.mail_outline),
-      inputField(_tPassword, 'Şifre', Ionicons.lock_closed_outline),
-      actionButton('Giriş Yap', onTap: () => locator.get<AuthService>().signIn(context, email: _tEmail.text, password: _tPassword.text),),
-      forgotPassword(),
-    ];
+
 
     ChangeScreenAnimation.initialize(
       vsync: this,
-      createAccountItems: createAccountContent.length,
       loginItems: loginContent.length,
+
+      createAccountItems: createAccountContent.length,
     );
+    for (var i = 0; i < loginContent.length; i++) {
+      loginContent[i] = HelperFunctions.wrapWithAnimatedBuilder(
+        animation: ChangeScreenAnimation.loginAnimations[i],
+        child: loginContent[i],
+      );
+    }
 
     for (var i = 0; i < createAccountContent.length; i++) {
       createAccountContent[i] = HelperFunctions.wrapWithAnimatedBuilder(
@@ -185,12 +194,7 @@ class _LoginContentState extends State<LoginContent>
       );
     }
 
-    for (var i = 0; i < loginContent.length; i++) {
-      loginContent[i] = HelperFunctions.wrapWithAnimatedBuilder(
-        animation: ChangeScreenAnimation.loginAnimations[i],
-        child: loginContent[i],
-      );
-    }
+
 
     super.initState();
   }
