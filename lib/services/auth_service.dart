@@ -53,6 +53,11 @@ class AuthService {
 
   }
 
+
+  Future<void> signOut() async {
+    await firebaseAuth.signOut();
+  }
+
   Future<void> _registerUser({required String name,required String surname, required String email, required String password}) async {
     await userCollection.doc().set({
       "email" : email,
