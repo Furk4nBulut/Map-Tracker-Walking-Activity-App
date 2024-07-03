@@ -121,10 +121,7 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(16.0),
               child: Text("Giriş Yapılmadı"),
             ),
-          _locationHeader(),
-          const SizedBox(height: 8.0),
-          _dateTimeInfo(),
-          const SizedBox(height: 16.0),
+          _weatherAndTimeInfo(),
         ],
       ),
     );
@@ -152,24 +149,98 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _locationHeader() {
-    return Text(
-      _weather?.areaName ?? "Bilinmiyor",
-      style: const TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
+  Widget _weatherAndTimeInfo() {
+    return Container(
+      margin: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (_weather?.weatherIcon != null)
+                Image.network(
+                  "http://openweathermap.org/img/wn/${_weather!.weatherIcon}@2x.png",
+                  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                    print("Error loading image: $exception");
+                    return const Icon(Icons.error);
+                  },
+                )
+              else
+                const Icon(Icons.error),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _weather?.areaName ?? "Bilinmiyor",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    "${_weather?.temperature?.celsius?.toInt() ?? "Bilinmiyor"}°",
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    _weather?.weatherDescription ?? "Bilinmiyor",
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                DateFormat("h:mm a").format(DateTime.now()),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                DateFormat("EEEE, d MMMM y").format(DateTime.now()),
+                style: const TextStyle(
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _dateTimeInfo() {
-    DateTime now = _weather?.date ?? DateTime.now();
-    return Text(
-      DateFormat("h:mm a").format(now),
-      style: const TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
+
+
 }
+
