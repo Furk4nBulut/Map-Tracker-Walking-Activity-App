@@ -5,7 +5,6 @@ import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
 import 'locator.dart';
 import 'services/provider/auth_provider.dart';
-import 'screens/login_screen/login_screen.dart';
 import 'utils/constants.dart';
 import 'firebase_options.dart';
 import 'screens/homepage.dart';
