@@ -23,25 +23,12 @@ class ProfilePage extends StatelessWidget {
               title: Text("Kullanıcı Adı: ${user.displayName ?? 'Bilinmiyor'}"),
               subtitle: Text("Email: ${user.email}"),
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(user.photoURL ?? ""),
+                backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+                child: user.photoURL == null ? const Icon(Icons.person) : null,
               ),
             ),
             const SizedBox(height: 16.0),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Genel Profil ve Spor Durumu", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8.0),
-                    Text("Toplam Yapılan Mesafe: 120 km"),
-                    Text("Toplam Süre: 10 saat"),
-                    Text("Aktivite Sayısı: 25"),
-                  ],
-                ),
-              ),
-            ),
+
           ],
         ),
       ),

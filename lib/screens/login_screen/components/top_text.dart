@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../screens/login_screen/animations/change_screen_animation.dart';
 import '../../../utils/helper_functions.dart';
-import 'login_content.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'login_content.dart';
+
 
 class TopText extends StatefulWidget {
   const TopText({Key? key}) : super(key: key);
@@ -14,13 +16,12 @@ class TopText extends StatefulWidget {
 class _TopTextState extends State<TopText> {
   @override
   void initState() {
+    super.initState();
     ChangeScreenAnimation.topTextAnimation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() {});
       }
     });
-
-    super.initState();
   }
 
   @override
@@ -32,11 +33,10 @@ class _TopTextState extends State<TopText> {
             ? 'Map Tracker'
             : 'Map Tracker \n Oturum Aç',
         style: GoogleFonts.roboto(
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             fontSize: 40,
             fontWeight: FontWeight.w900,
             color: Colors.black,
-
           ),
         ),
       ),

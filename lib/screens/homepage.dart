@@ -25,11 +25,15 @@ class _HomePageState extends State<HomePage> {
     _fetchWeather();
   }
 
-  void _fetchWeather() async {
-    Weather? weather = await _wf.currentWeatherByCityName("Istanbul");
-    setState(() {
-      _weather = weather;
-    });
+  Future<void> _fetchWeather() async {
+    try {
+      Weather weather = await _wf.currentWeatherByCityName("Istanbul");
+      setState(() {
+        _weather = weather;
+      });
+    } catch (e) {
+      print('Weather fetch error: $e');
+    }
   }
 
   void _onItemTapped(int index) {
@@ -44,12 +48,12 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Map Tracker App"),
+        title: const Text("Map Tracker App"),
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.exit_to_app),
             onPressed: () async {
               await AuthService().signOut();
               Navigator.of(context).pop();
@@ -78,7 +82,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBody(User? user) {
     if (_weather == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
     return Column(
@@ -105,15 +109,16 @@ class _HomePageState extends State<HomePage> {
                   title: Text("Kullanıcı Adı: ${user.displayName ?? 'Bilinmiyor'}"),
                   subtitle: Text("Email: ${user.email}"),
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user.photoURL ?? ""),
+                    backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+                    child: user.photoURL == null ? const Icon(Icons.person) : null,
                   ),
                 ),
                 const SizedBox(height: 16.0),
               ],
-            ),
-          if (user == null)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            )
+          else
+            const Padding(
+              padding: EdgeInsets.all(16.0),
               child: Text("Giriş Yapılmadı"),
             ),
           _locationHeader(),
@@ -126,12 +131,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHomeScreen(User? user) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Add any additional widgets for the home screen here
-      ],
+    return Center(
+      child: Text("Hoşgeldiniz, ${user?.displayName ?? 'Misafir'}"),
     );
   }
 
@@ -141,11 +142,11 @@ class _HomePageState extends State<HomePage> {
         case 1:
           return ProfilePage(user: user);
         default:
-          return Container(); // Handle other cases as needed
+          return Container();
       }
     } else {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Text("Giriş Yapılmadı"),
       );
     }
@@ -153,8 +154,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _locationHeader() {
     return Text(
-      _weather!.areaName ?? "Bilinmiyor",
-      style: TextStyle(
+      _weather?.areaName ?? "Bilinmiyor",
+      style: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),
@@ -162,10 +163,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _dateTimeInfo() {
-    DateTime now = _weather!.date!;
+    DateTime now = _weather?.date ?? DateTime.now();
     return Text(
       DateFormat("h:mm a").format(now),
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),
