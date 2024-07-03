@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
 import 'locator.dart';
 import 'services/provider/auth_provider.dart';
@@ -65,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
     );
   }
 
