@@ -46,41 +46,56 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final User? user = ModalRoute.of(context)?.settings.arguments as User?;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Map Tracker App"),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () async {
-              await AuthService().signOut();
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-      body: _buildBody(user),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Ana Sayfa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Map Tracker App"),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.exit_to_app),
+              onPressed: () async {
+                await AuthService().signOut();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+        body: _buildBody(user),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Ana Sayfa',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profil',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.amber[800],
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
 
   Widget _buildBody(User? user) {
+    return IndexedStack(
+      index: _selectedIndex,
+      children: [
+        _buildHomeScreen(user),
+        ProfilePage(user: user!),
+      ],
+    );
+  }
+
+  Widget _buildHomeScreen(User? user) {
     if (_weather == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -90,7 +105,9 @@ class _HomePageState extends State<HomePage> {
       children: [
         _buildUserInfo(user),
         Expanded(
-          child: _selectedIndex == 0 ? _buildHomeScreen(user) : _buildSelectedScreen(user),
+          child: Center(
+            child: Text("Hoşgeldiniz, ${user?.displayName ?? 'Misafir'}"),
+          ),
         ),
       ],
     );
@@ -125,28 +142,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  Widget _buildHomeScreen(User? user) {
-    return Center(
-      child: Text("Hoşgeldiniz, ${user?.displayName ?? 'Misafir'}"),
-    );
-  }
-
-  Widget _buildSelectedScreen(User? user) {
-    if (user != null) {
-      switch (_selectedIndex) {
-        case 1:
-          return ProfilePage(user: user);
-        default:
-          return Container();
-      }
-    } else {
-      return const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text("Giriş Yapılmadı"),
-      );
-    }
   }
 
   Widget _weatherAndTimeInfo() {
@@ -239,8 +234,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-
-
 }
-

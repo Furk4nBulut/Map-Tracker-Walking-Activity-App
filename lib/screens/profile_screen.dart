@@ -1,35 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:map_tracker/screens/homepage.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
 
-  ProfilePage({required this.user});
+  const ProfilePage({Key? key, required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profil"),
+        title: const Text("Profil"),
         centerTitle: true,
-        automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              title: Text("Kullanıcı Adı: ${user.displayName ?? 'Bilinmiyor'}"),
-              subtitle: Text("Email: ${user.email}"),
-              leading: CircleAvatar(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 50,
                 backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
-                child: user.photoURL == null ? const Icon(Icons.person) : null,
+                child: user.photoURL == null ? const Icon(Icons.person, size: 50) : null,
               ),
-            ),
-            const SizedBox(height: 16.0),
-
-          ],
+              const SizedBox(height: 16.0),
+              Text(
+                user.displayName ?? 'Bilinmiyor',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                user.email ?? 'Email bilinmiyor',
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  );
+                },
+                child: const Text("Çıkış Yap"),
+              ),
+            ],
+          ),
         ),
       ),
     );
