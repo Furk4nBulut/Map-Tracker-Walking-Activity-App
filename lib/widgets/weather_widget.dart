@@ -196,7 +196,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
           const SizedBox(height: 10),
           Container(
             height: 1,
-            width: MediaQuery.of(context).size.width * 0.5,
+            width: MediaQuery.of(context).size.width * 0.6,
             color: Colors.grey.withOpacity(0.5),
           ),
           const SizedBox(height: 10),
