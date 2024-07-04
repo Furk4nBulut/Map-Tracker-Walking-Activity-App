@@ -57,8 +57,9 @@ class _HomePageState extends State<HomePage> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Map Tracker App"),
+        appBar: _selectedIndex == 0
+            ? AppBar(
+          title: const Text("Ana Sayfa"),
           centerTitle: true,
           automaticallyImplyLeading: false,
           actions: <Widget>[
@@ -70,14 +71,9 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ],
-        ),
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: [
-            _buildHomeScreen(user),
-            ProfilePage(user: user!),
-          ],
-        ),
+        )
+            : null,
+        body: _selectedIndex == 0 ? _buildHomeScreen(user) : ProfilePage(user: user!),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
