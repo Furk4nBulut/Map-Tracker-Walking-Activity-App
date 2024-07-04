@@ -74,21 +74,36 @@ class _HomePageState extends State<HomePage> {
         )
             : null,
         body: _selectedIndex == 0 ? _buildHomeScreen(user) : ProfilePage(user: user!),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Ana Sayfa',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profil',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.amber[800],
-          onTap: _onItemTapped,
+        bottomNavigationBar: SafeArea(
+          child: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Ana Sayfa',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.plus_one),
+                label: 'Aktivite Ekle',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history),
+                label: 'Aktivite Geçmişi',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profil',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.amber[800],
+            unselectedItemColor: Colors.grey,
+            onTap: _onItemTapped,
+            elevation: 8,
+            type: BottomNavigationBarType.fixed,
+              ),
         ),
+
+        extendBody: true,
       ),
     );
   }
