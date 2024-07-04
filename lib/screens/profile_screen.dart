@@ -44,13 +44,12 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomePage(),
-                    ),
-                  );
+                  try {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  } catch (e) {
+                    print("Error signing out: $e");
+                  }
                 },
                 child: const Text("Çıkış Yap"),
               ),

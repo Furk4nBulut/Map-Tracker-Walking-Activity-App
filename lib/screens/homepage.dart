@@ -44,11 +44,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = ModalRoute.of(context)?.settings.arguments as User?;
+    final User? user = _firebaseAuth.currentUser;
 
     return WillPopScope(
       onWillPop: () async {
-        return false;
+        if (_selectedIndex != 0) {
+          setState(() {
+            _selectedIndex = 0;
+          });
+          return false;
+        }
+        return true;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -65,7 +71,13 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: _buildBody(user),
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            _buildHomeScreen(user),
+            ProfilePage(user: user!),
+          ],
+        ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -82,16 +94,6 @@ class _HomePageState extends State<HomePage> {
           onTap: _onItemTapped,
         ),
       ),
-    );
-  }
-
-  Widget _buildBody(User? user) {
-    return IndexedStack(
-      index: _selectedIndex,
-      children: [
-        _buildHomeScreen(user),
-        ProfilePage(user: user!),
-      ],
     );
   }
 
