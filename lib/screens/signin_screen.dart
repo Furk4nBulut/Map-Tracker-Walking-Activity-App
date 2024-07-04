@@ -116,20 +116,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 25.0),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: rememberPassword,
-                            onChanged: (value) {
-                              setState(() {
-                                rememberPassword = value!;
-                              });
-                            },
-                          ),
-                          const Text('Şifreyi Hatırla'),
-                        ],
-                      ),
-                      const SizedBox(height: 25.0),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(

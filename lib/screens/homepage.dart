@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'profile_screen.dart';
+import 'new_activity_screen.dart';
+import 'partials/navbar.dart'; // Import the BottomNavBar widget
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,9 +23,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 1) {
+      // Navigate to NewActivityScreen when the "Add Activity" tab is tapped
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => NewActivityScreen()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -58,33 +67,13 @@ class _HomePageState extends State<HomePage> {
           ],
         )
             : null,
-        body: _selectedIndex == 0 ? _buildHomeScreen(user) : ProfilePage(user: user!),
+        body: _selectedIndex == 0
+            ? _buildHomeScreen(user)
+            : (_selectedIndex == 3 ? ProfilePage(user: user!) : Container()), // Placeholder for other tabs
         bottomNavigationBar: SafeArea(
-          child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Ana Sayfa',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.plus_one),
-                label: 'Aktivite Ekle',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history),
-                label: 'Aktivite Geçmişi',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profil',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.amber[800],
-            unselectedItemColor: Colors.grey,
-            onTap: _onItemTapped,
-            elevation: 8,
-            type: BottomNavigationBarType.fixed,
+          child: BottomNavBar(
+            selectedIndex: _selectedIndex,
+            onItemTapped: _onItemTapped,
           ),
         ),
         extendBody: true,
