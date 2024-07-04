@@ -57,6 +57,12 @@ dependencies:
   icons_plus: ^4.0.0
   flutter_icons_plus: ^1.0.3
 
+
+  # Database
+  sqflite:
+  path:
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -22,12 +22,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _fetchWeather();
+    _fetchWeather("Turkey", "Istanbul", "Basaksehir");
   }
 
-  Future<void> _fetchWeather() async {
+  Future<void> _fetchWeather(String country, String city, String district) async {
     try {
-      Weather weather = await _wf.currentWeatherByCityName("Istanbul");
+      // We concatenate city and district to form the query
+      String location = "$district, $city, $country";
+      Weather weather = await _wf.currentWeatherByCityName(location);
       setState(() {
         _weather = weather;
       });
@@ -100,9 +102,8 @@ class _HomePageState extends State<HomePage> {
             onTap: _onItemTapped,
             elevation: 8,
             type: BottomNavigationBarType.fixed,
-              ),
+          ),
         ),
-
         extendBody: true,
       ),
     );
@@ -195,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _weather?.areaName ?? "Bilinmiyor",
+                    "${_weather?.areaName ?? "Bilinmiyor"}, ${_weather?.country ?? "Bilinmiyor"}",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
