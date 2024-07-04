@@ -29,58 +29,62 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _initializeLocation();
     _fetchWeatherData();
   }
 
   @override
   void dispose() {
-    _positionStream.cancel();
+    if (_positionStream != null) {
+      _positionStream.cancel();
+    }
     _timer?.cancel();
     super.dispose();
   }
 
-  Future<void> _getCurrentLocation() async {
+
+  Future<void> _initializeLocation() async {
+    try {
+      _currentPosition = await _getCurrentLocation();
+      _positionStream = Geolocator.getPositionStream().listen((Position position) {
+        setState(() {
+          _currentPosition = position;
+          if (_activityStarted) {
+            _updateActivityStats(position);
+            _updateRoute(position);
+          }
+        });
+      });
+    } catch (e) {
+      print('Error initializing location: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Konum bilgisi alınamadı.')),
+      );
+    }
+  }
+
+  Future<Position> _getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Konum servisleri devre dışı.')),
-      );
-      return;
+      throw 'Konum servisleri devre dışı.';
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Konum izinleri reddedildi.')),
-        );
-        return;
+        throw 'Konum izinleri reddedildi.';
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Konum izinleri kalıcı olarak reddedildi.')),
-      );
-      return;
+      throw 'Konum izinleri kalıcı olarak reddedildi.';
     }
 
-    _positionStream = Geolocator.getPositionStream(
-    ).listen((Position position) {
-      setState(() {
-        _currentPosition = position;
-        if (_activityStarted) {
-          _updateActivityStats(position);
-          _updateRoute(position);
-        }
-      });
-    });
+    return await Geolocator.getCurrentPosition();
   }
 
   void _startActivity() {
@@ -92,7 +96,9 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         setState(() {
           _elapsedSeconds++;
-          _averageSpeed = _totalDistance / (_elapsedSeconds / 3600); // km/s
+          if (_totalDistance > 0) {
+            _averageSpeed = _totalDistance / (_elapsedSeconds / 3600); // km/s
+          }
         });
       });
     });
@@ -105,19 +111,29 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _timer?.cancel();
     });
 
-    ActivityService().saveActivity(
-      startTime: _startTime!,
-      endTime: _endTime!,
-      totalDistance: _totalDistance,
-      elapsedTime: _elapsedSeconds,
-      startPosition: _currentPosition,
-      endPosition: _currentPosition,
-    );
+    LatLng? startPosition = _route.isNotEmpty ? _route.first : null;
+    LatLng? endPosition = _route.isNotEmpty ? _route.last : null;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
-    );
+    try {
+      await ActivityService().saveActivity(
+        startTime: _startTime!,
+        endTime: _endTime!,
+        totalDistance: _totalDistance,
+        elapsedTime: _elapsedSeconds,
+        startPosition: startPosition,
+        endPosition: endPosition,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
+      );
+    }
   }
+
 
   void _updateActivityStats(Position position) {
     if (_route.isNotEmpty) {
@@ -147,7 +163,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   }
 
   Future<void> _fetchWeatherData() async {
-    // Weather data fetching logic using the current location
+    // Implement weather data fetching logic using the current location
     // Example: OpenWeatherMap API call
   }
 

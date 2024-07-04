@@ -1,39 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 
 class ActivityService {
-  final CollectionReference _activitiesCollection = FirebaseFirestore.instance.collection('activities');
+  final CollectionReference _activityCollection = FirebaseFirestore.instance.collection('activities');
 
   Future<void> saveActivity({
     required DateTime startTime,
     required DateTime endTime,
     required double totalDistance,
     required int elapsedTime,
-    required Position startPosition,
-    required Position endPosition,
+    required LatLng? startPosition,
+    required LatLng? endPosition,
   }) async {
     try {
-      await _activitiesCollection.add({
+      await _activityCollection.add({
         'startTime': startTime,
         'endTime': endTime,
         'totalDistance': totalDistance,
         'elapsedTime': elapsedTime,
-        'startLatitude': startPosition.latitude,
-        'startLongitude': startPosition.longitude,
-        'endLatitude': endPosition.latitude,
-        'endLongitude': endPosition.longitude,
+        'startPosition': startPosition != null ? GeoPoint(startPosition.latitude, startPosition.longitude) : null,
+        'endPosition': endPosition != null ? GeoPoint(endPosition.latitude, endPosition.longitude) : null,
       });
     } catch (e) {
-      throw Exception('Failed to add activity: $e');
-    }
-  }
-
-  Future<List<DocumentSnapshot>> getActivities() async {
-    try {
-      QuerySnapshot querySnapshot = await _activitiesCollection.get();
-      return querySnapshot.docs;
-    } catch (e) {
-      throw Exception('Failed to get activities: $e');
+      print('Error saving activity: $e');
+      throw 'Aktivite kaydedilirken bir hata oluştu.';
     }
   }
 }
