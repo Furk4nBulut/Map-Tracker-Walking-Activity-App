@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
   final String activityId;
 
-  ActivityDetailScreen({required this.activityId});
+  const ActivityDetailScreen({Key? key, required this.activityId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,30 +48,51 @@ class ActivityDetailScreen extends StatelessWidget {
             return Center(child: Text('Aktivite bulunamadı.'));
           }
 
-          var data = snapshot.data!.data()!;
-          Timestamp startTimeStamp = data['startTime'];
+          var activityData = snapshot.data!.data() as Map<String, dynamic>;
+
+          Timestamp startTimeStamp = activityData['startTime'];
           DateTime startTime = startTimeStamp.toDate();
-          Timestamp? endTimeStamp = data['endTime'];
-          DateTime? endTime = endTimeStamp?.toDate();
-          double totalDistance = data['totalDistance'] ?? 0.0;
-          int elapsedTime = data['elapsedTime'] ?? 0;
-          double averageSpeed = (totalDistance > 0 && elapsedTime > 0)
-              ? totalDistance / (elapsedTime / 3600)
-              : 0;
+          double totalDistance = activityData['totalDistance'] ?? 0.0;
+          int elapsedTime = activityData['elapsedTime'] ?? 0;
+          List<dynamic> routeCoordinates = activityData['route'] ?? [];
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Başlangıç Zamanı: ${startTime.toString()}'),
-                Text('Bitiş Zamanı: ${endTime != null ? endTime.toString() : 'Devam Ediyor'}'),
-                Text('Toplam Mesafe: ${totalDistance.toStringAsFixed(2)} km'),
-                Text('Geçen Süre: ${elapsedTime} saniye'),
-                Text('Ortalama Hız: ${averageSpeed.toStringAsFixed(2)} km/s'),
+          List<LatLng> route = routeCoordinates.map((coord) {
+            return LatLng(coord['latitude'], coord['longitude']);
+          }).toList();
 
-              ],
+          Set<Polyline> _polylines = {
+            Polyline(
+              polylineId: PolylineId('route'),
+              color: Colors.blue,
+              width: 5,
+              points: route,
             ),
+          };
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: route.isNotEmpty ? route.first : LatLng(0, 0),
+                    zoom: 15,
+                  ),
+                  polylines: _polylines,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Başlangıç Zamanı: ${startTime.toString()}'),
+                    Text('Toplam Mesafe: ${totalDistance.toStringAsFixed(2)} km'),
+                    Text('Geçen Süre: ${Duration(seconds: elapsedTime).toString()}'),
+                  ],
+                ),
+              ),
+            ],
           );
         },
       ),
