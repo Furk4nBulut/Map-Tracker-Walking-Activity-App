@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
-import 'profile_screen.dart';
-import 'new_activity_screen.dart';
-import 'partials/navbar.dart'; // Import the BottomNavBar widget
+import 'package:map_tracker/screens/profile_screen.dart';
+import 'package:map_tracker/screens/new_activity_screen.dart';
+import 'package:map_tracker/screens/activity_record_screen.dart';
+import 'package:map_tracker/screens/partials/navbar.dart'; // Import the BottomNavBar widget
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,18 +18,18 @@ class _HomePageState extends State<HomePage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void _onItemTapped(int index) {
     if (index == 1) {
       // Navigate to NewActivityScreen when the "Add Activity" tab is tapped
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => NewActivityScreen()),
-      );
+      ).then((_) {
+        // Return to the previous selected index when back from NewActivityScreen
+        setState(() {
+          _selectedIndex = 0;
+        });
+      });
     } else {
       setState(() {
         _selectedIndex = index;
@@ -67,9 +68,15 @@ class _HomePageState extends State<HomePage> {
           ],
         )
             : null,
-        body: _selectedIndex == 0
-            ? _buildHomeScreen(user)
-            : (_selectedIndex == 3 ? ProfilePage(user: user!) : Container()), // Placeholder for other tabs
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            _buildHomeScreen(user),
+            Container(), // This will be replaced with NewActivityScreen which is a separate page
+            ActivityHistoryScreen(),
+            ProfilePage(user: user!),
+          ],
+        ),
         bottomNavigationBar: SafeArea(
           child: BottomNavBar(
             selectedIndex: _selectedIndex,

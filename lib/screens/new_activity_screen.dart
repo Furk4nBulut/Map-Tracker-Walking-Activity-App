@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_tracker/services/activity_service.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
 
 class NewActivityScreen extends StatefulWidget {
   const NewActivityScreen({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class NewActivityScreen extends StatefulWidget {
 }
 
 class _NewActivityScreenState extends State<NewActivityScreen> {
-  late Position _currentPosition;
+  Position? _currentPosition;
   late StreamSubscription<Position> _positionStream;
   bool _activityStarted = false;
   DateTime? _startTime;
@@ -35,13 +35,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
   @override
   void dispose() {
-    if (_positionStream != null) {
-      _positionStream.cancel();
-    }
+    _positionStream.cancel();
     _timer?.cancel();
     super.dispose();
   }
-
 
   Future<void> _initializeLocation() async {
     try {
@@ -52,6 +49,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           if (_activityStarted) {
             _updateActivityStats(position);
             _updateRoute(position);
+            _centerMapOnCurrentLocation(); // Center map on current location
           }
         });
       });
@@ -92,7 +90,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _activityStarted = true;
       _startTime = DateTime.now();
       _route.clear();
-      _updateRoute(_currentPosition);
+      _updateRoute(_currentPosition!); // Safe to use ! here assuming _currentPosition is not null
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         setState(() {
           _elapsedSeconds++;
@@ -101,8 +99,12 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           }
         });
       });
+
+      // Center map on current location when activity starts
+      _centerMapOnCurrentLocation();
     });
   }
+
 
   void _finishActivity() async {
     setState(() {
@@ -127,12 +129,15 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
+
+      Navigator.of(context).pop(); // Example of navigating back
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
       );
     }
   }
+
 
 
   void _updateActivityStats(Position position) {
@@ -144,7 +149,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         position.longitude,
       );
       setState(() {
-        _totalDistance += distanceInMeters / 1000; // km
+        _totalDistance += distanceInMeters / 1000; // Convert to kilometers
       });
     }
   }
@@ -152,19 +157,19 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   void _updateRoute(Position position) {
     setState(() {
       _route.add(LatLng(position.latitude, position.longitude));
-      _polylines.add(Polyline(
-        polylineId: PolylineId('route'),
-        visible: true,
-        points: _route,
-        width: 4,
-        color: Colors.blue,
-      ));
+      _polylines = {
+        Polyline(
+          polylineId: PolylineId('route'),
+          points: _route,
+          color: Colors.blue,
+          width: 5,
+        ),
+      };
     });
   }
 
   Future<void> _fetchWeatherData() async {
-    // Implement weather data fetching logic using the current location
-    // Example: OpenWeatherMap API call
+    // Fetch weather data asynchronously
   }
 
   @override
@@ -176,42 +181,87 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       ),
       body: Column(
         children: [
-          WeatherWidget(), // Hava durumu widget'ı
           Expanded(
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _route.isEmpty ? LatLng(0, 0) : _route.first,
-                zoom: 15,
-              ),
-              myLocationEnabled: true,
-              polylines: _polylines,
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
-              },
+            child: Stack(
+              children: [
+                _buildMap(),
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: FloatingActionButton(
+                    onPressed: _centerMapOnCurrentLocation,
+                    child: Icon(Icons.my_location),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
-          Text(
-            'Toplam Mesafe: ${_totalDistance.toStringAsFixed(2)} km',
-            style: TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Geçen Süre: ${_elapsedSeconds} saniye',
-            style: TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Ortalama Hız: ${_averageSpeed.toStringAsFixed(2)} km/s',
-            style: TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 20),
+          _buildActivityStats(),
+          WeatherWidget(), // Weather widget
+          _buildActivityButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMap() {
+    return GoogleMap(
+      initialCameraPosition: _currentPosition != null
+          ? CameraPosition(
+        target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+        zoom: 15,
+      )
+          : CameraPosition(
+        target: LatLng(0, 0),
+        zoom: 15,
+      ),
+      myLocationEnabled: true, // Enable user location tracking
+      polylines: _polylines,
+      onMapCreated: (GoogleMapController controller) {
+        _mapController = controller;
+      },
+    );
+  }
+
+  void _centerMapOnCurrentLocation() {
+    if (_currentPosition != null && _mapController != null) {
+      _mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          15,
+        ),
+      );
+    }
+  }
+
+  Widget _buildActivityStats() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Text('Toplam Mesafe: ${_totalDistance.toStringAsFixed(2)} km'),
+          Text('Geçen Süre: ${_elapsedSeconds} saniye'),
+          Text('Ortalama Hız: ${_averageSpeed.toStringAsFixed(2)} km/s'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           ElevatedButton(
-            onPressed: _activityStarted ? _finishActivity : _startActivity,
-            child: Text(
-                _activityStarted ? 'Aktiviteyi Bitir' : 'Aktiviteyi Başlat'),
+            onPressed: _activityStarted ? null : _startActivity,
+            child: const Text('Başlat'),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(width: 20),
+          ElevatedButton(
+            onPressed: _activityStarted ? _finishActivity : null,
+            child: const Text('Bitir'),
+          ),
         ],
       ),
     );

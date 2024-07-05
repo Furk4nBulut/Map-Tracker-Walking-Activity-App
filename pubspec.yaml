@@ -62,7 +62,7 @@ dependencies:
   # Database
   sqflite:
   path:
-  google_maps_flutter: ^2.7.0
+  google_maps_flutter:
 
 
 dev_dependencies:
