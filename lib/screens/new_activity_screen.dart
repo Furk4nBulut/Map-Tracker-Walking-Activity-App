@@ -124,19 +124,21 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         elapsedTime: _elapsedSeconds,
         startPosition: startPosition,
         endPosition: endPosition,
+        route: _route, // Rotayı Firestore'a kaydetmek için bu listeyi geçirin
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
 
-      Navigator.of(context).pop(); // Example of navigating back
+      Navigator.of(context).pop(); // Örnek olarak geri gitmek için
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
       );
     }
   }
+
 
 
 

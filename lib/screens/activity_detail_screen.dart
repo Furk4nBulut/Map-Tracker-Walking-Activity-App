@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
@@ -35,7 +35,7 @@ class ActivityDetailScreen extends StatelessWidget {
             .collection('activities')
             .doc(activityId)
             .get(),
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
           }
@@ -48,26 +48,32 @@ class ActivityDetailScreen extends StatelessWidget {
             return Center(child: Text('Aktivite bulunamadı.'));
           }
 
-          var activityData = snapshot.data!.data() as Map<String, dynamic>;
-
-          Timestamp startTimeStamp = activityData['startTime'];
+          // Aktivite verilerini al
+          Map<String, dynamic> data = snapshot.data!.data()!;
+          Timestamp startTimeStamp = data['startTime'];
           DateTime startTime = startTimeStamp.toDate();
-          double totalDistance = activityData['totalDistance'] ?? 0.0;
-          int elapsedTime = activityData['elapsedTime'] ?? 0;
-          List<dynamic> routeCoordinates = activityData['route'] ?? [];
+          Timestamp endTimeStamp = data['endTime'];
+          DateTime? endTime = endTimeStamp != null ? endTimeStamp.toDate() : null;
+          double totalDistance = data['totalDistance'] ?? 0.0;
 
-          List<LatLng> route = routeCoordinates.map((coord) {
-            return LatLng(coord['latitude'], coord['longitude']);
-          }).toList();
+          // Route verisini güvenli bir şekilde al
+          List<GeoPoint>? routeGeoPoints = data['route'] != null
+              ? List<GeoPoint>.from(data['route'])
+              : null;
+          List<LatLng> route = routeGeoPoints?.map((geoPoint) => LatLng(geoPoint.latitude, geoPoint.longitude)).toList() ?? [];
 
-          Set<Polyline> _polylines = {
-            Polyline(
-              polylineId: PolylineId('route'),
-              color: Colors.blue,
-              width: 5,
-              points: route,
-            ),
-          };
+          // Harita üzerinde polylines oluştur
+          Set<Polyline> polylines = {};
+          if (route.isNotEmpty) {
+            polylines.add(
+              Polyline(
+                polylineId: PolylineId('route_$activityId'),
+                points: route,
+                color: Colors.blue,
+                width: 5,
+              ),
+            );
+          }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -75,20 +81,21 @@ class ActivityDetailScreen extends StatelessWidget {
               Expanded(
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(
-                    target: route.isNotEmpty ? route.first : LatLng(0, 0),
+                    target: route.isNotEmpty ? route.first : LatLng(0, 0), // Default location if route is empty
                     zoom: 15,
                   ),
-                  polylines: _polylines,
+                  myLocationEnabled: false,
+                  polylines: polylines,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Başlangıç Zamanı: ${startTime.toString()}'),
+                    Text('Başlangıç Tarihi: ${startTime.toString()}'),
+                    if (endTime != null) Text('Bitiş Tarihi: ${endTime.toString()}'),
                     Text('Toplam Mesafe: ${totalDistance.toStringAsFixed(2)} km'),
-                    Text('Geçen Süre: ${Duration(seconds: elapsedTime).toString()}'),
                   ],
                 ),
               ),
