@@ -221,7 +221,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     );
   }
 
-
   void _centerMapOnCurrentLocation() {
     if (_currentPosition != null && _mapController != null) {
       _mapController.animateCamera(
@@ -235,13 +234,13 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
   Widget _buildActivityStats() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(2.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildStatCard('Mesafe', '${_totalDistance.toStringAsFixed(2)} km', Icons.directions_walk, Colors.green),
-          _buildStatCard('Süre', '$_elapsedSeconds saniye', Icons.timer, Colors.blue),
-          _buildStatCard('Hız', '${_averageSpeed.toStringAsFixed(2)} km/s', Icons.speed, Colors.deepOrange),
+          Expanded(child: _buildStatCard('Mesafe', '${_totalDistance.toStringAsFixed(2)} km', Icons.directions_walk, Colors.green)),
+          Expanded(child: _buildStatCard('Süre', '$_elapsedSeconds saniye', Icons.timer, Colors.blue)),
+          Expanded(child: _buildStatCard('Hız', '${_averageSpeed.toStringAsFixed(2)} km/s', Icons.speed, Colors.deepOrange)),
         ],
       ),
     );
@@ -249,14 +248,17 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, size: 30, color: color),
-            SizedBox(height: 8),
+            SizedBox(height: 10),
             Text(
               title,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
@@ -285,7 +287,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: Colors.green,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: TextStyle(fontSize: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -296,10 +298,8 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             label: const Text('Bitir'),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
-
               backgroundColor: Colors.red,
-
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: TextStyle(fontSize: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

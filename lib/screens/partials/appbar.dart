@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/screens/homepage.dart';
+import 'package:map_tracker/utils/constants.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool automaticallyImplyLeading;
@@ -31,7 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
 
       ),
-      backgroundColor: Colors.blue,
+      backgroundColor: basarsoft_color,
 
 
 

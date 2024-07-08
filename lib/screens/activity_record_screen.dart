@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:map_tracker/utils/constants.dart';
 import 'activity_detail_screen.dart';
 import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
 
@@ -69,7 +70,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                   contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                   title: Row(
                     children: [
-                      Icon(Icons.calendar_today, color: Colors.blue),
+                      Icon(Icons.calendar_today, color: Color(0xFF02205C)),
                       SizedBox(width: 10),
                       Text(
                         'Tarih: $formattedDate',
@@ -113,7 +114,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue, size: 20.0, semanticLabel: 'Detaylar',),
+                  trailing: Icon(Icons.arrow_forward_ios, color: basarsoft_color, size: 20.0, semanticLabel: 'Detaylar',),
                   onTap: () {
                     Navigator.push(
                       context,

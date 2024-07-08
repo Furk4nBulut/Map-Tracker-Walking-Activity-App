@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/screens/partials/appbar.dart'; // Import the BottomNavBar widget
+import 'package:map_tracker/utils/constants.dart';
 
 
 class ProfilePage extends StatelessWidget {
@@ -52,7 +53,7 @@ class ProfilePage extends StatelessWidget {
                 },
                 child: const Text('Çıkış Yap', style: TextStyle(fontSize: 18, color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: basarsoft_color,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),

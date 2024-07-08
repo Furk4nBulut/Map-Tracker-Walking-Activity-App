@@ -180,7 +180,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
       margin: const EdgeInsets.all(12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.blue,
+        color: basarsoft_color_light,
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).colorScheme.shadow.withOpacity(0.6),

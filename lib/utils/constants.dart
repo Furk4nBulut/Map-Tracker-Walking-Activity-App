@@ -7,3 +7,7 @@ const kSecondaryColor = Color(0xFF265DAB);
 
 
 const OPENWEATHER_API_KEY = 'd6143ca52fdfb839fb639b667daea1f0';
+
+
+const basarsoft_color = Color(0xFF02205C);
+const basarsoft_color_light = Color(0xFF00A5FF);
