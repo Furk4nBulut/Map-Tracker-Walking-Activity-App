@@ -19,12 +19,12 @@ class BottomNavBar extends StatelessWidget {
           label: 'Ana Sayfa',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.plus_one),
+          icon: Icon(Icons.add_circle_outline),
           label: 'Aktivite Ekle',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.history),
-          label: 'Aktivite Geçmişi',
+          label: 'Geçmiş',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
@@ -32,8 +32,7 @@ class BottomNavBar extends StatelessWidget {
         ),
       ],
       currentIndex: selectedIndex,
-      selectedItemColor: Colors.amber[800],
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: Colors.blue,
       onTap: onItemTapped,
       elevation: 8,
       type: BottomNavigationBarType.fixed,

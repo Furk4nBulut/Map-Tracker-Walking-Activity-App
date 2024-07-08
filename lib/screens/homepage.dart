@@ -20,16 +20,18 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) {
     if (index == 1) {
-      // Navigate to NewActivityScreen when the "Add Activity" tab is tapped
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => NewActivityScreen()),
-      ).then((_) {
-        // Return to the previous selected index when back from NewActivityScreen
-        setState(() {
-          _selectedIndex = 0;
+      // If already on NewActivityScreen, don't navigate again
+      if (_selectedIndex != 1) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => NewActivityScreen()),
+        ).then((_) {
+          // Reset _selectedIndex to 0 when returning from NewActivityScreen
+          setState(() {
+            _selectedIndex = 0;
+          });
         });
-      });
+      }
     } else {
       setState(() {
         _selectedIndex = index;
@@ -68,11 +70,12 @@ class _HomePageState extends State<HomePage> {
           ],
         )
             : null,
-        body: IndexedStack(
+        body:
+        IndexedStack(
           index: _selectedIndex,
           children: [
             _buildHomeScreen(user),
-            Container(), // This will be replaced with NewActivityScreen which is a separate page
+            const NewActivityScreen(),
             ActivityHistoryScreen(),
             ProfilePage(user: user!),
           ],
