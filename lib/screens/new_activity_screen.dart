@@ -49,7 +49,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           if (_activityStarted) {
             _updateActivityStats(position);
             _updateRoute(position);
-            _centerMapOnCurrentLocation(); // Center map on current location
+            _centerMapOnCurrentLocation();
           }
         });
       });
@@ -90,7 +90,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _activityStarted = true;
       _startTime = DateTime.now();
       _route.clear();
-      _updateRoute(_currentPosition!); // Safe to use ! here assuming _currentPosition is not null
+      _updateRoute(_currentPosition!);
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         setState(() {
           _elapsedSeconds++;
@@ -100,11 +100,9 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         });
       });
 
-      // Center map on current location when activity starts
       _centerMapOnCurrentLocation();
     });
   }
-
 
   void _finishActivity() async {
     setState(() {
@@ -125,22 +123,20 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         startPosition: startPosition,
         endPosition: endPosition,
         route: _route, // Rotayı Firestore'a kaydetmek için bu listeyi geçirin
+        averageSpeed: _averageSpeed,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
 
-      Navigator.of(context).pop(); // Örnek olarak geri gitmek için
+      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
       );
     }
   }
-
-
-
 
   void _updateActivityStats(Position position) {
     if (_route.isNotEmpty) {
@@ -183,6 +179,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       ),
       body: Column(
         children: [
+          WeatherWidget(), // Weather widget
           Expanded(
             child: Stack(
               children: [
@@ -199,12 +196,12 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             ),
           ),
           _buildActivityStats(),
-          WeatherWidget(), // Weather widget
           _buildActivityButtons(),
         ],
       ),
     );
   }
+
 
   Widget _buildMap() {
     return GoogleMap(
@@ -217,7 +214,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         target: LatLng(0, 0),
         zoom: 15,
       ),
-      myLocationEnabled: true, // Enable user location tracking
+      myLocationEnabled: true,
       polylines: _polylines,
       onMapCreated: (GoogleMapController controller) {
         _mapController = controller;
@@ -239,30 +236,69 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   Widget _buildActivityStats() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text('Toplam Mesafe: ${_totalDistance.toStringAsFixed(2)} km'),
-          Text('Geçen Süre: ${_elapsedSeconds} saniye'),
-          Text('Ortalama Hız: ${_averageSpeed.toStringAsFixed(2)} km/s'),
+          _buildStatCard('Mesafe', '${_totalDistance.toStringAsFixed(2)} km', Icons.directions_walk, Colors.green),
+          _buildStatCard('Süre', '$_elapsedSeconds saniye', Icons.timer, Colors.blue),
+          _buildStatCard('Hız', '${_averageSpeed.toStringAsFixed(2)} km/s', Icons.speed, Colors.deepOrange),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Icon(icon, size: 30, color: color),
+            SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
+            ),
+            SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildActivityButtons() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: _activityStarted ? null : _startActivity,
-            child: const Text('Başlat'),
+            icon: Icon(Icons.play_arrow),
+            label: const Text('Başlat'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              textStyle: TextStyle(fontSize: 18),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
-          const SizedBox(width: 20),
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: _activityStarted ? _finishActivity : null,
-            child: const Text('Bitir'),
+            icon: Icon(Icons.stop),
+            label: const Text('Bitir'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              textStyle: TextStyle(fontSize: 18),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
         ],
       ),

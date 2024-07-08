@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'activity_detail_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'activity_detail_screen.dart';
 
 class ActivityHistoryScreen extends StatelessWidget {
   @override
@@ -9,7 +10,7 @@ class ActivityHistoryScreen extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      // If no user is logged in, handle appropriately (e.g., show login screen)
+      // Handle appropriately if the user is not logged in (e.g., show login screen)
       return Scaffold(
         appBar: AppBar(
           title: Text('Aktivite Geçmişi'),
@@ -29,6 +30,7 @@ class ActivityHistoryScreen extends StatelessWidget {
             .collection('user')
             .doc(user.uid)
             .collection('activities')
+            .orderBy('startTime', descending: true) // Sort by startTime descending
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.hasError) {
@@ -44,28 +46,91 @@ class ActivityHistoryScreen extends StatelessWidget {
           }
 
           return ListView(
+            padding: EdgeInsets.all(10.0),
             children: snapshot.data!.docs.map((doc) {
               if (!doc.exists || !doc.data().containsKey('startTime')) {
-                return SizedBox(); // Belge yoksa veya startTime alanı yoksa boş bir widget döndür
+                return SizedBox(); // Return an empty widget if document doesn't exist or startTime field is missing
               }
 
               Timestamp startTimeStamp = doc['startTime'];
               DateTime startTime = startTimeStamp.toDate();
               double totalDistance = doc['totalDistance'] ?? 0.0;
               bool isCompleted = doc['endTime'] != null;
+              // averageSpeed = _totalDistance / (_elapsedSeconds / 3600)
+              num averageSpeed =  totalDistance / (doc['elapsedTime'] / 3600);
+              // Format date
+              String formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(startTime);
 
-              return ListTile(
-                title: Text('Tarih: ${startTime.toString()}'),
-                subtitle: Text('Mesafe: ${totalDistance.toStringAsFixed(2)} km'),
-                trailing: Icon(Icons.arrow_forward),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ActivityDetailScreen(activityId: doc.id),
+              return Card(
+                elevation: 5,
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                  title: Row(
+                    children: [
+                      Icon(Icons.calendar_today, color: Colors.blue),
+                      SizedBox(width: 5),
+                      Text(
+                        'Tarih: $formattedDate',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Icon(Icons.directions_walk, color: Colors.blue),
+                          SizedBox(width: 5),
+                          Text(
+                            'Mesafe: ${totalDistance.toStringAsFixed(2)} km',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.speed, color: Colors.deepOrange),
+                          SizedBox(width: 5),
+                          Text(
+                            'Hız: ${averageSpeed.toStringAsFixed(2)} km/s',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        isCompleted ? 'Durum: Tamamlandı' : 'Durum: Devam Ediyor',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: isCompleted ? Colors.green : Colors.orange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  trailing: Container(
+                    padding: EdgeInsets.all(6.0),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
+                    child: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ActivityDetailScreen(activityId: doc.id),
+                      ),
+                    );
+                  },
+                ),
               );
             }).toList(),
           );

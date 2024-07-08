@@ -13,7 +13,7 @@ class ActivityDetailScreen extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      // If no user is logged in, handle appropriately (e.g., show login screen)
+      // Eğer kullanıcı giriş yapmamışsa, uygun şekilde yönetin (örneğin, giriş ekranını gösterin)
       return Scaffold(
         appBar: AppBar(
           title: Text('Aktivite Detayı'),
@@ -90,13 +90,40 @@ class ActivityDetailScreen extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Başlangıç Tarihi: ${startTime.toString()}'),
-                    if (endTime != null) Text('Bitiş Tarihi: ${endTime.toString()}'),
-                    Text('Toplam Mesafe: ${totalDistance.toStringAsFixed(2)} km'),
-                  ],
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.timer, color: Colors.blue),
+                          title: Text('Başlangıç Tarihi', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          subtitle: Text('${startTime.toLocal()}'),
+                        ),
+                        if (endTime != null)
+                          ListTile(
+                            leading: Icon(Icons.timer_off, color: Colors.red),
+                            title: Text('Bitiş Tarihi', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                            subtitle: Text('${endTime.toLocal()}'),
+                          ),
+                        ListTile(
+                          leading: Icon(Icons.directions_walk, color: Colors.green),
+                          title: Text('Toplam Mesafe', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          subtitle: Text('${totalDistance.toStringAsFixed(2)} km'),
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.speed, color: Colors.deepOrange),
+                          title: Text('Ortalama Hız', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          subtitle: Text('${data['averageSpeed']} km/s'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
