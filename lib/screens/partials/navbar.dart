@@ -34,7 +34,10 @@ class BottomNavBar extends StatelessWidget {
                       backgroundColor: Colors.blue,
                       child: Icon(Icons.fitness_center, color: Colors.white),
                       elevation: 0.1,
-                      onPressed: () {},
+                      onPressed: () {
+                        onItemTapped(1);
+
+                      },
                     ),
                   ),
                   Container(
