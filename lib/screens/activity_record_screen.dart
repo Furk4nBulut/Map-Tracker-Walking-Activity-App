@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'activity_detail_screen.dart';
+import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
 
 class ActivityHistoryScreen extends StatelessWidget {
   @override
@@ -12,9 +13,7 @@ class ActivityHistoryScreen extends StatelessWidget {
     if (user == null) {
       // Handle appropriately if the user is not logged in (e.g., show login screen)
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Aktivite Geçmişi'),
-        ),
+        appBar: CustomAppBar(title: "Aktivite Geçmişi", automaticallyImplyLeading: true),
         body: Center(
           child: Text('Kullanıcı girişi gereklidir.'),
         ),
@@ -22,9 +21,7 @@ class ActivityHistoryScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Aktivite Geçmişi'),
-      ),
+      appBar: CustomAppBar(title: "Aktivite Geçmişi", automaticallyImplyLeading: true),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('user')
@@ -56,12 +53,13 @@ class ActivityHistoryScreen extends StatelessWidget {
               DateTime startTime = startTimeStamp.toDate();
               double totalDistance = doc['totalDistance'] ?? 0.0;
               bool isCompleted = doc['endTime'] != null;
-              // averageSpeed = _totalDistance / (_elapsedSeconds / 3600)
-              num averageSpeed =  totalDistance / (doc['elapsedTime'] / 3600);
+              // Calculate average speed
+              num averageSpeed = totalDistance / (doc['elapsedTime'] / 3600);
               // Format date
               String formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(startTime);
 
               return Card(
+                color: Colors.white,
                 elevation: 5,
                 margin: EdgeInsets.symmetric(vertical: 8.0),
                 shape: RoundedRectangleBorder(
@@ -72,7 +70,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                   title: Row(
                     children: [
                       Icon(Icons.calendar_today, color: Colors.blue),
-                      SizedBox(width: 5),
+                      SizedBox(width: 10),
                       Text(
                         'Tarih: $formattedDate',
                         style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -82,28 +80,29 @@ class ActivityHistoryScreen extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 5),
+                      SizedBox(height: 8),
                       Row(
                         children: [
                           Icon(Icons.directions_walk, color: Colors.blue),
-                          SizedBox(width: 5),
+                          SizedBox(width: 10),
                           Text(
                             'Mesafe: ${totalDistance.toStringAsFixed(2)} km',
                             style: TextStyle(fontSize: 14.0),
                           ),
                         ],
                       ),
+                      SizedBox(height: 5),
                       Row(
                         children: [
                           Icon(Icons.speed, color: Colors.deepOrange),
-                          SizedBox(width: 5),
+                          SizedBox(width: 10),
                           Text(
-                            'Hız: ${averageSpeed.toStringAsFixed(2)} km/s',
+                            'Ortalama Hız: ${averageSpeed.toStringAsFixed(2)} km/s',
                             style: TextStyle(fontSize: 14.0),
                           ),
                         ],
                       ),
-                      SizedBox(height: 5),
+                      SizedBox(height: 8),
                       Text(
                         isCompleted ? 'Durum: Tamamlandı' : 'Durum: Devam Ediyor',
                         style: TextStyle(
@@ -114,14 +113,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  trailing: Container(
-                    padding: EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                  ),
+                  trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue, size: 20.0, semanticLabel: 'Detaylar',),
                   onTap: () {
                     Navigator.push(
                       context,

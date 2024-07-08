@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/services/activity_service.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:map_tracker/services/auth_service.dart';
+import 'package:map_tracker/screens/partials/navbar.dart';
 
 class NewActivityScreen extends StatefulWidget {
   const NewActivityScreen({Key? key}) : super(key: key);
@@ -170,31 +173,47 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     // Fetch weather data asynchronously
   }
 
+  Widget _buildMap() {
+    return Expanded(
+      child: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: _currentPosition != null
+                ? CameraPosition(
+              target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+              zoom: 15,
+            )
+                : CameraPosition(
+              target: LatLng(0, 0),
+              zoom: 15,
+            ),
+            myLocationEnabled: true,
+            polylines: _polylines,
+            onMapCreated: (GoogleMapController controller) {
+              _mapController = controller;
+            },
+          ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: _centerMapOnCurrentLocation,
+              child: Icon(Icons.my_location),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Yeni Aktivite'),
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: "Yeni Aktivite"),
       body: Column(
         children: [
           WeatherWidget(), // Weather widget
-          Expanded(
-            child: Stack(
-              children: [
-                _buildMap(),
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: FloatingActionButton(
-                    onPressed: _centerMapOnCurrentLocation,
-                    child: Icon(Icons.my_location),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildMap(), // Integrated into the column
           _buildActivityStats(),
           _buildActivityButtons(),
         ],
@@ -202,25 +221,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     );
   }
 
-
-  Widget _buildMap() {
-    return GoogleMap(
-      initialCameraPosition: _currentPosition != null
-          ? CameraPosition(
-        target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-        zoom: 15,
-      )
-          : CameraPosition(
-        target: LatLng(0, 0),
-        zoom: 15,
-      ),
-      myLocationEnabled: true,
-      polylines: _polylines,
-      onMapCreated: (GoogleMapController controller) {
-        _mapController = controller;
-      },
-    );
-  }
 
   void _centerMapOnCurrentLocation() {
     if (_currentPosition != null && _mapController != null) {
@@ -283,6 +283,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             icon: Icon(Icons.play_arrow),
             label: const Text('Başlat'),
             style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
               backgroundColor: Colors.green,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               textStyle: TextStyle(fontSize: 18),
@@ -294,7 +295,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             icon: Icon(Icons.stop),
             label: const Text('Bitir'),
             style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+
               backgroundColor: Colors.red,
+
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               textStyle: TextStyle(fontSize: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

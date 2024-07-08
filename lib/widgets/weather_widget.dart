@@ -114,110 +114,166 @@ class _WeatherWidgetState extends State<WeatherWidget> {
 
   @override
   Widget build(BuildContext context) {
+    return _isLoading
+        ? _buildLoadingWidget()
+        : _errorMessage != null
+        ? _buildErrorWidget()
+        : _buildWeatherWidget();
+  }
+
+  Widget _buildLoadingWidget() {
     return Center(
-      child: _buildWeatherWidget(),
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+      ),
     );
   }
 
-  Widget _buildWeatherWidget() {
-    if (_isLoading) {
-      return const CircularProgressIndicator();
-    }
-
-    if (_errorMessage != null) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(_errorMessage!),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _fetchUserLocation,
-            child: const Text('Tekrar Dene'),
-          ),
-        ],
-      );
-    }
-
+  Widget _buildErrorWidget() {
     return Container(
-      margin: const EdgeInsets.all(12.0),
-      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.redAccent.withOpacity(0.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
+            color: Colors.redAccent.withOpacity(0.4),
+            blurRadius: 6,
             offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            _errorMessage!,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.redAccent,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: _fetchUserLocation,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: const Text(
+              'Tekrar Dene',
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeatherWidget() {
+    return Container(
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withOpacity(0.6),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (_weather?.weatherIcon != null)
-                Image.network(
-                  "http://openweathermap.org/img/wn/${_weather!.weatherIcon}@2x.png",
-                  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                    print("Resim yüklenirken hata: $exception");
-                    return const Icon(Icons.error);
-                  },
-                )
-              else
-                const Icon(Icons.error),
-              const SizedBox(width: 10),
+              Row(
+                children: [
+                  if (_weather?.weatherIcon != null)
+                    Image.network(
+                      "http://openweathermap.org/img/wn/${_weather!.weatherIcon}@2x.png",
+                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                        print("Error loading image: $exception");
+                        return const Icon(Icons.error);
+                      },
+                      width: 50,
+                      height: 50,
+                    )
+                  else
+                    const Icon(Icons.error),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${_weather?.areaName ?? "Unknown"}, ${_weather?.country ?? "Unknown"}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "${_weather?.temperature?.celsius?.toInt() ?? "Unknown"}° ${_weather?.weatherDescription ?? "Unknown"}",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              IconButton(
+                onPressed: _fetchUserLocation,
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                tooltip: 'Refresh',
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            height: 1,
+            color: Colors.white.withOpacity(0.5),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${_weather?.areaName ?? "Bilinmeyen"}, ${_weather?.country ?? "Bilinmeyen"}",
+                    DateFormat("h:mm a").format(DateTime.now()),
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 5),
                   Text(
-                    "${_weather?.temperature?.celsius?.toInt() ?? "Bilinmeyen"}° ${_weather?.weatherDescription ?? "Bilinmeyen"}",
+                    DateFormat("EEEE, d MMMM y").format(DateTime.now()),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
+                      color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Container(
-            height: 1,
-            width: MediaQuery.of(context).size.width * 0.6,
-            color: Colors.grey.withOpacity(0.5),
-          ),
-          const SizedBox(height: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                DateFormat("h:mm a").format(DateTime.now()),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                DateFormat("EEEE, d MMMM y").format(DateTime.now()),
-                style: const TextStyle(
-                  fontSize: 14,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+              // Add more widgets here as needed
             ],
           ),
         ],
@@ -225,3 +281,4 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     );
   }
 }
+

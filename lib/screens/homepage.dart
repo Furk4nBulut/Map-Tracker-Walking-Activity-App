@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:map_tracker/screens/profile_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
 import 'package:map_tracker/screens/activity_record_screen.dart';
 import 'package:map_tracker/screens/partials/navbar.dart'; // Import the BottomNavBar widget
+import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,13 +20,11 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) {
     if (index == 1) {
-      // If already on NewActivityScreen, don't navigate again
       if (_selectedIndex != 1) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => NewActivityScreen()),
         ).then((_) {
-          // Reset _selectedIndex to 0 when returning from NewActivityScreen
           setState(() {
             _selectedIndex = 0;
           });
@@ -55,38 +53,26 @@ class _HomePageState extends State<HomePage> {
       },
       child: Scaffold(
         appBar: _selectedIndex == 0
-            ? AppBar(
-          title: const Text("Ana Sayfa"),
-          centerTitle: true,
+            ? CustomAppBar(
+          title: "Ana Sayfa",
           automaticallyImplyLeading: false,
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.exit_to_app),
-              onPressed: () async {
-                await AuthService().signOut();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         )
             : null,
-        body:
-        IndexedStack(
+        body: IndexedStack(
           index: _selectedIndex,
           children: [
             _buildHomeScreen(user),
-            const NewActivityScreen(),
+            NewActivityScreen(),
             ActivityHistoryScreen(),
             ProfilePage(user: user!),
           ],
         ),
-        bottomNavigationBar: SafeArea(
-          child: BottomNavBar(
-            selectedIndex: _selectedIndex,
-            onItemTapped: _onItemTapped,
-          ),
-        ),
         extendBody: true,
+        bottomNavigationBar: BottomNavBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
+
+        ),
       ),
     );
   }
@@ -137,8 +123,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildWeatherWidget() {
-    return Container(
-      margin: const EdgeInsets.all(4.0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: WeatherWidget(),
     );
   }

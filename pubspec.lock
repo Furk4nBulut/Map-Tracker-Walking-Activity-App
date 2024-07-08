@@ -448,6 +448,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.7.0"
+  go_router:
+    dependency: transitive
+    description:
+      name: go_router
+      sha256: cdae1b9c8bd7efadcef6112e81c903662ef2ce105cbd220a04bbb7c3425b5554
+      url: "https://pub.dev"
+    source: hosted
+    version: "14.2.0"
   google_fonts:
     dependency: "direct main"
     description:
@@ -680,6 +688,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: "623a88c9594aa774443aa3eb2d41807a48486b5613e67599fb4c41c0ad47c340"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   matcher:
     dependency: transitive
     description:
@@ -784,6 +800,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  persistent_bottom_nav_bar_v2:
+    dependency: "direct main"
+    description:
+      name: persistent_bottom_nav_bar_v2
+      sha256: f5cc01ed36d6f93ecb3b8b64eaaa5b41618c6ac75c54e8beb1d3486cfc6d8547
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.0"
   petitparser:
     dependency: transitive
     description:

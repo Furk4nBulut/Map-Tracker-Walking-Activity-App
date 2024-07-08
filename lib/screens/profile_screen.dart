@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/screens/homepage.dart';
+import 'package:map_tracker/screens/partials/appbar.dart'; // Import the BottomNavBar widget
+
 
 class ProfilePage extends StatelessWidget {
   final User user;
@@ -10,10 +12,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profil"),
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: "Profil", automaticallyImplyLeading: true),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -51,7 +50,14 @@ class ProfilePage extends StatelessWidget {
                     print("Error signing out: $e");
                   }
                 },
-                child: const Text("Çıkış Yap"),
+                child: const Text('Çıkış Yap', style: TextStyle(fontSize: 18, color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                )
               ),
             ],
           ),
