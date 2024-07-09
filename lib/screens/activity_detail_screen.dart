@@ -69,6 +69,27 @@ class ActivityDetailScreen extends StatelessWidget {
             );
           }
 
+          Set<Marker> markers = {};
+          // Adding start and end markers if route points are available
+          if (route.isNotEmpty) {
+            markers.add(
+              Marker(
+                markerId: MarkerId('start'),
+                position: route.first,
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                infoWindow: InfoWindow(title: 'Start'),
+              ),
+            );
+            markers.add(
+              Marker(
+                markerId: MarkerId('end'),
+                position: route.last,
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                infoWindow: InfoWindow(title: 'Finish'),
+              ),
+            );
+          }
+
           // Format dates
           String formattedStartTime = DateFormat('dd MMMM yyyy, HH:mm').format(startTime);
           String? formattedEndTime = endTime != null ? DateFormat('dd MMMM yyyy, HH:mm').format(endTime) : null;
@@ -84,6 +105,7 @@ class ActivityDetailScreen extends StatelessWidget {
                   ),
                   myLocationEnabled: false,
                   polylines: polylines,
+                  markers: markers,
                 ),
               ),
               SizedBox(height: 0), // Added spacing between map and details

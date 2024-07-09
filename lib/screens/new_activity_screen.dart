@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/services/activity_service.dart';
+import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
@@ -192,19 +193,38 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             onMapCreated: (GoogleMapController controller) {
               _mapController = controller;
             },
-          ),
-          Positioned(
-            top: 16,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: _centerMapOnCurrentLocation,
-              child: Icon(Icons.my_location),
-            ),
+            markers: _buildMarkers(), // Add markers for start and end points
           ),
         ],
       ),
     );
   }
+
+  Set<Marker> _buildMarkers() {
+    Set<Marker> markers = {};
+    if (_route.isNotEmpty) {
+      // Custom icons for start and end markers
+      markers.add(
+        Marker(
+          markerId: MarkerId('start'),
+          position: _route.first,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          infoWindow: InfoWindow(title: 'Start'),
+        ),
+      );
+      markers.add(
+        Marker(
+          markerId: MarkerId('end'),
+          position: _route.last,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          infoWindow: InfoWindow(title: 'Finish'),
+        ),
+      );
+    }
+    return markers;
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -234,45 +254,64 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
   Widget _buildActivityStats() {
     return Padding(
-      padding: const EdgeInsets.all(2.0),
+      padding: const EdgeInsets.only(top:6, bottom: 6, left: 8, right:8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(child: _buildStatCard('Mesafe', '${_totalDistance.toStringAsFixed(2)} km', Icons.directions_walk, Colors.green)),
-          Expanded(child: _buildStatCard('Süre', '$_elapsedSeconds saniye', Icons.timer, Colors.blue)),
-          Expanded(child: _buildStatCard('Hız', '${_averageSpeed.toStringAsFixed(2)} km/s', Icons.speed, Colors.deepOrange)),
+
+          _buildStatItem(
+            'Mesafe',
+            '${_totalDistance.toStringAsFixed(2)} km',
+            Icons.directions_walk,
+            Colors.green,
+          ),
+          _buildDivider(),
+          _buildStatItem(
+            'Süre',
+            '$_elapsedSeconds saniye',
+            Icons.timer,
+            Colors.blue,
+          ),
+          _buildDivider(),
+          _buildStatItem(
+            'Hız',
+            '${_averageSpeed.toStringAsFixed(2)} km/s',
+            Icons.speed,
+            Colors.deepOrange,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, size: 30, color: color),
-            SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
-            ),
-            SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
-          ],
+  Widget _buildStatItem(String title, String value, IconData icon, Color color) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 30, color: color),
+        SizedBox(height: 10),
+        Text(
+          title,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
         ),
-      ),
+        SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+        ),
+      ],
     );
   }
+
+  Widget _buildDivider() {
+    return Container(
+      height: 100,
+      width: 1,
+      color: basarsoft_color, // Adjust color to match your theme
+      margin: const EdgeInsets.symmetric(horizontal: 25), // Add some horizontal margin
+    );
+  }
+
 
   Widget _buildActivityButtons() {
     return Padding(
@@ -286,7 +325,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             label: const Text('Başlat'),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
-              backgroundColor: Colors.green,
+              backgroundColor: basarsoft_color,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: TextStyle(fontSize: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
