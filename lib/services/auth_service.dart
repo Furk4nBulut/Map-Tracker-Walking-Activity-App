@@ -59,6 +59,7 @@ class AuthService {
     await firebaseAuth.signOut();
     final navigator = Navigator.of(context);
       //home page back button direkt yönlednrme home page e
+    Navigator.of(context).pop();
       navigator.push(MaterialPageRoute(builder: (context) => WelcomeScreen(),));
 
   }

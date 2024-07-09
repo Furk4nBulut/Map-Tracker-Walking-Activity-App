@@ -50,6 +50,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: Colors.white,
         onPressed: () {
           //home page back button direkt yönlednrme home page e
+          Navigator.of(context).pop();
+
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
@@ -73,6 +75,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],),
           color: Colors.white,
           onPressed: () async {
+            Navigator.of(context).pop();
+
             await AuthService().signOut(context);
           },
         ),
