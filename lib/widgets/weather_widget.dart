@@ -177,12 +177,13 @@ class _WeatherWidgetState extends State<WeatherWidget> {
 
   Widget _buildWeatherWidget() {
     return Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.all(0),
+        padding: const EdgeInsets.all(10),
+
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
             colors: [basarsoft_color_light, basarsoft_color],
           ),
           boxShadow: [
@@ -192,7 +193,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
               offset: const Offset(0, 4),
             ),
           ],
-          borderRadius: BorderRadius.circular(12), // Optional: add border radius if needed
+          borderRadius: BorderRadius.circular(0), // Optional: add border radius if needed
         ),
     child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
