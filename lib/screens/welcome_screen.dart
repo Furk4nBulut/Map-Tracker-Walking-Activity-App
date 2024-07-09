@@ -5,7 +5,6 @@ import 'package:map_tracker/theme/theme.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/widgets/welcome_button.dart';
-
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
 
@@ -40,11 +39,25 @@ class WelcomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Add your map logo here
-                    Icon(
-                      Icons.map_outlined,
-                      size: 200.0,
-                      color: Colors.white,
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: basarsoft_color.withOpacity(0.3),
+                            spreadRadius: 10,
+                            blurRadius: 15,
+                            offset: Offset(0, 3), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.map_outlined,
+                        size: 200.0,
+                        color: Colors.white,
+                        semanticLabel: 'Map Tracker Logo',
+                      ),
                     ),
+
                     const SizedBox(height: 20.0), // Space between logo and text
                     RichText(
                       textAlign: TextAlign.center,
@@ -55,6 +68,14 @@ class WelcomeScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 50.0,
                               fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: basarsoft_color,
+                                  offset: Offset(2, 2),
+                                  blurRadius: 3,
+                                ),
+                              ],
                             ),
                           ),
                           TextSpan(
@@ -62,6 +83,14 @@ class WelcomeScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  color: basarsoft_color,
+                                  offset: Offset(2, 2),
+                                  blurRadius: 3,
+                                ),
+                              ],
                             ),
                           ),
                         ],
