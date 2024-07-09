@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:map_tracker/screens/homepage.dart';
+import 'package:map_tracker/screens/welcome_screen.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
@@ -54,8 +55,12 @@ class AuthService {
   }
 
 
-  Future<void> signOut() async {
+  Future<void> signOut(BuildContext context) async {
     await firebaseAuth.signOut();
+    final navigator = Navigator.of(context);
+      //home page back button direkt yönlednrme home page e
+      navigator.push(MaterialPageRoute(builder: (context) => WelcomeScreen(),));
+
   }
 
   Future<void> _registerUser({required String name,required String surname, required String email, required String password}) async {
