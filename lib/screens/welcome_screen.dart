@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:map_tracker/screens/signin_screen.dart';
 import 'package:map_tracker/screens/signup_screen.dart';
 import 'package:map_tracker/theme/theme.dart';
+import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/widgets/welcome_button.dart';
 
@@ -35,25 +36,38 @@ class WelcomeScreen extends StatelessWidget {
                 horizontal: 40.0,
               ),
               child: Center(
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Map Tracker\n',
-                        style: TextStyle(
-                          fontSize: 45.0,
-                          fontWeight: FontWeight.w600,
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Add your map logo here
+                    Icon(
+                      Icons.map_outlined,
+                      size: 200.0,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 20.0), // Space between logo and text
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: const TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Map Tracker\n',
+                            style: TextStyle(
+                              fontSize: 50.0,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '\nYürüyüş Aktivitesi Asistanı',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                      TextSpan(
-                        text: '\nYürüyüş Aktivitesi Asistanı',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -77,7 +91,7 @@ class WelcomeScreen extends StatelessWidget {
                       buttonText: 'Kayıt Ol',
                       onTap: const SignUpScreen(),
                       color: Colors.white,
-                      textColor: lightColorScheme.primary,
+                      textColor: basarsoft_color,
                     ),
                   ),
                 ],

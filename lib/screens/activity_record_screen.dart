@@ -84,10 +84,21 @@ class ActivityHistoryScreen extends StatelessWidget {
                       SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.directions_walk, color: Colors.blue),
+                          Icon(Icons.directions_walk, color: Colors.green),
                           SizedBox(width: 10),
                           Text(
                             'Mesafe: ${totalDistance.toStringAsFixed(2)} km',
+                            style: TextStyle(fontSize: 14.0),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Icon(Icons.timer_outlined, color: Colors.blue),
+                          SizedBox(width: 10),
+                          Text(
+                            'Süre: ${doc['elapsedTime']} saniye',
                             style: TextStyle(fontSize: 14.0),
                           ),
                         ],
