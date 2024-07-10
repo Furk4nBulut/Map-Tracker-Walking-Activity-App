@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:map_tracker/utils/constants.dart';
+
 class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTapped;
@@ -12,42 +13,53 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: 'Ana Sayfa',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.add_circle_outline),
-          label: 'Aktivite Ekle',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.history),
-          label: 'Geçmiş',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: 'Profil',
-        ),
+    return BottomAppBar(
+      color: basarsoft_color,
+      shape: CircularNotchedRectangle(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          _buildAnimatedIconButton(Icons.home_outlined, 0),
+          _buildAnimatedIconButton(Icons.add, 1),
+          FloatingActionButton(
+            backgroundColor: basarsoft_color_light,
+            onPressed: () => onItemTapped(1),
+            child: Icon(
+              Icons.add_outlined,
+              color: Colors.white,
+              size: 35,
+              shadows: [
+                BoxShadow(
+                  color: basarsoft_color,
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: Offset(0, 0),
+                ),
+              ],
+            ),
+          ),
+          _buildAnimatedIconButton(Icons.history_outlined, 2),
+          _buildAnimatedIconButton(Icons.person_outline, 3),
         ],
-    currentIndex: selectedIndex,
-    selectedItemColor: Colors.white,
-    unselectedItemColor: Colors.white.withOpacity(0.7),
-    onTap: onItemTapped,
-      // 2, 32, 92 rgb color
-      backgroundColor: basarsoft_color,
-    elevation: 0,
-    type: BottomNavigationBarType.fixed,
-    selectedLabelStyle: TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 14,
-    ),
-    unselectedLabelStyle: TextStyle(
-    fontWeight: FontWeight.normal,
-    fontSize: 12,
-    ),
-    iconSize: 28,
+      ),
+    );
+  }
+
+  Widget _buildAnimatedIconButton(IconData icon, int index) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 10),
+      padding: EdgeInsets.all(0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: selectedIndex == index ? basarsoft_color_light.withOpacity(0.1) : Colors.transparent,
+      ),
+      child: IconButton(
+        icon: Icon(
+          icon,
+          color: selectedIndex == index ? Colors.white : Colors.white,
+        ),
+        onPressed: () => onItemTapped(index),
+      ),
     );
   }
 }
