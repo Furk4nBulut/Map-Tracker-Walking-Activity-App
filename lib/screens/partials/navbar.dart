@@ -20,10 +20,11 @@ class BottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           _buildAnimatedIconButton(Icons.home_outlined, 0),
-          _buildAnimatedIconButton(Icons.add, 1),
+          _buildAnimatedIconButton(Icons.bar_chart_outlined, 1),
+
           FloatingActionButton(
             backgroundColor: basarsoft_color_light,
-            onPressed: () => onItemTapped(1),
+            onPressed: () => onItemTapped(2),
             child: Icon(
               Icons.add_outlined,
               color: Colors.white,
@@ -38,8 +39,8 @@ class BottomNavBar extends StatelessWidget {
               ],
             ),
           ),
-          _buildAnimatedIconButton(Icons.history_outlined, 2),
-          _buildAnimatedIconButton(Icons.person_outline, 3),
+          _buildAnimatedIconButton(Icons.history_outlined, 3),
+          _buildAnimatedIconButton(Icons.person_outline, 4),
         ],
       ),
     );

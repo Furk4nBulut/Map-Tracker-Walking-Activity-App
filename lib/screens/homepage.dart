@@ -6,6 +6,7 @@ import 'package:map_tracker/screens/new_activity_screen.dart';
 import 'package:map_tracker/screens/activity_record_screen.dart';
 import 'package:map_tracker/screens/partials/navbar.dart'; // Import the BottomNavBar widget
 import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
+import 'package:map_tracker/screens/stat_page.dart'; // Import the ActivityHistoryScreen widget
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,8 +20,8 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    if (index == 1) {
-      if (_selectedIndex != 1) {
+    if (index == 2) {
+      if (_selectedIndex != 2) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => NewActivityScreen()),
@@ -62,7 +63,10 @@ class _HomePageState extends State<HomePage> {
           index: _selectedIndex,
           children: [
             _buildHomeScreen(user),
+            StatisticPage(),
+
             NewActivityScreen(),
+
             ActivityHistoryScreen(),
             ProfilePage(user: user!),
           ],
