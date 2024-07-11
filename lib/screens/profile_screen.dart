@@ -81,7 +81,7 @@ class ProfilePage extends StatelessWidget {
                     tag: 'userProfileImage',
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: basarsoft_color,
                         borderRadius: BorderRadius.circular(50),
                       ),
                       padding: EdgeInsets.all(2),
@@ -132,21 +132,37 @@ class ProfilePage extends StatelessWidget {
                               Icon(
                                 Icons.insert_chart_outlined,
                                 size: 28,
+                                semanticLabel: 'İstatistikler',
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
                               ),
                               SizedBox(width: 8),
                               Text(
                                 "İstatistikler",
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 25,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1.2,
                                   fontFamily: 'OpenSans',
+                                  color: Colors.black87,
                                 ),
                               ),
                               SizedBox(width: 8),
                               Icon(
                                 Icons.insert_chart_outlined,
                                 size: 28,
+                                semanticLabel: 'İstatistikler',
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 2,
+                                    offset: Offset(1, 1),
+                                  ),],
                               ),
                             ],
                           ),
