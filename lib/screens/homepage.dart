@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
           index: _selectedIndex,
           children: [
             _buildHomeScreen(user),
-            StatisticPage(),
+            StatisticPage(user: user!),
 
             NewActivityScreen(),
 

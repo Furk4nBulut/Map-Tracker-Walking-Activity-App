@@ -22,6 +22,7 @@ class ProfilePage extends StatelessWidget {
     double totalDistance = 0.0;
     Duration totalDuration = Duration();
     int activityCount = activitiesSnapshot.size;
+    double averageSpeed = 0.0;
 
     for (var doc in activitiesSnapshot.docs) {
       totalDistance += doc['totalDistance'] ?? 0.0;
@@ -30,8 +31,13 @@ class ProfilePage extends StatelessWidget {
       totalDuration += endTime.toDate().difference(startTime.toDate());
     }
 
-    double averageDistance = totalDistance / activityCount;
-    Duration averageDuration = totalDuration ~/ activityCount;
+    double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
+    Duration averageDuration = activityCount > 0 ? totalDuration ~/ activityCount : Duration();
+
+    // Calculate average speed
+    if (totalDuration.inHours > 0) {
+      averageSpeed = totalDistance / totalDuration.inHours;
+    }
 
     return {
       'totalDistance': totalDistance,
@@ -39,6 +45,7 @@ class ProfilePage extends StatelessWidget {
       'averageDistance': averageDistance,
       'averageDuration': averageDuration,
       'activityCount': activityCount,
+      'averageSpeed': averageSpeed,
     };
   }
 
@@ -66,10 +73,15 @@ class ProfilePage extends StatelessWidget {
           double totalDistance = stats['totalDistance'];
           Duration totalDuration = stats['totalDuration'];
           double averageDistance = stats['averageDistance'];
+          Duration averageDuration = stats['averageDuration'];
           int activityCount = stats['activityCount'];
+          double averageSpeed = stats['averageSpeed'];
 
           String formattedTotalDuration =
-              "${totalDuration.inHours} saat ${totalDuration.inMinutes.remainder(60)} dakika";
+              "${totalDuration.inHours} saat ${totalDuration.inMinutes.remainder(60)} dk ${totalDuration.inSeconds.remainder(60) } sn";
+
+          String formattedAverageDuration =
+              "${averageDuration.inHours} saat ${averageDuration.inMinutes.remainder(60)} dk ${averageDuration.inSeconds.remainder(60) } sn    ";
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(16.0),
@@ -116,7 +128,7 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: 8.0),
                   Card(
                     color: Colors.white,
-                    elevation: 6, // Adjusted elevation value
+                    elevation: 6,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(0),
                     ),
@@ -162,7 +174,8 @@ class ProfilePage extends StatelessWidget {
                                     color: Colors.black.withOpacity(0.3),
                                     blurRadius: 2,
                                     offset: Offset(1, 1),
-                                  ),],
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -172,6 +185,7 @@ class ProfilePage extends StatelessWidget {
                             endIndent: 20,
                             color: Colors.black,
                           ),
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -181,14 +195,40 @@ class ProfilePage extends StatelessWidget {
                                   'Toplam Mesafe',
                                   '${totalDistance.toStringAsFixed(2)} km',
                                   Colors.green,
+                                  MainAxisAlignment.center,
                                 ),
                               ),
                               Expanded(
                                 child: _buildStatItem(
-                                  Icons.nordic_walking_outlined,
+                                  Icons.add_road,
                                   'Ortalama Mesafe',
                                   '${averageDistance.toStringAsFixed(2)} km',
                                   Colors.green,
+                                  MainAxisAlignment.center,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: _buildStatItem(
+                                  Icons.timer_outlined,
+                                  'Toplam Süre',
+                                  formattedTotalDuration,
+                                  basarsoft_color_light,
+                                  MainAxisAlignment.center,
+                                ),
+                              ),
+                              Expanded(
+                                child: _buildStatItem(
+                                  Icons.timelapse_rounded,
+                                  'Ortalama Süre',
+                                  formattedAverageDuration,
+                                  basarsoft_color_light,
+                                  MainAxisAlignment.center,
                                 ),
                               ),
                             ],
@@ -199,22 +239,11 @@ class ProfilePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               _buildStatItem(
-                                Icons.timer,
-                                'Toplam Süre',
-                                formattedTotalDuration,
-                                Colors.blue,
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _buildStatItem(
                                 Icons.fitness_center,
                                 'Aktivite Sayısı',
                                 '$activityCount',
-                                Colors.black,
+                                Colors.white,
+                                MainAxisAlignment.center,
                               ),
                             ],
                           ),
@@ -266,13 +295,21 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildStatItem(
-      IconData icon, String title, String subtitle, Color iconColor) {
+      IconData icon, String title, String subtitle, Color iconColor, MainAxisAlignment alignment) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: iconColor, size: 25),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: basarsoft_color,
+              border: Border.all(color: basarsoft_color_light, width: 3),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Icon(icon, color: iconColor, size: 25),
+          ),
           SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,7 +322,7 @@ class ProfilePage extends StatelessWidget {
                   color: Colors.black87,
                 ),
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 4),
               Text(
                 subtitle,
                 style: TextStyle(
@@ -310,7 +347,7 @@ class ProfilePage extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: basarsoft_color, // Custom color from your constants
+          backgroundColor: basarsoft_color,
           padding: EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0),
@@ -329,7 +366,7 @@ class ProfilePage extends StatelessWidget {
             color: Colors.white,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.3), // Adjust shadow color and opacity
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 2,
                 offset: Offset(1, 1),
               ),
@@ -340,4 +377,3 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-
