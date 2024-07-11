@@ -84,7 +84,7 @@ class ProfilePage extends StatelessWidget {
               "${averageDuration.inHours} saat ${averageDuration.inMinutes.remainder(60)} dk ${averageDuration.inSeconds.remainder(60) } sn    ";
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(8.0),
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -96,7 +96,7 @@ class ProfilePage extends StatelessWidget {
                         color: basarsoft_color,
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(6),
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage: user.photoURL != null
@@ -128,64 +128,16 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: 8.0),
                   Card(
                     color: Colors.white,
-                    elevation: 6,
+                    elevation: 5,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(0),
                     ),
                     shadowColor: basarsoft_color,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
+                      padding: const EdgeInsets.only(top: 10.0,right: 0,left: 0,bottom: 10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.insert_chart_outlined,
-                                size: 28,
-                                semanticLabel: 'İstatistikler',
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 2,
-                                    offset: Offset(1, 1),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                "İstatistikler",
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.2,
-                                  fontFamily: 'OpenSans',
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Icon(
-                                Icons.insert_chart_outlined,
-                                size: 28,
-                                semanticLabel: 'İstatistikler',
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 2,
-                                    offset: Offset(1, 1),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            thickness: 2,
-                            indent: 20,
-                            endIndent: 20,
-                            color: Colors.black,
-                          ),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -209,7 +161,6 @@ class ProfilePage extends StatelessWidget {
                               ),
                             ],
                           ),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -233,7 +184,6 @@ class ProfilePage extends StatelessWidget {
                               ),
                             ],
                           ),
-
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +201,6 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 10.0),
                   _buildProfileButton(
                     icon: Icons.add,
@@ -297,6 +246,7 @@ class ProfilePage extends StatelessWidget {
   Widget _buildStatItem(
       IconData icon, String title, String subtitle, Color iconColor, MainAxisAlignment alignment) {
     return Padding(
+
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -305,12 +255,12 @@ class ProfilePage extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: basarsoft_color,
-              border: Border.all(color: basarsoft_color_light, width: 3),
+              border: Border.all(color: basarsoft_color_light, width: 2),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(8),
             child: Icon(icon, color: iconColor, size: 25),
           ),
-          SizedBox(width: 12),
+          SizedBox(width: 5),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

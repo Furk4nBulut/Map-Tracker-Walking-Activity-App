@@ -62,85 +62,79 @@ class StatisticPage extends StatelessWidget {
         title: 'İstatistikler', // Adjust title as per your preference
         automaticallyImplyLeading: true,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: FutureBuilder<Map<String, dynamic>>(
-              future: _fetchUserStatistics(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _fetchUserStatistics(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
-                }
+          if (snapshot.hasError) {
+            return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
+          }
 
-                if (!snapshot.hasData) {
-                  return Center(child: Text('Veriler yüklenemedi.'));
-                }
+          if (!snapshot.hasData) {
+            return Center(child: Text('Veriler yüklenemedi.'));
+          }
 
-                Map<String, dynamic> stats = snapshot.data!;
-                double totalDistance = stats['totalDistance'];
-                Duration totalDuration = stats['totalDuration'];
-                double averageDistance = stats['averageDistance'];
-                Duration averageDuration = stats['averageDuration'];
-                int activityCount = stats['activityCount'];
-                double averageSpeed = stats['averageSpeed'];
+          Map<String, dynamic> stats = snapshot.data!;
+          double totalDistance = stats['totalDistance'];
+          Duration totalDuration = stats['totalDuration'];
+          double averageDistance = stats['averageDistance'];
+          Duration averageDuration = stats['averageDuration'];
+          int activityCount = stats['activityCount'];
+          double averageSpeed = stats['averageSpeed'];
 
-                String formattedTotalDuration = _formatDuration(totalDuration);
-                String formattedAverageDuration = _formatDuration(averageDuration);
-                String formattedAverageSpeed = averageSpeed.toStringAsFixed(2); // Format average speed to show two decimal places
+          String formattedTotalDuration = _formatDuration(totalDuration);
+          String formattedAverageDuration = _formatDuration(averageDuration);
+          String formattedAverageSpeed = averageSpeed.toStringAsFixed(2); // Format average speed to show two decimal places
 
-                return SingleChildScrollView(
-                  padding: EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildStatItem(
-                        icon: Icons.directions_walk,
-                        title: 'Toplam Mesafe',
-                        subtitle: '${totalDistance.toStringAsFixed(2)} km',
-                        iconColor: Colors.green,
-                      ),
-                      _buildStatItem(
-                        icon: Icons.add_road,
-                        title: 'Ortalama Mesafe',
-                        subtitle: '${averageDistance.toStringAsFixed(2)} km',
-                        iconColor: Colors.green,
-                      ),
-                      _buildStatItem(
-                        icon: Icons.timer_outlined,
-                        title: 'Toplam Süre',
-                        subtitle: formattedTotalDuration,
-                        iconColor: basarsoft_color_light,
-                      ),
-                      _buildStatItem(
-                        icon: Icons.timelapse_rounded,
-                        title: 'Ortalama Süre',
-                        subtitle: formattedAverageDuration,
-                        iconColor: Colors.blueAccent,
-                      ),
-                      _buildStatItem(
-                        icon: Icons.speed_outlined,
-                        title: 'Ortalama Hız',
-                        subtitle: '${formattedAverageSpeed} km/saat',
-                        iconColor: Colors.red,
-                      ),
-                      _buildStatItem(
-                        icon: Icons.fitness_center,
-                        title: 'Aktivite Sayısı',
-                        subtitle: '$activityCount',
-                        iconColor: Colors.white,
-                      ),
-                    ],
-                  ),
-                );
-              },
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildStatItem(
+                  icon: Icons.directions_walk,
+                  title: 'Toplam Mesafe',
+                  subtitle: '${totalDistance.toStringAsFixed(2)} km',
+                  iconColor: Colors.green,
+                ),
+                _buildStatItem(
+                  icon: Icons.add_road,
+                  title: 'Ortalama Mesafe',
+                  subtitle: '${averageDistance.toStringAsFixed(2)} km',
+                  iconColor: Colors.green,
+                ),
+                _buildStatItem(
+                  icon: Icons.timer_outlined,
+                  title: 'Toplam Süre',
+                  subtitle: formattedTotalDuration,
+                  iconColor: basarsoft_color_light,
+                ),
+                _buildStatItem(
+                  icon: Icons.timelapse_rounded,
+                  title: 'Ortalama Süre',
+                  subtitle: formattedAverageDuration,
+                  iconColor: Colors.blueAccent,
+                ),
+                _buildStatItem(
+                  icon: Icons.speed_outlined,
+                  title: 'Ortalama Hız',
+                  subtitle: '${formattedAverageSpeed} km/saat',
+                  iconColor: Colors.red,
+                ),
+                _buildStatItem(
+                  icon: Icons.fitness_center,
+                  title: 'Aktivite Sayısı',
+                  subtitle: '$activityCount',
+                  iconColor: Colors.white,
+                ),
+                SizedBox(height: 70.0), // Add space at the bottom
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -162,7 +156,7 @@ class StatisticPage extends StatelessWidget {
       ),
       color: Colors.white,
       shadowColor: basarsoft_color,
-      margin: EdgeInsets.symmetric(vertical: 15),
+      margin: EdgeInsets.only(bottom: 20.0),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
