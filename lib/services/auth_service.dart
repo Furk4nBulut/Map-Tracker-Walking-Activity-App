@@ -13,12 +13,10 @@ class AuthService {
   final firebaseAuth = FirebaseAuth.instance;
 
   Future<void> signUp(BuildContext context, {required String name,required String surname, required String email, required String password}) async {
-    final navigator = Navigator.of(context);
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null )  {
         await _registerUser(name: name, surname: surname ,email: email, password: password);
-        navigator.push(MaterialPageRoute(builder: (context) => HomePage(),));
       }
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);

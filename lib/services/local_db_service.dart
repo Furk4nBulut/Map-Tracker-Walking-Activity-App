@@ -87,4 +87,5 @@ class DatabaseHelper {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('currentUserId');
   }
+
 }
