@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/screens/homepage.dart';
@@ -75,7 +76,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],),
           color: Colors.white,
           onPressed: () async {
-            Navigator.of(context).pop();
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const WelcomeScreen())
+            );
 
             await AuthService().signOut(context);
           },

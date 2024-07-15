@@ -7,6 +7,8 @@ import 'package:map_tracker/services/provider/auth_provider.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/screens/homepage.dart';
+import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
 
 final locator = GetIt.instance;
 
@@ -25,6 +27,47 @@ class _SignInScreenState extends State<SignInScreen> {
 
   AuthService get _authService => locator<AuthService>();
   AuthProvider get _authProvider => locator<AuthProvider>();
+
+  DatabaseHelper dbHelper = DatabaseHelper();
+
+
+
+  login() async{
+    var response =  await DatabaseHelper().login(
+        User(
+          firstName: '',
+          lastName: '',
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ));
+
+    if(response==true){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+    }else{
+      Fluttertoast.showToast(
+        msg: "Kullanıcı adı veya şifre hatalı",
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
+
+    try {
+      await _authService.signIn(
+        context,
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
+  }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,18 +172,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 ),
                               );
 
-                              try {
-                                await _authService.signIn(
-                                  context,
-                                  email: _emailController.text.trim(),
-                                  password: _passwordController.text.trim(),
-                                );
-                              } catch (e) {
-                                Fluttertoast.showToast(
-                                  msg: e.toString(),
-                                  toastLength: Toast.LENGTH_LONG,
-                                );
-                              }
+                             login();
                             }
                           },
                           style: ElevatedButton.styleFrom(

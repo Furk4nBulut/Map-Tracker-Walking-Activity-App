@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/screens/signin_screen.dart';
-import 'package:map_tracker/theme/theme.dart';
+import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
-
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/homepage.dart';
+import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/model/user_model.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -25,21 +24,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final dnHelper = DatabaseHelper();
+
   Future<void> _handleSignUp() async {
+    final String firstName = _firstNameController.text.trim();
+    final String lastName = _lastNameController.text.trim();
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text;
+
+    // Check if the form is valid and the user agrees to the personal data policy
+    if (!_formSignupKey.currentState!.validate() || !agreePersonalData) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen formu doğru şekilde doldurun ve sözleşmeyi kabul edin.'),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Kayıt olunuyor...'),
+      ),
+    );
+
     try {
-      final String firstName = _firstNameController.text.trim();
-      final String lastName = _lastNameController.text.trim();
-      final String email = _emailController.text.trim();
-      final String password = _passwordController.text;
+      // Create a new user instance
+      final User user = User(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+      );
 
-      if (_formSignupKey.currentState!.validate() && agreePersonalData) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kayıt Olunuyor...'),
-          ),
-        );
+      // Insert user into local database
+      await dnHelper.insertUser(user);
 
-        await AuthService().signUp(
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kayıt başarılı!'),
+        ),
+      );
+
+      // Attempt to sign up the user online
+      try {
+        await locator.get<AuthService>().signUp(
           context,
           name: firstName,
           surname: lastName,
@@ -47,19 +76,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: password,
         );
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SignInScreen(),
-          ),
-        );
-      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Lütfen formu doğru şekilde doldurun ve sözleşmeyi kabul edin.'),
+            content: Text('Online kayıt başarılı!'),
+          ),
+        );
+
+        // Navigate to HomePage with the user information
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+            settings: RouteSettings(arguments: user),
+          ),
+        );
+
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Online kayıt olma sırasında bir hata oluştu: $e'),
           ),
         );
       }
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
