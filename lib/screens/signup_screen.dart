@@ -27,78 +27,74 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final dnHelper = DatabaseHelper();
 
   Future<void> _handleSignUp() async {
-    final String firstName = _firstNameController.text.trim();
-    final String lastName = _lastNameController.text.trim();
-    final String email = _emailController.text.trim();
-    final String password = _passwordController.text;
-
-    // Check if the form is valid and the user agrees to the personal data policy
-    if (!_formSignupKey.currentState!.validate() || !agreePersonalData) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lütfen formu doğru şekilde doldurun ve sözleşmeyi kabul edin.'),
-        ),
-      );
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Kayıt olunuyor...'),
-      ),
-    );
-
     try {
-      // Create a new user instance
-      final User user = User(
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
-      );
+      final String firstName = _firstNameController.text.trim();
+      final String lastName = _lastNameController.text.trim();
+      final String email = _emailController.text.trim();
+      final String password = _passwordController.text;
 
-      // Insert user into local database
-      await dnHelper.insertUser(user);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Kayıt başarılı!'),
-        ),
-      );
-
-      // Attempt to sign up the user online
-      try {
-        await locator.get<AuthService>().signUp(
-          context,
-          name: firstName,
-          surname: lastName,
-          email: email,
-          password: password,
-        );
-
+      if (_formSignupKey.currentState!.validate() && agreePersonalData) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Online kayıt başarılı!'),
+            content: Text('Kayıt olunuyor...'),
           ),
         );
+        try {
+          final User user = User(
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+          );
+          await dnHelper.insertUser(user);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kayıt başarılı!'),
+            ),
+          );
 
-        // Navigate to HomePage with the user information
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(),
-            settings: RouteSettings(arguments: user),
-          ),
-        );
+          try {
+            locator.get<AuthService>().signUp(context, name: firstName, surname: lastName, email: email, password: password);
+            SnackBar(
+              content: Text('Online Furkan  Bl  Kayıt başarılı!'),
+            );
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
+              ),
+            );
+          }
 
-      } catch (e) {
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+              settings: RouteSettings(arguments: user),
+            ),
+          );
+
+
+
+
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
+            ),
+          );
+        }
+
+
+
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Online kayıt olma sırasında bir hata oluştu: $e'),
+          const SnackBar(
+            content: Text('Lütfen formu doğru şekilde doldurun ve sözleşmeyi kabul edin.'),
           ),
         );
       }
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
