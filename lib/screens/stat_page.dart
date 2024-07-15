@@ -6,12 +6,13 @@ import 'package:map_tracker/screens/partials/appbar.dart'; // Adjust this import
 import 'package:map_tracker/utils/constants.dart'; // Adjust this import as per your project structure
 
 class StatisticPage extends StatelessWidget {
-  final User user;
-
-  const StatisticPage({Key? key, required this.user}) : super(key: key);
-
   Future<Map<String, dynamic>> _fetchUserStatistics() async {
     try {
+      final User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw 'Kullanıcı oturumu açmamış.';
+      }
+
       final userActivities = FirebaseFirestore.instance
           .collection('user')
           .doc(user.uid)

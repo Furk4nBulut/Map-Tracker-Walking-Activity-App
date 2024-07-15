@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:map_tracker/screens/profile_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
@@ -18,10 +17,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
   DatabaseHelper dbHelper = DatabaseHelper();
-  User? localUser;
-  firebase_auth.User? firebaseUser;
+  LocalUser? localUser;
   int _selectedIndex = 0;
 
   @override
@@ -31,10 +28,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadCurrentUser() async {
-    User? userFromDb = await dbHelper.getCurrentUser();
+    LocalUser? userFromDb = await dbHelper.getCurrentUser();
     setState(() {
       localUser = userFromDb;
-      firebaseUser = _firebaseAuth.currentUser;
     });
   }
 
@@ -80,12 +76,12 @@ class _HomePageState extends State<HomePage> {
           index: _selectedIndex,
           children: [
             _buildHomeScreen(),
-            StatisticPage(user: firebaseUser!),
+            StatisticPage(), // You can pass null here or handle differently if user is not logged in
 
             NewActivityScreen(),
 
             ActivityHistoryScreen(),
-            ProfilePage(user:  firebaseUser!),
+            ProfilePage(), // You can pass null here or handle differently if user is not logged in
           ],
         ),
         extendBody: true,
@@ -100,7 +96,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHomeScreen() {
     final displayName = localUser?.firstName != null && localUser?.lastName != null
         ? "${localUser!.firstName} ${localUser!.lastName}"
-        : firebaseUser?.displayName ?? 'Misafir';
+        : 'Misafir'; // Default guest name or handle differently if not logged in
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -127,15 +123,6 @@ class _HomePageState extends State<HomePage> {
               subtitle: Text("Email: ${localUser!.email}"),
               leading: CircleAvatar(
                 child: const Icon(Icons.person),
-              ),
-            )
-          else if (firebaseUser != null)
-            ListTile(
-              title: Text("Kullanıcı Adı: ${firebaseUser!.displayName ?? 'Bilinmiyor'}"),
-              subtitle: Text("Email: ${firebaseUser!.email}"),
-              leading: CircleAvatar(
-                backgroundImage: firebaseUser!.photoURL != null ? NetworkImage(firebaseUser!.photoURL!) : null,
-                child: firebaseUser!.photoURL == null ? const Icon(Icons.person) : null,
               ),
             )
           else

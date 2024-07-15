@@ -34,7 +34,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   login() async{
     var response =  await DatabaseHelper().login(
-        User(
+        LocalUser(
           firstName: '',
           lastName: '',
           email: _emailController.text.trim(),

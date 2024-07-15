@@ -7,18 +7,28 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
+import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/model/user_model.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
   final firebaseAuth = FirebaseAuth.instance;
+
+  DatabaseHelper dbHelper = DatabaseHelper();
 
   Future<void> signUp(BuildContext context, {required String name,required String surname, required String email, required String password}) async {
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null )  {
         await _registerUser(name: name, surname: surname ,email: email, password: password);
+        Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
+        dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
+        Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
       }
     } on FirebaseAuthException catch (e) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
+
+      Fluttertoast.showToast( msg: 'İlk kayıtta internet bağlantısı gereklidir! İnternet bağlantınızı kontrol edin!', toastLength: Toast.LENGTH_LONG);
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }

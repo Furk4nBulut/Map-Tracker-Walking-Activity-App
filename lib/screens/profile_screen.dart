@@ -7,11 +7,12 @@ import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/utils/constants.dart';
 
 class ProfilePage extends StatelessWidget {
-  final User user;
-
-  const ProfilePage({Key? key, required this.user}) : super(key: key);
-
   Future<Map<String, dynamic>> _fetchUserStatistics() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw 'Kullanıcı oturumu açmamış.';
+    }
+
     final userActivities = FirebaseFirestore.instance
         .collection('user')
         .doc(user.uid)
@@ -99,10 +100,10 @@ class ProfilePage extends StatelessWidget {
                       padding: EdgeInsets.all(6),
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: user.photoURL != null
-                            ? NetworkImage(user.photoURL!)
+                        backgroundImage: FirebaseAuth.instance.currentUser?.photoURL != null
+                            ? NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!)
                             : null,
-                        child: user.photoURL == null
+                        child: FirebaseAuth.instance.currentUser?.photoURL == null
                             ? const Icon(Icons.person, size: 50)
                             : null,
                       ),
@@ -110,7 +111,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   SizedBox(height: 4.0),
                   Text(
-                    user.displayName ?? 'Bilinmiyor',
+                    FirebaseAuth.instance.currentUser?.displayName ?? 'Bilinmiyor',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -119,7 +120,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   SizedBox(height: 4.0),
                   Text(
-                    user.email ?? 'Email bilinmiyor',
+                    FirebaseAuth.instance.currentUser?.email ?? 'Email bilinmiyor',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black54,

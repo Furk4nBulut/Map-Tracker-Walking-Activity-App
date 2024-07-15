@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:map_tracker/services/auth_service.dart';
@@ -77,6 +79,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: Colors.white,
           onPressed: () async {
             await AuthService().signOut(context);
+            await FirebaseAuth.instance.signOut();
           },
         ),
       ],

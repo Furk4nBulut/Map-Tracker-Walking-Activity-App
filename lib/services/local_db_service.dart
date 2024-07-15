@@ -28,7 +28,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> insertUser(User user) async {
+  Future<void> insertUser(LocalUser user) async {
     final db = await database;
     await db.insert(
       tableName,
@@ -37,7 +37,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<User?> getUserByEmail(String email) async {
+  Future<LocalUser?> getUserByEmail(String email) async {
     final db = await database;
     List<Map<String, dynamic>> users = await db.query(
       tableName,
@@ -45,13 +45,13 @@ class DatabaseHelper {
       whereArgs: [email],
     );
     if (users.isNotEmpty) {
-      return User.fromMap(users.first);
+      return LocalUser.fromMap(users.first);
     } else {
       return null;
     }
   }
 
-  Future<bool> login(User user) async {
+  Future<bool> login(LocalUser user) async {
     final db = await database;
     List<Map<String, dynamic>> users = await db.query(
       tableName,
@@ -66,7 +66,7 @@ class DatabaseHelper {
     return false;
   }
 
-  Future<User?> getCurrentUser() async {
+  Future<LocalUser?> getCurrentUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? currentUserId = prefs.getInt('currentUserId');
     if (currentUserId != null) {
@@ -77,7 +77,7 @@ class DatabaseHelper {
         whereArgs: [currentUserId],
       );
       if (users.isNotEmpty) {
-        return User.fromMap(users.first);
+        return LocalUser.fromMap(users.first);
       }
     }
     return null;

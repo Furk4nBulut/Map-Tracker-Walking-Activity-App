@@ -51,35 +51,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             password: password,
           );
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Online Kayıt başarılı!'),
-            ),
-          );
-
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
             ),
           );
-          Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
-
         }
-        // Yerel veritabanına kayıt işlemi
-        final User user = User(
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          password: password,
-        );
-        await dnHelper.insertUser(user);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Yerel veritabanına kayıt başarılı!'),
-          ),
-        );
 
         // İleri yönlendirme
         Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));

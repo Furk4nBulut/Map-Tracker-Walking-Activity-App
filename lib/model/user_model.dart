@@ -1,11 +1,11 @@
-class User {
+class LocalUser {
   final int? id;
   final String firstName;
   final String lastName;
   final String email;
   final String password;
 
-  User({
+  LocalUser({
     this.id,
     required this.firstName,
     required this.lastName,
@@ -25,8 +25,8 @@ class User {
   }
 
   // Map'ten User modeline dönüştüren yöntem
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
+  factory LocalUser.fromMap(Map<String, dynamic> map) {
+    return LocalUser(
       id: map['id'],
       firstName: map['firstName'],
       lastName: map['lastName'],
