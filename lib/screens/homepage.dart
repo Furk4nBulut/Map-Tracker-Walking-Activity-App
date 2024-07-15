@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:map_tracker/screens/profile_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
@@ -7,6 +7,8 @@ import 'package:map_tracker/screens/activity_record_screen.dart';
 import 'package:map_tracker/screens/partials/navbar.dart'; // Import the BottomNavBar widget
 import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
 import 'package:map_tracker/screens/stat_page.dart'; // Import the ActivityHistoryScreen widget
+import 'package:map_tracker/model/user_model.dart'; // Import the User model
+import 'package:map_tracker/services/local_db_service.dart'; // Import the DatabaseHelper
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,8 +18,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  DatabaseHelper dbHelper = DatabaseHelper();
+  User? localUser;
+  firebase_auth.User? firebaseUser;
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    User? userFromDb = await dbHelper.getCurrentUser();
+    setState(() {
+      localUser = userFromDb;
+      firebaseUser = _firebaseAuth.currentUser;
+    });
+  }
 
   void _onItemTapped(int index) {
     if (index == 2) {
@@ -40,8 +59,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = _firebaseAuth.currentUser;
-
     return WillPopScope(
       onWillPop: () async {
         if (_selectedIndex != 0) {
@@ -62,58 +79,64 @@ class _HomePageState extends State<HomePage> {
         body: IndexedStack(
           index: _selectedIndex,
           children: [
-            _buildHomeScreen(user),
-            StatisticPage(user: user!),
+            _buildHomeScreen(),
+            StatisticPage(user: firebaseUser!),
 
             NewActivityScreen(),
 
             ActivityHistoryScreen(),
-            ProfilePage(user: user!),
+            ProfilePage(user:  firebaseUser!),
           ],
         ),
         extendBody: true,
         bottomNavigationBar: BottomNavBar(
           selectedIndex: _selectedIndex,
           onItemTapped: _onItemTapped,
-
         ),
       ),
     );
   }
 
-  Widget _buildHomeScreen(User? user) {
+  Widget _buildHomeScreen() {
+    final displayName = localUser?.firstName != null && localUser?.lastName != null
+        ? "${localUser!.firstName} ${localUser!.lastName}"
+        : firebaseUser?.displayName ?? 'Misafir';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildUserInfo(user),
+        _buildUserInfo(),
         Expanded(
           child: Center(
-            child: Text("Hoşgeldiniz, ${user?.displayName ?? 'Misafir'}"),
+            child: Text("Hoşgeldin! $displayName"),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildUserInfo(User? user) {
+  Widget _buildUserInfo() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (user != null)
-            Column(
-              children: [
-                ListTile(
-                  title: Text("Kullanıcı Adı: ${user.displayName ?? 'Bilinmiyor'}"),
-                  subtitle: Text("Email: ${user.email}"),
-                  leading: CircleAvatar(
-                    backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
-                    child: user.photoURL == null ? const Icon(Icons.person) : null,
-                  ),
-                ),
-                const SizedBox(height: 1.0),
-              ],
+          if (localUser != null)
+            ListTile(
+              title: Text("Adı Soyad: ${localUser!.firstName} ${localUser!.lastName}"),
+              subtitle: Text("Email: ${localUser!.email}"),
+              leading: CircleAvatar(
+                child: const Icon(Icons.person),
+              ),
+            )
+          else if (firebaseUser != null)
+            ListTile(
+              title: Text("Kullanıcı Adı: ${firebaseUser!.displayName ?? 'Bilinmiyor'}"),
+              subtitle: Text("Email: ${firebaseUser!.email}"),
+              leading: CircleAvatar(
+                backgroundImage: firebaseUser!.photoURL != null ? NetworkImage(firebaseUser!.photoURL!) : null,
+                child: firebaseUser!.photoURL == null ? const Icon(Icons.person) : null,
+              ),
             )
           else
             const Padding(

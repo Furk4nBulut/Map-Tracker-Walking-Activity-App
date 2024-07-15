@@ -76,10 +76,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],),
           color: Colors.white,
           onPressed: () async {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const WelcomeScreen())
-            );
-
             await AuthService().signOut(context);
           },
         ),

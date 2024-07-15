@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:map_tracker/model/user_model.dart';
 
 class DatabaseHelper {
@@ -10,13 +11,11 @@ class DatabaseHelper {
     if (_database != null) {
       return _database!;
     }
-    // Eğer _database null ise, onu başlat
     _database = await initDatabase();
     return _database!;
   }
 
   Future<Database> initDatabase() async {
-    // Veritabanı yolunu al
     String path = await getDatabasesPath();
     return openDatabase(
       join(path, 'furkan.db'),
@@ -38,7 +37,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<User?> getUsers(String email) async {
+  Future<User?> getUserByEmail(String email) async {
     final db = await database;
     List<Map<String, dynamic>> users = await db.query(
       tableName,
@@ -52,17 +51,40 @@ class DatabaseHelper {
     }
   }
 
-Future <bool> login(User user) async {
-    final db = await initDatabase();
+  Future<bool> login(User user) async {
+    final db = await database;
     List<Map<String, dynamic>> users = await db.query(
       tableName,
       where: "email = ? AND password = ?",
       whereArgs: [user.email, user.password],
     );
     if (users.isNotEmpty) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('currentUserId', users.first['id'] as int);
       return true;
-    } else {
-      return false;
     }
-}
+    return false;
+  }
+
+  Future<User?> getCurrentUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? currentUserId = prefs.getInt('currentUserId');
+    if (currentUserId != null) {
+      final db = await database;
+      List<Map<String, dynamic>> users = await db.query(
+        tableName,
+        where: "id = ?",
+        whereArgs: [currentUserId],
+      );
+      if (users.isNotEmpty) {
+        return User.fromMap(users.first);
+      }
+    }
+    return null;
+  }
+
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('currentUserId');
+  }
 }

@@ -7,6 +7,7 @@ import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -56,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           try {
             locator.get<AuthService>().signUp(context, name: firstName, surname: lastName, email: email, password: password);
             SnackBar(
-              content: Text('Online Furkan  Bl  Kayıt başarılı!'),
+              content: Text('Online Kayıt başarılı!'),
             );
           } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -65,15 +66,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             );
           }
-
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(),
-              settings: RouteSettings(arguments: user),
-            ),
-          );
 
 
 
