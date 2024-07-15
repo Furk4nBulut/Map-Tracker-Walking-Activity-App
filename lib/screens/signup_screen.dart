@@ -40,39 +40,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
             content: Text('Kayıt olunuyor...'),
           ),
         );
+
         try {
-          final User user = User(
-            firstName: firstName,
-            lastName: lastName,
+          // Online kayıt işlemi
+          await locator.get<AuthService>().signUp(
+            context,
+            name: firstName,
+            surname: lastName,
             email: email,
             password: password,
           );
-          await dnHelper.insertUser(user);
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Kayıt başarılı!'),
+              content: Text('Online Kayıt başarılı!'),
             ),
           );
-
-          try {
-            locator.get<AuthService>().signUp(context, name: firstName, surname: lastName, email: email, password: password);
-            SnackBar(
-              content: Text('Online Kayıt başarılı!'),
-            );
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
-              ),
-            );
-          }
-
-          Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
-
-
-
-
-
 
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -80,9 +63,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
               content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
             ),
           );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
+
         }
+        // Yerel veritabanına kayıt işlemi
+        final User user = User(
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          password: password,
+        );
+        await dnHelper.insertUser(user);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Yerel veritabanına kayıt başarılı!'),
+          ),
+        );
 
+        // İleri yönlendirme
+        Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
 
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
