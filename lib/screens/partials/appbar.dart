@@ -78,8 +78,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],),
           color: Colors.white,
           onPressed: () async {
-            await AuthService().signOut(context);
             await FirebaseAuth.instance.signOut();
+
+            await AuthService().signOut(context);
           },
         ),
       ],

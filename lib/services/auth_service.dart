@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
-import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/services/local_db_service.dart'; // Assuming you have DatabaseHelper defined
 import 'package:map_tracker/model/user_model.dart';
 
 class AuthService {
@@ -16,19 +16,20 @@ class AuthService {
 
   DatabaseHelper dbHelper = DatabaseHelper();
 
-  Future<void> signUp(BuildContext context, {required String name,required String surname, required String email, required String password}) async {
+  Future<void> signUp(BuildContext context, {required String name, required String surname, required String email, required String password}) async {
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      if (userCredential.user != null )  {
-        await _registerUser(name: name, surname: surname ,email: email, password: password);
+      if (userCredential.user != null) {
+        await _registerUser(name: name, surname: surname, email: email, password: password);
         Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
-        dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
+
+        // Yerel veritabanına kullanıcıyı kaydet
+        await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
         Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
       }
     } on FirebaseAuthException catch (e) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
-
-      Fluttertoast.showToast( msg: 'İlk kayıtta internet bağlantısı gereklidir! İnternet bağlantınızı kontrol edin!', toastLength: Toast.LENGTH_LONG);
+      Fluttertoast.showToast(msg: 'İlk kayıtta internet bağlantısı gereklidir! İnternet bağlantınızı kontrol edin!', toastLength: Toast.LENGTH_LONG);
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }
@@ -38,7 +39,14 @@ class AuthService {
     try {
       final UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-        navigator.push(MaterialPageRoute(builder: (context) => HomePage(),));
+
+        // Firebase'den giriş yapılan kullanıcı bilgilerini yerel veritabanına kaydetmek için
+        // Bu kısmı isteğe bağlı olarak kullanabilirsiniz. Genellikle ilk kayıtta kullanılır.
+        await dbHelper.insertUser(LocalUser(email: email, firstName: userCredential.user!.displayName ?? '', lastName: '', password: password));
+
+
+        navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
+
       }
     } on FirebaseAuthException catch(e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
@@ -59,20 +67,15 @@ class AuthService {
     final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
     log(userCredential.user!.email.toString());
     return userCredential.user;
-
   }
-
 
   Future<void> signOut(BuildContext context) async {
     await firebaseAuth.signOut();
-    final navigator = Navigator.of(context);
-      //home page back button direkt yönlednrme home page e
-    Navigator.of(context).pop();
-      navigator.push(MaterialPageRoute(builder: (context) => WelcomeScreen(),));
-
+    Navigator.of(context).pop(); // Ana sayfaya dönmek için
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => WelcomeScreen()));
   }
 
-  Future<void> _registerUser({required String name,required String surname, required String email, required String password}) async {
+  Future<void> _registerUser({required String name, required String surname, required String email, required String password}) async {
     await userCollection.doc().set({
       "email" : email,
       "name": name,

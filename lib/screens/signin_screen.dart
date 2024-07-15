@@ -33,6 +33,18 @@ class _SignInScreenState extends State<SignInScreen> {
 
 
   login() async{
+    try {
+      await _authService.signIn(
+        context,
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
     var response =  await DatabaseHelper().login(
         LocalUser(
           firstName: '',
@@ -50,18 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
       );
     }
 
-    try {
-      await _authService.signIn(
-        context,
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        toastLength: Toast.LENGTH_LONG,
-      );
-    }
+
   }
 
 
