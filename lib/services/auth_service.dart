@@ -9,14 +9,8 @@ import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:map_tracker/services/local_db_service.dart'; // Assuming you have DatabaseHelper defined
 import 'package:map_tracker/model/user_model.dart';
-
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_tracker/model/activity_model.dart';
-import 'package:map_tracker/services/local_db_service.dart';
-import 'package:map_tracker/model/user_model.dart';
-
-
-
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
@@ -42,6 +36,7 @@ class AuthService {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }
+
   Future<void> signIn(BuildContext context, {required String email, required String password}) async {
     final navigator = Navigator.of(context);
     try {
@@ -104,8 +99,6 @@ class AuthService {
     });
   }
 
-
-  // _syncUserActivitiesFromFirestore metodunun güncellenmiş hali
   Future<void> _syncUserActivitiesFromFirestore(LocalUser localUser) async {
     try {
       User? firebaseUser = firebaseAuth.currentUser;
@@ -120,32 +113,27 @@ class AuthService {
           var data = doc.data() as Map<String, dynamic>;
           String activityId = doc.id;
 
-          // Kontrol et, eğer aktivite zaten yerelde varsa senkronizasyonu atla
+          // Check if the activity already exists in the local database to avoid duplicates
           bool activityExists = await dbHelper.checkActivityExists(activityId);
           if (activityExists) {
             Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Zaten Güncel!", toastLength: Toast.LENGTH_LONG);
-
-
             continue;
           }
 
           LatLng? startPosition;
           if (data['startPosition'] != null) {
-            GeoPoint geoPoint = data['startPosition'];
-            startPosition = LatLng(geoPoint.latitude, geoPoint.longitude);
+            startPosition = LatLng(data['startPosition']['latitude'], data['startPosition']['longitude']);
           }
 
           LatLng? endPosition;
           if (data['endPosition'] != null) {
-            GeoPoint geoPoint = data['endPosition'];
-            endPosition = LatLng(geoPoint.latitude, geoPoint.longitude);
+            endPosition = LatLng(data['endPosition']['latitude'], data['endPosition']['longitude']);
           }
 
           List<LatLng> route = [];
           if (data['route'] != null) {
             for (var point in data['route']) {
-              GeoPoint geoPoint = point;
-              route.add(LatLng(geoPoint.latitude, geoPoint.longitude));
+              route.add(LatLng(point['latitude'], point['longitude']));
             }
           }
 
@@ -172,7 +160,4 @@ class AuthService {
       throw 'An error occurred while syncing activities: $e';
     }
   }
-
-
-
 }

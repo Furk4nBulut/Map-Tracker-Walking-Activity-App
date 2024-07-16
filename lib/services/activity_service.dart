@@ -39,26 +39,24 @@ class ActivityService {
       final FirebaseAuth _auth = FirebaseAuth.instance;
       User? firebaseuser = _auth.currentUser;
       if (firebaseuser != null) {
-
-      // Save activity to Firestore
-      await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').add({
-        'userId': user.id,
-        'startTime': startTime,
-        'endTime': endTime,
-        'totalDistance': totalDistance,
-        'elapsedTime': elapsedTime,
-        'averageSpeed': averageSpeed,
-        'startPosition': startPosition != null
-            ? {'latitude': startPosition.latitude, 'longitude': startPosition.longitude}
-            : null,
-        'endPosition': endPosition != null
-            ? {'latitude': endPosition.latitude, 'longitude': endPosition.longitude}
-            : null,
-        'route': route.map((latLng) => {'latitude': latLng.latitude, 'longitude': latLng.longitude}).toList(),
-      });
-    }
-    }
-      catch (e) {
+        // Save activity to Firestore
+        await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').add({
+          'userId': user.id,
+          'startTime': startTime,
+          'endTime': endTime,
+          'totalDistance': totalDistance,
+          'elapsedTime': elapsedTime,
+          'averageSpeed': averageSpeed,
+          'startPosition': startPosition != null
+              ? {'latitude': startPosition.latitude, 'longitude': startPosition.longitude}
+              : null,
+          'endPosition': endPosition != null
+              ? {'latitude': endPosition.latitude, 'longitude': endPosition.longitude}
+              : null,
+          'route': route.map((latLng) => {'latitude': latLng.latitude, 'longitude': latLng.longitude}).toList(),
+        });
+      }
+    } catch (e) {
       print('An error occurred while saving the activity: $e');
       throw 'An error occurred while saving the activity: $e';
     }
