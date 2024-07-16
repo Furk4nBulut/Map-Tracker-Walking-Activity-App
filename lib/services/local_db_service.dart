@@ -121,4 +121,18 @@ class DatabaseHelper {
       return Activity.fromMap(maps[i]);
     });
   }
+
+
+  // get user activities
+  Future<List<Activity>> getUserActivities(int userId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      activityTable,
+      where: "id = ?",
+      whereArgs: [userId],
+    );
+    return List.generate(maps.length, (i) {
+      return Activity.fromMap(maps[i]);
+    });
+  }
 }
