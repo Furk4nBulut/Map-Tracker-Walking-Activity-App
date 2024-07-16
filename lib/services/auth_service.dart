@@ -105,6 +105,7 @@ class AuthService {
   }
 
 
+  // _syncUserActivitiesFromFirestore metodunun güncellenmiş hali
   Future<void> _syncUserActivitiesFromFirestore(LocalUser localUser) async {
     try {
       User? firebaseUser = firebaseAuth.currentUser;
@@ -117,6 +118,16 @@ class AuthService {
 
         for (var doc in activitySnapshot.docs) {
           var data = doc.data() as Map<String, dynamic>;
+          String activityId = doc.id;
+
+          // Kontrol et, eğer aktivite zaten yerelde varsa senkronizasyonu atla
+          bool activityExists = await dbHelper.checkActivityExists(activityId);
+          if (activityExists) {
+            Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Zaten Güncel!", toastLength: Toast.LENGTH_LONG);
+
+
+            continue;
+          }
 
           LatLng? startPosition;
           if (data['startPosition'] != null) {

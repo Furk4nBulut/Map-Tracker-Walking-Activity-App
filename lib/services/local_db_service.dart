@@ -145,6 +145,15 @@ class DatabaseHelper {
     return null;
   }
 
+  // DatabaseHelper içine eklenecek metod
+  Future<bool> checkActivityExists(String activityId) async {
+    final db = await database;
+    var res = await db.query(activityTable,
+        where: "id = ?", whereArgs: [activityId]);
+    return res.isNotEmpty;
+  }
+
+
   // Get user activities
   Future<List<Activity>> getUserActivities(int userId) async {
     final db = await database;

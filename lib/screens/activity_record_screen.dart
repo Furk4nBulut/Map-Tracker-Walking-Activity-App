@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'activity_detail_screen.dart';
 import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
-
-import 'package:flutter/material.dart';
 import 'package:map_tracker/model/activity_model.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
-import 'activity_detail_screen.dart';
-import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
 
 class ActivityHistoryScreen extends StatelessWidget {
   @override
