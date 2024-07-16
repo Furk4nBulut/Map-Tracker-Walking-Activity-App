@@ -4,7 +4,7 @@ import 'package:map_tracker/model/user_model.dart';
 import 'dart:convert';  // Add this import
 
 class Activity {
-  int? id;
+  String? id;
   late DateTime startTime;
   late DateTime endTime;
   late double totalDistance;

@@ -48,14 +48,17 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
-          Fluttertoast.showToast(msg: "User added to local database!", toastLength: Toast.LENGTH_LONG);
+          await _syncUserActivitiesFromFirestore(localUser);
+
+          Fluttertoast.showToast(msg: "KUllanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.", toastLength: Toast.LENGTH_LONG);
         } else {
           // User is in local database, update their details
           var firstName = email.split('@')[0];
           localUser.firstName = firstName;
           localUser.password = password;  // Update password in case it has changed
           await dbHelper.updateUser(localUser);
-          Fluttertoast.showToast(msg: "Local user updated!", toastLength: Toast.LENGTH_LONG);
+
+          Fluttertoast.showToast(msg: "Yerel Kullanıcı güncellendi.", toastLength: Toast.LENGTH_LONG);
         }
 
         // Sync activities from Firestore to local database
@@ -118,7 +121,8 @@ class AuthService {
           if (activityExists) {
             Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Zaten Güncel!", toastLength: Toast.LENGTH_LONG);
             continue;
-          }
+          } else {
+            Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Güncelleniyor!", toastLength: Toast.LENGTH_LONG);
 
           LatLng? startPosition;
           if (data['startPosition'] != null) {
@@ -149,9 +153,12 @@ class AuthService {
             endPositionLat: endPosition?.latitude,
             endPositionLng: endPosition?.longitude,
             route: route,
+            id: activityId,// Include the Firestore document ID as the activity ID
           );
 
           await dbHelper.insertActivity(activity);
+          }
+
         }
         Fluttertoast.showToast(msg: "Activities synchronized!", toastLength: Toast.LENGTH_LONG);
       }
@@ -160,4 +167,8 @@ class AuthService {
       throw 'An error occurred while syncing activities: $e';
     }
   }
+
+
+
+
 }

@@ -13,7 +13,7 @@ class ActivityDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Activity?>(
-      future: DatabaseHelper().getActivityById(int.parse(activityId)), // Fetch activity from local DB
+      future: DatabaseHelper().getActivityById(activityId), // Fetch activity from local DB
       builder: (context, AsyncSnapshot<Activity?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(

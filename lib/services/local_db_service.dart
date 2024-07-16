@@ -21,13 +21,13 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'saas.db'),
+      join(path, 'map_tracker_localdb.db'),
       onCreate: (db, version) {
         db.execute(
           "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, email TEXT, password TEXT)",
         );
         db.execute(
-          "CREATE TABLE $activityTable(id INTEGER PRIMARY KEY, userId INTEGER, startTime TEXT, endTime TEXT, totalDistance REAL, elapsedTime INTEGER, averageSpeed REAL, startPositionLat REAL, startPositionLng REAL, endPositionLat REAL, endPositionLng REAL, route TEXT)",
+          "CREATE TABLE $activityTable(id TEXT PRIMARY KEY, userId INTEGER, startTime TEXT, endTime TEXT, totalDistance REAL, elapsedTime INTEGER, averageSpeed REAL, startPositionLat REAL, startPositionLng REAL, endPositionLat REAL, endPositionLng REAL, route TEXT)",
         );
       },
       version: 1,
@@ -108,7 +108,6 @@ class DatabaseHelper {
   // Activity CRUD Operations
   Future<void> insertActivity(Activity activity) async {
     final db = await database;
-
     await db.insert(
       activityTable,
       activity.toMap(),
@@ -128,8 +127,8 @@ class DatabaseHelper {
     }
     return activities;
   }
-  // get acitivty by id
-  Future<Activity?> getActivityById(int id) async {
+
+  Future<Activity?> getActivityById(String id) async {
     final db = await database;
     List<Map<String, dynamic>> activities = await db.query(
       activityTable,
@@ -145,16 +144,12 @@ class DatabaseHelper {
     return null;
   }
 
-  // DatabaseHelper içine eklenecek metod
   Future<bool> checkActivityExists(String activityId) async {
     final db = await database;
-    var res = await db.query(activityTable,
-        where: "id = ?", whereArgs: [activityId]);
+    var res = await db.query(activityTable, where: "id = ?", whereArgs: [activityId]);
     return res.isNotEmpty;
   }
 
-
-  // Get user activities
   Future<List<Activity>> getUserActivities(int userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
