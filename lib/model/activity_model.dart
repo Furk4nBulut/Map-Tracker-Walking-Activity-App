@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+
 class Activity {
   int? id;
-  DateTime startTime;
-  DateTime endTime;
-  double totalDistance;
-  int elapsedTime;
-  double averageSpeed;
+  late DateTime startTime;
+  late DateTime endTime;
+  late double totalDistance;
+  late int elapsedTime;
+  late double averageSpeed;
   double? startPositionLat;
   double? startPositionLng;
   double? endPositionLat;

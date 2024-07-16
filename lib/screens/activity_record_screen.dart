@@ -6,40 +6,31 @@ import 'package:map_tracker/utils/constants.dart';
 import 'activity_detail_screen.dart';
 import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
 
+import 'package:flutter/material.dart';
+import 'package:map_tracker/model/activity_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
+import 'activity_detail_screen.dart';
+import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
+
 class ActivityHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      // Handle appropriately if the user is not logged in (e.g., show login screen)
-      return Scaffold(
-        appBar: CustomAppBar(title: "Aktivite Geçmişi", automaticallyImplyLeading: true),
-        body: Center(
-          child: Text('Kullanıcı girişi gereklidir.'),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: CustomAppBar(title: "Aktivite Geçmişi", automaticallyImplyLeading: true),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('user')
-            .doc(user.uid)
-            .collection('activities')
-            .orderBy('startTime', descending: true) // Sort by startTime descending
-            .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
-          }
-
+      body: FutureBuilder<List<Activity>>(
+        future: DatabaseHelper().getActivities(),
+        builder: (context, AsyncSnapshot<List<Activity>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
+          }
+
+          final activities = snapshot.data;
+
+          if (activities == null || activities.isEmpty) {
             return Center(child: Text('Aktivite bulunamadı.'));
           }
 
@@ -47,23 +38,9 @@ class ActivityHistoryScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 70.0),
             child: ListView.builder(
               padding: EdgeInsets.all(10.0),
-              itemCount: snapshot.data!.docs.length,
+              itemCount: activities.length,
               itemBuilder: (context, index) {
-                var doc = snapshot.data!.docs[index];
-
-                if (!doc.exists || !doc.data().containsKey('startTime')) {
-                  return SizedBox(); // Return an empty widget if document doesn't exist or startTime field is missing
-                }
-
-                Timestamp startTimeStamp = doc['startTime'];
-                DateTime startTime = startTimeStamp.toDate();
-                double totalDistance = doc['totalDistance'] ?? 0.0;
-                bool isCompleted = doc['endTime'] != null;
-                // Calculate average speed
-                num averageSpeed = totalDistance / (doc['elapsedTime'] / 3600);
-                // Format date
-                String formattedDate = DateFormat('dd MMM yyyy, HH:mm').format(startTime);
-
+                final activity = activities[index];
                 return Card(
                   color: Colors.white,
                   elevation: 5,
@@ -78,7 +55,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                         Icon(Icons.calendar_today, color: Color(0xFF02205C)),
                         SizedBox(width: 10),
                         Text(
-                          'Tarih: $formattedDate',
+                          'Tarih: ${DateFormat('dd MMM yyyy, HH:mm').format(activity.startTime)}',
                           style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -92,7 +69,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                             Icon(Icons.directions_walk, color: Colors.green),
                             SizedBox(width: 10),
                             Text(
-                              'Mesafe: ${totalDistance.toStringAsFixed(2)} km',
+                              'Mesafe: ${activity.totalDistance.toStringAsFixed(2)} km',
                               style: TextStyle(fontSize: 14.0),
                             ),
                           ],
@@ -103,7 +80,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                             Icon(Icons.timer_outlined, color: Colors.blue),
                             SizedBox(width: 10),
                             Text(
-                              'Süre: ${doc['elapsedTime']} saniye',
+                              'Süre: ${activity.elapsedTime} saniye',
                               style: TextStyle(fontSize: 14.0),
                             ),
                           ],
@@ -114,17 +91,17 @@ class ActivityHistoryScreen extends StatelessWidget {
                             Icon(Icons.speed, color: Colors.deepOrange),
                             SizedBox(width: 10),
                             Text(
-                              'Ortalama Hız: ${averageSpeed.toStringAsFixed(2)} km/s',
+                              'Ortalama Hız: ${activity.averageSpeed.toStringAsFixed(2)} km/s',
                               style: TextStyle(fontSize: 14.0),
                             ),
                           ],
                         ),
                         SizedBox(height: 8),
                         Text(
-                          isCompleted ? 'Durum: Tamamlandı' : 'Durum: Devam Ediyor',
+                          activity.endTime != null ? 'Durum: Tamamlandı' : 'Durum: Devam Ediyor',
                           style: TextStyle(
                             fontSize: 14.0,
-                            color: isCompleted ? Colors.green : Colors.orange,
+                            color: activity.endTime != null ? Colors.green : Colors.orange,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -135,7 +112,8 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ActivityDetailScreen(activityId: doc.id),
+                          builder: (context) => ActivityDetailScreen(activityId: activity.id!.toString()),
+
                         ),
                       );
                     },
