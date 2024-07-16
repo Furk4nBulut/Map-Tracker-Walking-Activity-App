@@ -126,7 +126,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         elapsedTime: _elapsedSeconds,
         startPosition: startPosition,
         endPosition: endPosition,
-        route: _route, // Rotayı Firestore'a kaydetmek için bu listeyi geçirin
+        route: _route,
         averageSpeed: _averageSpeed,
       );
 
@@ -203,7 +203,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   Set<Marker> _buildMarkers() {
     Set<Marker> markers = {};
     if (_route.isNotEmpty) {
-      // Custom icons for start and end markers
       markers.add(
         Marker(
           markerId: MarkerId('start'),
@@ -223,8 +222,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     }
     return markers;
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -254,11 +251,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
   Widget _buildActivityStats() {
     return Padding(
-      padding: const EdgeInsets.only(top:6, bottom: 6, left: 8, right:8),
+      padding: const EdgeInsets.only(top: 6, bottom: 6, left: 8, right: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-
           _buildStatItem(
             'Mesafe',
             '${_totalDistance.toStringAsFixed(2)} km',
@@ -311,7 +307,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 25), // Add some horizontal margin
     );
   }
-
 
   Widget _buildActivityButtons() {
     return Padding(
