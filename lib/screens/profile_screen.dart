@@ -1,53 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:map_tracker/screens/activity_record_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/utils/constants.dart';
+import 'package:map_tracker/model/activity_model.dart';
+import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/services/local_db_service.dart'; // DatabaseHelper kullanılacak
+import 'package:intl/intl.dart'; // Tarih biçimlendirme için
 
 class ProfilePage extends StatelessWidget {
+  final DatabaseHelper dbHelper = DatabaseHelper();
+
   Future<Map<String, dynamic>> _fetchUserStatistics() async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw 'Kullanıcı oturumu açmamış.';
+    try {
+      final LocalUser? user = await dbHelper.getCurrentUser();
+      if (user == null) {
+        throw 'Kullanıcı oturumu açmamış.';
+      }
+
+      List<Activity> userActivities = await dbHelper.getUserActivities(user.id!);
+
+      double totalDistance = 0.0;
+      Duration totalDuration = Duration();
+      int activityCount = userActivities.length;
+      double averageSpeed = 0.0;
+
+      for (var activity in userActivities) {
+        totalDistance += activity.totalDistance ?? 0.0;
+        if (activity.startTime != null && activity.endTime != null) {
+          totalDuration += activity.endTime!.difference(activity.startTime!);
+        }
+      }
+
+      double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
+      Duration averageDuration = activityCount > 0 ? totalDuration ~/ activityCount : Duration();
+
+      // Calculate average speed
+      if (totalDuration.inHours > 0) {
+        averageSpeed = totalDistance / totalDuration.inHours;
+      }
+
+      return {
+        'totalDistance': totalDistance,
+        'totalDuration': totalDuration,
+        'averageDistance': averageDistance,
+        'averageDuration': averageDuration,
+        'activityCount': activityCount,
+        'averageSpeed': averageSpeed,
+      };
+    } catch (e) {
+      throw ('Kullanıcı istatistikleri alınırken hata oluştu: $e');
     }
-
-    final userActivities = FirebaseFirestore.instance
-        .collection('user')
-        .doc(user.uid)
-        .collection('activities');
-
-    final activitiesSnapshot = await userActivities.get();
-
-    double totalDistance = 0.0;
-    Duration totalDuration = Duration();
-    int activityCount = activitiesSnapshot.size;
-    double averageSpeed = 0.0;
-
-    for (var doc in activitiesSnapshot.docs) {
-      totalDistance += doc['totalDistance'] ?? 0.0;
-      Timestamp startTime = doc['startTime'];
-      Timestamp endTime = doc['endTime'];
-      totalDuration += endTime.toDate().difference(startTime.toDate());
-    }
-
-    double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
-    Duration averageDuration = activityCount > 0 ? totalDuration ~/ activityCount : Duration();
-
-    // Calculate average speed
-    if (totalDuration.inHours > 0) {
-      averageSpeed = totalDistance / totalDuration.inHours;
-    }
-
-    return {
-      'totalDistance': totalDistance,
-      'totalDuration': totalDuration,
-      'averageDistance': averageDistance,
-      'averageDuration': averageDuration,
-      'activityCount': activityCount,
-      'averageSpeed': averageSpeed,
-    };
   }
 
   @override
@@ -62,8 +66,7 @@ class ProfilePage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(
-                child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
+            return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
           }
 
           if (!snapshot.hasData) {
@@ -78,11 +81,8 @@ class ProfilePage extends StatelessWidget {
           int activityCount = stats['activityCount'];
           double averageSpeed = stats['averageSpeed'];
 
-          String formattedTotalDuration =
-              "${totalDuration.inHours} saat ${totalDuration.inMinutes.remainder(60)} dk ${totalDuration.inSeconds.remainder(60) } sn";
-
-          String formattedAverageDuration =
-              "${averageDuration.inHours} saat ${averageDuration.inMinutes.remainder(60)} dk ${averageDuration.inSeconds.remainder(60) } sn    ";
+          String formattedTotalDuration = _formatDuration(totalDuration);
+          String formattedAverageDuration = _formatDuration(averageDuration);
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(8.0),
@@ -135,7 +135,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     shadowColor: basarsoft_color,
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10.0,right: 0,left: 0,bottom: 10.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -148,7 +148,6 @@ class ProfilePage extends StatelessWidget {
                                   'Toplam Mesafe',
                                   '${totalDistance.toStringAsFixed(2)} km',
                                   Colors.green,
-                                  MainAxisAlignment.center,
                                 ),
                               ),
                               Expanded(
@@ -157,11 +156,11 @@ class ProfilePage extends StatelessWidget {
                                   'Ortalama Mesafe',
                                   '${averageDistance.toStringAsFixed(2)} km',
                                   Colors.green,
-                                  MainAxisAlignment.center,
                                 ),
                               ),
                             ],
                           ),
+                          SizedBox(height: 8.0),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -171,7 +170,6 @@ class ProfilePage extends StatelessWidget {
                                   'Toplam Süre',
                                   formattedTotalDuration,
                                   basarsoft_color_light,
-                                  MainAxisAlignment.center,
                                 ),
                               ),
                               Expanded(
@@ -180,23 +178,16 @@ class ProfilePage extends StatelessWidget {
                                   'Ortalama Süre',
                                   formattedAverageDuration,
                                   basarsoft_color_light,
-                                  MainAxisAlignment.center,
                                 ),
                               ),
                             ],
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _buildStatItem(
-                                Icons.fitness_center,
-                                'Aktivite Sayısı',
-                                '$activityCount',
-                                Colors.white,
-                                MainAxisAlignment.center,
-                              ),
-                            ],
+                          SizedBox(height: 8.0),
+                          _buildStatItem(
+                            Icons.fitness_center,
+                            'Aktivite Sayısı',
+                            '$activityCount',
+                            Colors.white,
                           ),
                         ],
                       ),
@@ -231,7 +222,7 @@ class ProfilePage extends StatelessWidget {
                         await FirebaseAuth.instance.signOut();
                         Navigator.of(context).popUntil((route) => route.isFirst);
                       } catch (e) {
-                        print("Error signing out: $e");
+                        print("Çıkış yaparken hata oluştu: $e");
                       }
                     },
                   ),
@@ -244,10 +235,13 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(
-      IconData icon, String title, String subtitle, Color iconColor, MainAxisAlignment alignment) {
-    return Padding(
+  String _formatDuration(Duration duration) {
+    return "${duration.inHours} saat ${duration.inMinutes.remainder(60)} dk ${duration.inSeconds.remainder(60)} sn";
+  }
 
+  Widget _buildStatItem(
+      IconData icon, String title, String subtitle, Color iconColor) {
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -328,3 +322,4 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+

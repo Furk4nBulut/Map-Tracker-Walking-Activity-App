@@ -1,40 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:map_tracker/model/activity_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart'; // Adjust this import as per your project structure
 import 'package:map_tracker/utils/constants.dart'; // Adjust this import as per your project structure
 
 class StatisticPage extends StatelessWidget {
-  Future<Map<String, dynamic>> _fetchUserStatistics() async {
+  final DatabaseHelper dbHelper = DatabaseHelper();
+
+  Future<Map<String, dynamic>> _getUserStatistics() async {
     try {
-      final User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      LocalUser? currentUser = await dbHelper.getCurrentUser();
+      if (currentUser == null) {
         throw 'Kullanıcı oturumu açmamış.';
       }
 
-      final userActivities = FirebaseFirestore.instance
-          .collection('user')
-          .doc(user.uid)
-          .collection('activities');
-
-      final activitiesSnapshot = await userActivities.get();
+      List<Activity> userActivities = await dbHelper.getUserActivities(currentUser.id!);
 
       double totalDistance = 0.0;
       Duration totalDuration = Duration();
-      int activityCount = activitiesSnapshot.size;
+      int activityCount = userActivities.length;
 
-      for (var doc in activitiesSnapshot.docs) {
-        totalDistance += doc['totalDistance'] ?? 0.0;
-        Timestamp startTime = doc['startTime'];
-        Timestamp endTime = doc['endTime'];
+      for (var activity in userActivities) {
+        totalDistance += activity.totalDistance ?? 0.0;
 
-        // Convert Timestamp to DateTime
-        DateTime startDate = startTime.toDate();
-        DateTime endDate = endTime.toDate();
-
-        // Calculate duration
-        totalDuration += endDate.difference(startDate);
+        if (activity.startTime != null && activity.endTime != null) {
+          totalDuration += activity.endTime!.difference(activity.startTime!);
+        }
       }
 
       double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
@@ -52,7 +46,7 @@ class StatisticPage extends StatelessWidget {
         'averageSpeed': averageSpeed,
       };
     } catch (e) {
-      throw ('Error fetching user statistics: $e');
+      throw ('Kullanıcı istatistikleri alınırken hata oluştu: $e');
     }
   }
 
@@ -64,7 +58,7 @@ class StatisticPage extends StatelessWidget {
         automaticallyImplyLeading: true,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: _fetchUserStatistics(),
+        future: _getUserStatistics(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
