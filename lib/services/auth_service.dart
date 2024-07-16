@@ -39,16 +39,22 @@ class AuthService {
     try {
       final UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-
-        // Firebase'den giriş yapılan kullanıcı bilgilerini yerel veritabanına kaydetmek için
-        // Bu kısmı isteğe bağlı olarak kullanabilirsiniz. Genellikle ilk kayıtta kullanılır.
-        await dbHelper.insertUser(LocalUser(email: email, firstName: userCredential.user!.displayName ?? '', lastName: '', password: password));
-
-
+        var localUser = await dbHelper.getUserByEmail(email);
+        if (localUser == null) {
+          // Kullanıcı yerel veritabanında yoksa, ekle
+          var firstName = email.split('@')[0];
+          await dbHelper.insertUser(LocalUser(email: email, firstName: firstName, lastName: '', password: password));
+          Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
+        } else {
+          // Kullanıcı yerel veritabanında varsa, güncelle
+          var firstName = email.split('@')[0];
+          localUser.setFirstName = firstName;
+          await dbHelper.updateUser(localUser);
+          Fluttertoast.showToast(msg: "Yerel kullanıcı güncellendi!", toastLength: Toast.LENGTH_LONG);
+        }
         navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
-
       }
-    } on FirebaseAuthException catch(e) {
+    } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }

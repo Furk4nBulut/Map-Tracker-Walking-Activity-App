@@ -88,4 +88,14 @@ class DatabaseHelper {
     await prefs.remove('currentUserId');
   }
 
+  // update student method
+  Future<int> updateUser(LocalUser user) async {
+    final db = await database;
+    return await db.update(
+      tableName,
+      user.toMap(),
+      where: "id = ?",
+      whereArgs: [user.id],
+    );
+  }
 }
