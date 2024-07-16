@@ -128,6 +128,22 @@ class DatabaseHelper {
     }
     return activities;
   }
+  // get acitivty by id
+  Future<Activity?> getActivityById(int id) async {
+    final db = await database;
+    List<Map<String, dynamic>> activities = await db.query(
+      activityTable,
+      where: "id = ?",
+      whereArgs: [id],
+    );
+    if (activities.isNotEmpty) {
+      LocalUser? user = await getUserById(activities.first['userId']);
+      if (user != null) {
+        return Activity.fromMap(activities.first, user);
+      }
+    }
+    return null;
+  }
 
   // Get user activities
   Future<List<Activity>> getUserActivities(int userId) async {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
+import 'package:map_tracker/model/activity_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
   final String activityId;
@@ -12,89 +12,71 @@ class ActivityDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
+    return FutureBuilder<Activity?>(
+      future: DatabaseHelper().getActivityById(int.parse(activityId)), // Fetch activity from local DB
+      builder: (context, AsyncSnapshot<Activity?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
 
-    if (user == null) {
-      return Scaffold(
-        appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
-        body: Center(
-          child: Text('Kullanıcı girişi gereklidir.'),
-        ),
-      );
-    }
+        if (snapshot.hasError || snapshot.data == null) {
+          return Scaffold(
+            appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
+            body: Center(
+              child: Text('Aktivite bulunamadı.'),
+            ),
+          );
+        }
 
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance
-            .collection('user')
-            .doc(user.uid)
-            .collection('activities')
-            .doc(activityId)
-            .get(),
-        builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
-          }
+        Activity activity = snapshot.data!;
+        DateTime startTime = activity.startTime!;
+        DateTime? endTime = activity.endTime;
+        double totalDistance = activity.totalDistance ?? 0.0;
+        List<LatLng> route = activity.route ?? [];
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
+        Set<Polyline> polylines = {};
+        if (route.isNotEmpty) {
+          polylines.add(
+            Polyline(
+              polylineId: PolylineId('route_$activityId'),
+              points: route,
+              color: Colors.blue,
+              width: 5,
+            ),
+          );
+        }
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return Center(child: Text('Aktivite bulunamadı.'));
-          }
+        Set<Marker> markers = {};
+        if (route.isNotEmpty) {
+          markers.add(
+            Marker(
+              markerId: MarkerId('start'),
+              position: route.first,
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+              infoWindow: InfoWindow(title: 'Başlangıç'),
+            ),
+          );
+          markers.add(
+            Marker(
+              markerId: MarkerId('end'),
+              position: route.last,
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+              infoWindow: InfoWindow(title: 'Bitiş'),
+            ),
+          );
+        }
 
-          Map<String, dynamic> data = snapshot.data!.data()!;
-          Timestamp startTimeStamp = data['startTime'];
-          DateTime startTime = startTimeStamp.toDate();
-          Timestamp endTimeStamp = data['endTime'];
-          DateTime? endTime = endTimeStamp != null ? endTimeStamp.toDate() : null;
-          double totalDistance = data['totalDistance'] ?? 0.0;
+        String formattedStartTime = DateFormat('dd MMMM yyyy, HH:mm').format(startTime);
+        String? formattedEndTime = endTime != null ? DateFormat('dd MMMM yyyy, HH:mm').format(endTime) : null;
 
-          List<GeoPoint>? routeGeoPoints = data['route'] != null
-              ? List<GeoPoint>.from(data['route'])
-              : null;
-          List<LatLng> route = routeGeoPoints?.map((geoPoint) => LatLng(geoPoint.latitude, geoPoint.longitude)).toList() ?? [];
-
-          Set<Polyline> polylines = {};
-          if (route.isNotEmpty) {
-            polylines.add(
-              Polyline(
-                polylineId: PolylineId('route_$activityId'),
-                points: route,
-                color: Colors.blue,
-                width: 5,
-              ),
-            );
-          }
-
-          Set<Marker> markers = {};
-          // Adding start and end markers if route points are available
-          if (route.isNotEmpty) {
-            markers.add(
-              Marker(
-                markerId: MarkerId('start'),
-                position: route.first,
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-                infoWindow: InfoWindow(title: 'Start'),
-              ),
-            );
-            markers.add(
-              Marker(
-                markerId: MarkerId('end'),
-                position: route.last,
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-                infoWindow: InfoWindow(title: 'Finish'),
-              ),
-            );
-          }
-
-          // Format dates
-          String formattedStartTime = DateFormat('dd MMMM yyyy, HH:mm').format(startTime);
-          String? formattedEndTime = endTime != null ? DateFormat('dd MMMM yyyy, HH:mm').format(endTime) : null;
-
-          return Column(
+        return Scaffold(
+          appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
+          body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
@@ -108,9 +90,9 @@ class ActivityDetailScreen extends StatelessWidget {
                   markers: markers,
                 ),
               ),
-              SizedBox(height: 0), // Added spacing between map and details
+              SizedBox(height: 8),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 0),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
@@ -118,7 +100,7 @@ class ActivityDetailScreen extends StatelessWidget {
                   ),
                   color: Colors.blue.shade50,
                   child: Padding(
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -141,9 +123,9 @@ class ActivityDetailScreen extends StatelessWidget {
                               ),
                           ],
                         ),
-                        SizedBox(height: 8), // Added spacing between sections
+                        SizedBox(height: 8),
                         Divider(),
-                        SizedBox(height: 8), // Added spacing between sections
+                        SizedBox(height: 8),
                         Row(
                           children: [
                             Expanded(
@@ -157,21 +139,21 @@ class ActivityDetailScreen extends StatelessWidget {
                               child: ListTile(
                                 leading: Icon(Icons.speed, color: Colors.deepOrange),
                                 title: Text('Ortalama Hız', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                subtitle: Text('${data['averageSpeed']} km/s'),
+                                subtitle: Text('${activity.averageSpeed} km/s'),
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 16), // Added spacing between sections
+                        SizedBox(height: 16),
                       ],
                     ),
                   ),
                 ),
               ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
