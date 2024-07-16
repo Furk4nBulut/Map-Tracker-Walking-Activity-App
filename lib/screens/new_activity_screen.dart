@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/services/activity_service.dart';
 import 'package:map_tracker/utils/constants.dart';
@@ -29,12 +31,14 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   List<LatLng> _route = [];
   late GoogleMapController _mapController;
   Set<Polyline> _polylines = {};
+  LocalUser? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _initializeLocation();
     _fetchWeatherData();
+    _loadCurrentUser();
   }
 
   @override
@@ -89,6 +93,11 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     return await Geolocator.getCurrentPosition();
   }
 
+  Future<void> _loadCurrentUser() async {
+    _currentUser = await DatabaseHelper().getCurrentUser();
+    setState(() {});
+  }
+
   void _startActivity() {
     setState(() {
       _activityStarted = true;
@@ -118,8 +127,16 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     LatLng? startPosition = _route.isNotEmpty ? _route.first : null;
     LatLng? endPosition = _route.isNotEmpty ? _route.last : null;
 
+    if (_currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kullanıcı bilgisi alınamadı.')),
+      );
+      return;
+    }
+
     try {
       await ActivityService().saveActivity(
+        user: _currentUser!,
         startTime: _startTime!,
         endTime: _endTime!,
         totalDistance: _totalDistance,

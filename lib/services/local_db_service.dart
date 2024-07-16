@@ -8,6 +8,7 @@ class DatabaseHelper {
   static Database? _database;
   static const String tableName = 'user';
   static const String activityTable = 'activities';
+  LocalUser? localUser;
 
   Future<Database> get database async {
     if (_database != null) {
@@ -20,13 +21,13 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'ss.db'),
+      join(path, 'saas.db'),
       onCreate: (db, version) {
         db.execute(
           "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, email TEXT, password TEXT)",
         );
         db.execute(
-          "CREATE TABLE $activityTable(id INTEGER PRIMARY KEY, startTime TEXT, endTime TEXT, totalDistance REAL, elapsedTime INTEGER, averageSpeed REAL, startPositionLat REAL, startPositionLng REAL, endPositionLat REAL, endPositionLng REAL, route TEXT)",
+          "CREATE TABLE $activityTable(id INTEGER PRIMARY KEY, userId INTEGER, startTime TEXT, endTime TEXT, totalDistance REAL, elapsedTime INTEGER, averageSpeed REAL, startPositionLat REAL, startPositionLng REAL, endPositionLat REAL, endPositionLng REAL, route TEXT)",
         );
       },
       version: 1,
@@ -107,6 +108,7 @@ class DatabaseHelper {
   // Activity CRUD Operations
   Future<void> insertActivity(Activity activity) async {
     final db = await database;
+
     await db.insert(
       activityTable,
       activity.toMap(),
@@ -117,22 +119,45 @@ class DatabaseHelper {
   Future<List<Activity>> getActivities() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(activityTable);
-    return List.generate(maps.length, (i) {
-      return Activity.fromMap(maps[i]);
-    });
+    List<Activity> activities = [];
+    for (var map in maps) {
+      LocalUser? user = await getUserById(map['userId']);
+      if (user != null) {
+        activities.add(Activity.fromMap(map, user));
+      }
+    }
+    return activities;
   }
 
-
-  // get user activities
+  // Get user activities
   Future<List<Activity>> getUserActivities(int userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       activityTable,
-      where: "id = ?",
+      where: "userId = ?",
       whereArgs: [userId],
     );
-    return List.generate(maps.length, (i) {
-      return Activity.fromMap(maps[i]);
-    });
+    List<Activity> activities = [];
+    LocalUser? user = await getUserById(userId);
+    if (user != null) {
+      for (var map in maps) {
+        activities.add(Activity.fromMap(map, user));
+      }
+    }
+    return activities;
+  }
+
+  Future<LocalUser?> getUserById(int id) async {
+    final db = await database;
+    List<Map<String, dynamic>> users = await db.query(
+      tableName,
+      where: "id = ?",
+      whereArgs: [id],
+    );
+    if (users.isNotEmpty) {
+      return LocalUser.fromMap(users.first);
+    } else {
+      return null;
+    }
   }
 }
