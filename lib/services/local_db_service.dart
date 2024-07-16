@@ -136,6 +136,7 @@ class DatabaseHelper {
       activityTable,
       where: "userId = ?",
       whereArgs: [userId],
+      orderBy: "startTime DESC",
     );
     List<Activity> activities = [];
     LocalUser? user = await getUserById(userId);

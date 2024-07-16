@@ -10,9 +10,18 @@ import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:map_tracker/services/local_db_service.dart'; // Assuming you have DatabaseHelper defined
 import 'package:map_tracker/model/user_model.dart';
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:map_tracker/model/activity_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/model/user_model.dart';
+
+
+
+
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
   final firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   DatabaseHelper dbHelper = DatabaseHelper();
 
@@ -33,7 +42,6 @@ class AuthService {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }
-
   Future<void> signIn(BuildContext context, {required String email, required String password}) async {
     final navigator = Navigator.of(context);
     try {
@@ -41,17 +49,23 @@ class AuthService {
       if (userCredential.user != null) {
         var localUser = await dbHelper.getUserByEmail(email);
         if (localUser == null) {
-          // Kullanıcı yerel veritabanında yoksa, ekle
+          // User is not in local database, add them
           var firstName = email.split('@')[0];
-          await dbHelper.insertUser(LocalUser(email: email, firstName: firstName, lastName: '', password: password));
-          Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
+          localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
+          await dbHelper.insertUser(localUser);
+          Fluttertoast.showToast(msg: "User added to local database!", toastLength: Toast.LENGTH_LONG);
         } else {
-          // Kullanıcı yerel veritabanında varsa, güncelle
+          // User is in local database, update their details
           var firstName = email.split('@')[0];
-          localUser.setFirstName = firstName;
+          localUser.firstName = firstName;
+          localUser.password = password;  // Update password in case it has changed
           await dbHelper.updateUser(localUser);
-          Fluttertoast.showToast(msg: "Yerel kullanıcı güncellendi!", toastLength: Toast.LENGTH_LONG);
+          Fluttertoast.showToast(msg: "Local user updated!", toastLength: Toast.LENGTH_LONG);
         }
+
+        // Sync activities from Firestore to local database
+        await _syncUserActivitiesFromFirestore(localUser);
+
         navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
       }
     } on FirebaseAuthException catch (e) {
@@ -89,4 +103,65 @@ class AuthService {
       "password": password
     });
   }
+
+
+  Future<void> _syncUserActivitiesFromFirestore(LocalUser localUser) async {
+    try {
+      User? firebaseUser = firebaseAuth.currentUser;
+      if (firebaseUser != null) {
+        QuerySnapshot activitySnapshot = await firestore
+            .collection('user')
+            .doc(firebaseUser.uid)
+            .collection('activities')
+            .get();
+
+        for (var doc in activitySnapshot.docs) {
+          var data = doc.data() as Map<String, dynamic>;
+
+          LatLng? startPosition;
+          if (data['startPosition'] != null) {
+            GeoPoint geoPoint = data['startPosition'];
+            startPosition = LatLng(geoPoint.latitude, geoPoint.longitude);
+          }
+
+          LatLng? endPosition;
+          if (data['endPosition'] != null) {
+            GeoPoint geoPoint = data['endPosition'];
+            endPosition = LatLng(geoPoint.latitude, geoPoint.longitude);
+          }
+
+          List<LatLng> route = [];
+          if (data['route'] != null) {
+            for (var point in data['route']) {
+              GeoPoint geoPoint = point;
+              route.add(LatLng(geoPoint.latitude, geoPoint.longitude));
+            }
+          }
+
+          Activity activity = Activity(
+            user: localUser,
+            startTime: (data['startTime'] as Timestamp).toDate(),
+            endTime: (data['endTime'] as Timestamp).toDate(),
+            totalDistance: data['totalDistance'],
+            elapsedTime: data['elapsedTime'],
+            averageSpeed: data['averageSpeed'],
+            startPositionLat: startPosition?.latitude,
+            startPositionLng: startPosition?.longitude,
+            endPositionLat: endPosition?.latitude,
+            endPositionLng: endPosition?.longitude,
+            route: route,
+          );
+
+          await dbHelper.insertActivity(activity);
+        }
+        Fluttertoast.showToast(msg: "Activities synchronized!", toastLength: Toast.LENGTH_LONG);
+      }
+    } catch (e) {
+      print('An error occurred while syncing activities: $e');
+      throw 'An error occurred while syncing activities: $e';
+    }
+  }
+
+
+
 }
