@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/services/activity_service.dart';
@@ -122,6 +123,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _activityStarted = false;
       _endTime = DateTime.now();
       _timer?.cancel();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
     });
 
     LatLng? startPosition = _route.isNotEmpty ? _route.first : null;
@@ -146,7 +151,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         route: _route,
         averageSpeed: _averageSpeed,
       );
-
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
@@ -156,7 +161,9 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
       );
+
     }
+
   }
 
   void _updateActivityStats(Position position) {

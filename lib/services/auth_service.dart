@@ -61,6 +61,7 @@ class AuthService {
 // Sync activities from Firestore to local database
           await _syncUserActivitiesFromFirestore(localUser);
 
+
           navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
 
         }
@@ -177,6 +178,48 @@ class AuthService {
 
 
 
+// syncuser to firestone
+  Future<void> _syncUserActivitiesToFirestore(LocalUser localuser) async {
+    try {
+      User? firebaseUser = firebaseAuth.currentUser;
+      LocalUser? localUser = await dbHelper.getUserByEmail(localuser.email);
+      var userid = localUser?.id;
+      if (firebaseUser != null) {
+        List<Activity> activities = await dbHelper.getUserActivities(userid!);
+        for (Activity activity in activities) {
+          await firestore
+              .collection('user')
+              .doc(firebaseUser.uid)
+              .collection('activities')
+              .doc(activity.id)
+              .set({
+            'startTime': activity.startTime,
+            'endTime': activity.endTime,
+            'totalDistance': activity.totalDistance,
+            'elapsedTime': activity.elapsedTime,
+            'averageSpeed': activity.averageSpeed,
+            'startPosition': {
+              'latitude': activity.startPositionLat,
+              'longitude': activity.startPositionLng,
+            },
+            'endPosition': {
+              'latitude': activity.endPositionLat,
+              'longitude': activity.endPositionLng,
+            },
+            'route': activity.route?.map((point) => {
+              'latitude': point.latitude,
+              'longitude': point.longitude,
+            }).toList(),
+          });
+        }
+        Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
+      }
+      } catch (e)
+    {
+      print("Aktiviteleri senkronize ederken hata oluştu: $e");
+      Fluttertoast.showToast(msg: "Buluta kaydedilemedi: $e", toastLength: Toast.LENGTH_LONG);
+    }
+    }
 
 
 }
