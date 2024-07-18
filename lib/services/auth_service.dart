@@ -48,26 +48,25 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
+          await signOut(context);
 
 
-          // Sync activities from Firestore to local database
-          await _syncUserActivitiesFromFirestore(localUser);
 
-          Fluttertoast.showToast(msg: "KUllanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.", toastLength: Toast.LENGTH_LONG);
+          Fluttertoast.showToast(msg: "KUllanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.Tekrar giriş yapınız!", toastLength: Toast.LENGTH_LONG);
         } else {
           // User is in local database, update their details
           var firstName = email.split('@')[0];
           localUser.firstName = firstName;
           localUser.password = password;  // Update password in case it has changed
           await dbHelper.updateUser(localUser);
+// Sync activities from Firestore to local database
+          await _syncUserActivitiesFromFirestore(localUser);
 
+          navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
         }
 
 
-        // Sync activities from Firestore to local database
-        await _syncUserActivitiesFromFirestore(localUser);
 
-        navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
       }
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);

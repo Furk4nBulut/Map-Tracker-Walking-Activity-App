@@ -54,7 +54,6 @@ class _SignInScreenState extends State<SignInScreen> {
         ));
 
     if(response==true){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
     }else{
       Fluttertoast.showToast(
         msg: "Kullanıcı adı veya şifre hatalı",
