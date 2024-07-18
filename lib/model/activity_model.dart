@@ -18,7 +18,7 @@ class Activity {
   late LocalUser user;  // Integrate user from user_model.dart
 
   Activity({
-    this.id,
+    required this.id,
     required this.user,
     required this.startTime,
     required this.endTime,

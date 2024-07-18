@@ -4,6 +4,7 @@ import 'package:map_tracker/model/activity_model.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 
 class ActivityService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
@@ -22,7 +23,19 @@ class ActivityService {
   }) async {
     try {
       // Save activity locally
+      String activityId = generateUniqueId();
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
       await _dbHelper.insertActivity(Activity(
+        id: activityId,
         user: user,
         startTime: startTime,
         endTime: endTime,
@@ -39,8 +52,11 @@ class ActivityService {
       final FirebaseAuth _auth = FirebaseAuth.instance;
       User? firebaseuser = _auth.currentUser;
       if (firebaseuser != null) {
+
+
         // Save activity to Firestore
-        await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').add({
+        // Firestore kaydı
+        await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').doc(activityId).set({
           'userId': user.id,
           'startTime': startTime,
           'endTime': endTime,
@@ -60,5 +76,11 @@ class ActivityService {
       print('An error occurred while saving the activity: $e');
       throw 'An error occurred while saving the activity: $e';
     }
+  }
+
+  // Basit bir benzersiz ID oluşturma işlevi
+  String generateUniqueId() {
+    var uuid = Uuid();
+    return uuid.v4();
   }
 }
