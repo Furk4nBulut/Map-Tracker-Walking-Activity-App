@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_helper_utils/flutter_helper_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:map_tracker/screens/homepage.dart';
@@ -75,20 +76,70 @@ class AuthService {
     }
   }
 
-  Future<User?> signInWithGoogle() async {
-    // Oturum açma sürecini başlat
+  Future<User?> signInWithGoogle(BuildContext context) async {
+    // Start the sign-in process
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
-    // Süreç içerisinden bilgileri al
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+    if (gUser == null) {
+      // The user canceled the sign-in
+      return null;
+    }
 
-    // Kullanıcı nesnesi oluştur
-    final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
+    // Retrieve the authentication details
+    final GoogleSignInAuthentication gAuth = await gUser.authentication;
 
-    // Kullanıcı girişini sağla
+    // Create a credential object
+    final credential = GoogleAuthProvider.credential(
+      accessToken: gAuth.accessToken,
+      idToken: gAuth.idToken,
+    );
+
+    // Sign in the user with the credential
     final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
-    log(userCredential.user!.email.toString());
-    return userCredential.user;
+
+    // Retrieve user information
+    final User? firebaseUser = userCredential.user;
+    if (firebaseUser != null) {
+      final String email = firebaseUser.email!;
+      final String displayName = firebaseUser.displayName ?? '';
+      String firstName =firebaseUser.displayName ?? '';
+      String lastName = '';
+      final String password = firebaseUser.uid;
+      final String userid = firebaseUser.uid;
+      print(email);
+      print(displayName);
+      print(firstName);
+      print(lastName);
+      print(password);
+      print(password);
+      print(password);
+      print(password);
+      print(firebaseUser.uid);
+      print(userid);
+      print(userid);
+      print(userid);
+      print(userid);
+
+      // Save user information to Firestore
+      await _registerGoogleUser(name: firstName, surname: lastName, email: email, password: password, id: userid);
+
+      // Save user information to the local database
+      LocalUser localUser = LocalUser(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password, // Password is not used in this case
+      );
+
+      await dbHelper.insertUser(localUser);
+      signIn(context, email: email, password: password);
+
+
+      // Sync activities from Firestore to local database
+      await _syncUserActivitiesFromFirestore(localUser);
+    }
+
+    return firebaseUser;
   }
 
   Future<void> signOut(BuildContext context) async {
@@ -99,6 +150,16 @@ class AuthService {
 
   Future<void> _registerUser({required String name, required String surname, required String email, required String password}) async {
     await userCollection.doc().set({
+      "email" : email,
+      "name": name,
+      "surname": surname,
+      "password": password
+    });
+  }
+  // register user for google with id field
+  Future<void> _registerGoogleUser({required String name, required String surname, required String email, required String password, required String id}) async {
+    await userCollection.doc(id).set({
+      "id": id,
       "email" : email,
       "name": name,
       "surname": surname,
@@ -119,41 +180,41 @@ class AuthService {
         for (var doc in activitySnapshot.docs) {
           var data = doc.data() as Map<String, dynamic>;
           String activityId = doc.id;
-            Fluttertoast.showToast(msg: "Kullanıcı bilgileri güncelleniyor!", toastLength: Toast.LENGTH_LONG);
+          Fluttertoast.showToast(msg: "Kullanıcı bilgileri güncelleniyor!", toastLength: Toast.LENGTH_LONG);
 
-            LatLng? startPosition;
-            if (data['startPosition'] != null) {
-              startPosition = LatLng(data['startPosition']['latitude'], data['startPosition']['longitude']);
+          LatLng? startPosition;
+          if (data['startPosition'] != null) {
+            startPosition = LatLng(data['startPosition']['latitude'], data['startPosition']['longitude']);
+          }
+
+          LatLng? endPosition;
+          if (data['endPosition'] != null) {
+            endPosition = LatLng(data['endPosition']['latitude'], data['endPosition']['longitude']);
+          }
+
+          List<LatLng> route = [];
+          if (data['route'] != null) {
+            for (var point in data['route']) {
+              route.add(LatLng(point['latitude'], point['longitude']));
             }
+          }
 
-            LatLng? endPosition;
-            if (data['endPosition'] != null) {
-              endPosition = LatLng(data['endPosition']['latitude'], data['endPosition']['longitude']);
-            }
+          Activity activity = Activity(
+            user: localUser,
+            startTime: (data['startTime'] as Timestamp).toDate(),
+            endTime: (data['endTime'] as Timestamp).toDate(),
+            totalDistance: data['totalDistance'],
+            elapsedTime: data['elapsedTime'],
+            averageSpeed: data['averageSpeed'],
+            startPositionLat: startPosition?.latitude,
+            startPositionLng: startPosition?.longitude,
+            endPositionLat: endPosition?.latitude,
+            endPositionLng: endPosition?.longitude,
+            route: route,
+            id: activityId,
+          );
 
-            List<LatLng> route = [];
-            if (data['route'] != null) {
-              for (var point in data['route']) {
-                route.add(LatLng(point['latitude'], point['longitude']));
-              }
-            }
-
-            Activity activity = Activity(
-              user: localUser,
-              startTime: (data['startTime'] as Timestamp).toDate(),
-              endTime: (data['endTime'] as Timestamp).toDate(),
-              totalDistance: data['totalDistance'],
-              elapsedTime: data['elapsedTime'],
-              averageSpeed: data['averageSpeed'],
-              startPositionLat: startPosition?.latitude,
-              startPositionLng: startPosition?.longitude,
-              endPositionLat: endPosition?.latitude,
-              endPositionLng: endPosition?.longitude,
-              route: route,
-              id: activityId,
-            );
-
-            await dbHelper.insertActivity(activity);
+          await dbHelper.insertActivity(activity);
 
         }
         Fluttertoast.showToast(msg: "Activities synchronized!", toastLength: Toast.LENGTH_LONG);
@@ -214,12 +275,12 @@ class AuthService {
         }
         Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
       }
-      } catch (e)
+    } catch (e)
     {
       print("Aktiviteleri senkronize ederken hata oluştu: $e");
       Fluttertoast.showToast(msg: "Buluta kaydedilemedi: $e", toastLength: Toast.LENGTH_LONG);
     }
-    }
+  }
 
 
 }
