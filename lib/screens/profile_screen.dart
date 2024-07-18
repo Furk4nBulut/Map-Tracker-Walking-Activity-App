@@ -85,171 +85,169 @@ class ProfilePage extends StatelessWidget {
           String formattedTotalDuration = _formatDuration(totalDuration);
           String formattedAverageDuration = _formatDuration(averageDuration);
 
-          return SingleChildScrollView(
+          return ListView(
             padding: EdgeInsets.all(8.0),
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Hero(
-                    tag: 'userProfileImage',
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: basarsoft_color,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      padding: EdgeInsets.all(6),
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage: FirebaseAuth.instance.currentUser?.photoURL != null
-                            ? NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!)
-                            : null,
-                        child: FirebaseAuth.instance.currentUser?.photoURL == null
-                            ? const Icon(Icons.person, size: 50)
-                            : null,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    FirebaseAuth.instance.currentUser?.displayName ?? 'Bilinmiyor',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    FirebaseAuth.instance.currentUser?.email ?? 'Email bilinmiyor',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Card(
-                    color: Colors.white,
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0),
-                    ),
-                    shadowColor: basarsoft_color,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.directions_walk,
-                                  'Toplam Mesafe',
-                                  '${totalDistance.toStringAsFixed(2)} km',
-                                  Colors.green,
-                                ),
-                              ),
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.add_road,
-                                  'Ortalama Mesafe',
-                                  '${averageDistance.toStringAsFixed(2)} km',
-                                  Colors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.timer_outlined,
-                                  'Toplam Süre',
-                                  formattedTotalDuration,
-                                  basarsoft_color_light,
-                                ),
-                              ),
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.timelapse_rounded,
-                                  'Ortalama Süre',
-                                  formattedAverageDuration,
-                                  basarsoft_color_light,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8.0),
-                          _buildStatItem(
-                            Icons.fitness_center,
-                            'Aktivite Sayısı',
-                            '$activityCount',
-                            Colors.white,
-                          ),
-                        ],
+            children: [
+              Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Hero(
+                      tag: 'userProfileImage',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: basarsoft_color,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        padding: EdgeInsets.all(6),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: FirebaseAuth.instance.currentUser?.photoURL != null
+                              ? NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!)
+                              : null,
+                          child: FirebaseAuth.instance.currentUser?.photoURL == null
+                              ? const Icon(Icons.person, size: 50)
+                              : null,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10.0),
-                  _buildProfileButton(
-                    icon: Icons.add,
-                    text: 'Yeni Aktivite',
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => NewActivityScreen(),
-                      ));
-                    },
-                  ),
-                  SizedBox(height: 8.0),
-                  _buildProfileButton(
-                    icon: Icons.history,
-                    text: 'Aktivite Geçmişim',
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => ActivityHistoryScreen(),
-                      ));
-                    },
-                  ),
-                  SizedBox(height: 8.0),
-
-                  _buildProfileButton(
-                    icon: Icons.sync,
-                    text: 'Verileri Senkronize Et',
-                    onPressed: () async {
-                      try {
-                        final LocalUser? user = await dbHelper.getCurrentUser();
-                        if (user != null) {
-                          await AuthService().syncUserActivities(context, user);
+                    SizedBox(height: 4.0),
+                    Text(
+                      FirebaseAuth.instance.currentUser?.displayName ?? 'Bilinmiyor',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      FirebaseAuth.instance.currentUser?.email ?? 'Email bilinmiyor',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    SizedBox(height: 8.0),
+                    Card(
+                      color: Colors.white,
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      shadowColor: basarsoft_color,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: _buildStatItem(
+                                    Icons.directions_walk,
+                                    'Toplam Mesafe',
+                                    '${totalDistance.toStringAsFixed(2)} km',
+                                    Colors.green,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _buildStatItem(
+                                    Icons.add_road,
+                                    'Ortalama Mesafe',
+                                    '${averageDistance.toStringAsFixed(2)} km',
+                                    Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: _buildStatItem(
+                                    Icons.timer_outlined,
+                                    'Toplam Süre',
+                                    formattedTotalDuration,
+                                    basarsoft_color_light,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _buildStatItem(
+                                    Icons.timelapse_rounded,
+                                    'Ortalama Süre',
+                                    formattedAverageDuration,
+                                    basarsoft_color_light,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8.0),
+                            _buildStatItem(
+                              Icons.fitness_center,
+                              'Aktivite Sayısı',
+                              '$activityCount',
+                              Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10.0),
+                    _buildProfileButton(
+                      icon: Icons.add,
+                      text: 'Yeni Aktivite',
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => NewActivityScreen(),
+                        ));
+                      },
+                    ),
+                    SizedBox(height: 8.0),
+                    _buildProfileButton(
+                      icon: Icons.history,
+                      text: 'Aktivite Geçmişim',
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ActivityHistoryScreen(),
+                        ));
+                      },
+                    ),
+                    SizedBox(height: 8.0),
+                    _buildProfileButton(
+                      icon: Icons.sync,
+                      text: 'Verileri Senkronize Et',
+                      onPressed: () async {
+                        try {
+                          final LocalUser? user = await dbHelper.getCurrentUser();
+                          if (user != null) {
+                            await AuthService().syncUserActivities(context, user);
+                          }
+                        } catch (e) {
+                          print("Hata oluştu: $e");
+                          // Handle error as needed
                         }
-                      } catch (e) {
-                        print("Hata oluştu: $e");
-                        // Handle error as needed
-                      }
-                    },
-                  ),
-
-
-
-                  SizedBox(height: 8.0),
-                  _buildProfileButton(
-                    icon: Icons.logout,
-                    text: 'Çıkış Yap',
-                    onPressed: () async {
-                      try {
-                        await FirebaseAuth.instance.signOut();
-                        Navigator.of(context).popUntil((route) => route.isFirst);
-                      } catch (e) {
-                        print("Çıkış yaparken hata oluştu: $e");
-                      }
-                    },
-                  ),
-                ],
+                      },
+                    ),
+                    SizedBox(height: 8.0),
+                    _buildProfileButton(
+                      icon: Icons.logout,
+                      text: 'Çıkış Yap',
+                      onPressed: () async {
+                        try {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        } catch (e) {
+                          print("Çıkış yaparken hata oluştu: $e");
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           );
         },
       ),
@@ -343,4 +341,3 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-
