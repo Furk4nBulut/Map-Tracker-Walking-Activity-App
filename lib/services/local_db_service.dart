@@ -21,7 +21,7 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'yıldızlarssss.db'),
+      join(path, 'asdsadfsdadsadasdsadsadaegfqw.db'),
       onCreate: (db, version) {
         db.execute(
           "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, email TEXT, password TEXT)",

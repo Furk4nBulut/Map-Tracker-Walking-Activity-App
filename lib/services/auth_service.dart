@@ -77,51 +77,28 @@ class AuthService {
   }
 
   Future<User?> signInWithGoogle(BuildContext context) async {
-    // Start the sign-in process
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
     if (gUser == null) {
-      // The user canceled the sign-in
-      return null;
+      return null; // The user canceled the sign-in
     }
 
-    // Retrieve the authentication details
     final GoogleSignInAuthentication gAuth = await gUser.authentication;
-
-    // Create a credential object
     final credential = GoogleAuthProvider.credential(
       accessToken: gAuth.accessToken,
       idToken: gAuth.idToken,
     );
 
-    // Sign in the user with the credential
     final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
-
-    // Retrieve user information
     final User? firebaseUser = userCredential.user;
+
     if (firebaseUser != null) {
       final String email = firebaseUser.email!;
       final String displayName = firebaseUser.displayName ?? '';
-      String firstName =firebaseUser.displayName ?? '';
-      String lastName = '';
+      final String firstName = firebaseUser.email!.split('@').first;
+      final String lastName = firebaseUser.displayName ?? '';
       final String password = firebaseUser.uid;
-      final String userid = firebaseUser.uid;
-      print(email);
-      print(displayName);
-      print(firstName);
-      print(lastName);
-      print(password);
-      print(password);
-      print(password);
-      print(password);
-      print(firebaseUser.uid);
-      print(userid);
-      print(userid);
-      print(userid);
-      print(userid);
-
-      // Save user information to Firestore
-      await _registerGoogleUser(name: firstName, surname: lastName, email: email, password: password, id: userid);
+      final String userId = firebaseUser.uid;
 
       // Save user information to the local database
       LocalUser localUser = LocalUser(
@@ -131,16 +108,30 @@ class AuthService {
         password: password, // Password is not used in this case
       );
 
+
+
       await dbHelper.insertUser(localUser);
-      signIn(context, email: email, password: password);
+      // Save user information to Firestore
+      await _registerGoogleUser(
+        id: userId,
+        name: firstName,
+        surname: lastName,
+        email: email,
+        password: password,
+      );
+
 
 
       // Sync activities from Firestore to local database
       await _syncUserActivitiesFromFirestore(localUser);
+
+      // Sign in locally
+      await signIn(context, email: email, password: password);
     }
 
     return firebaseUser;
   }
+
 
   Future<void> signOut(BuildContext context) async {
     await firebaseAuth.signOut();

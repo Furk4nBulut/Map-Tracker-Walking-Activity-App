@@ -24,6 +24,16 @@ class ActivityService {
     try {
       // Save activity locally
       String activityId = generateUniqueId();
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
+      print(activityId);
       await _dbHelper.insertActivity(Activity(
         id: activityId,
         user: user,
@@ -42,9 +52,11 @@ class ActivityService {
       final FirebaseAuth _auth = FirebaseAuth.instance;
       User? firebaseuser = _auth.currentUser;
       if (firebaseuser != null) {
+
+
         // Save activity to Firestore
-        await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').add({
-          'id': activityId,
+        // Firestore kaydı
+        await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').doc(activityId).set({
           'userId': user.id,
           'startTime': startTime,
           'endTime': endTime,
