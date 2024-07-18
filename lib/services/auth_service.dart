@@ -58,7 +58,6 @@ class AuthService {
           localUser.password = password;  // Update password in case it has changed
           await dbHelper.updateUser(localUser);
 
-          Fluttertoast.showToast(msg: "Yerel Kullanıcı güncellendi.", toastLength: Toast.LENGTH_LONG);
         }
 
         // Sync activities from Firestore to local database
@@ -118,9 +117,8 @@ class AuthService {
 
           // Check if the activity already exists in the local database to avoid duplicates
           bool activityExists = await dbHelper.checkActivityExists(activityId);
-          if (activityExists) {
-            Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Zaten Güncel!", toastLength: Toast.LENGTH_LONG);
-            continue;
+          if (activityExists == true) {
+            Fluttertoast.showToast(msg: "Kullanıcı aktivit Zaten Güncel!", toastLength: Toast.LENGTH_LONG);
           } else {
             Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Güncelleniyor!", toastLength: Toast.LENGTH_LONG);
 
