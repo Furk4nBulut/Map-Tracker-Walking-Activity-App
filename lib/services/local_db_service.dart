@@ -21,7 +21,7 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'alicabbardb.db'),
+      join(path, 'testalicabbar.db'),
       onCreate: (db, version) {
         db.execute(
           "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, email TEXT, password TEXT)",
@@ -143,13 +143,6 @@ class DatabaseHelper {
     }
     return null;
   }
-
-  Future<bool> checkActivityExists(String activityId) async {
-    final db = await database;
-    var res = await db.query(activityTable, where: "id = ?", whereArgs: [activityId]);
-    return res.isNotEmpty;
-  }
-
   Future<List<Activity>> getUserActivities(int userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(

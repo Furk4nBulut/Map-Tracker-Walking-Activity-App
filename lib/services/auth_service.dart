@@ -48,6 +48,9 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
+
+
+          // Sync activities from Firestore to local database
           await _syncUserActivitiesFromFirestore(localUser);
 
           Fluttertoast.showToast(msg: "KUllanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.", toastLength: Toast.LENGTH_LONG);
@@ -59,6 +62,7 @@ class AuthService {
           await dbHelper.updateUser(localUser);
 
         }
+
 
         // Sync activities from Firestore to local database
         await _syncUserActivitiesFromFirestore(localUser);
@@ -114,48 +118,41 @@ class AuthService {
         for (var doc in activitySnapshot.docs) {
           var data = doc.data() as Map<String, dynamic>;
           String activityId = doc.id;
+            Fluttertoast.showToast(msg: "Kullanıcı bilgileri güncelleniyor!", toastLength: Toast.LENGTH_LONG);
 
-          // Check if the activity already exists in the local database to avoid duplicates
-          bool activityExists = await dbHelper.checkActivityExists(activityId);
-          if (activityExists == true) {
-            Fluttertoast.showToast(msg: "Kullanıcı aktivit Zaten Güncel!", toastLength: Toast.LENGTH_LONG);
-          } else {
-            Fluttertoast.showToast(msg: "Kullanıcı Bilgileri Güncelleniyor!", toastLength: Toast.LENGTH_LONG);
-
-          LatLng? startPosition;
-          if (data['startPosition'] != null) {
-            startPosition = LatLng(data['startPosition']['latitude'], data['startPosition']['longitude']);
-          }
-
-          LatLng? endPosition;
-          if (data['endPosition'] != null) {
-            endPosition = LatLng(data['endPosition']['latitude'], data['endPosition']['longitude']);
-          }
-
-          List<LatLng> route = [];
-          if (data['route'] != null) {
-            for (var point in data['route']) {
-              route.add(LatLng(point['latitude'], point['longitude']));
+            LatLng? startPosition;
+            if (data['startPosition'] != null) {
+              startPosition = LatLng(data['startPosition']['latitude'], data['startPosition']['longitude']);
             }
-          }
 
-          Activity activity = Activity(
-            user: localUser,
-            startTime: (data['startTime'] as Timestamp).toDate(),
-            endTime: (data['endTime'] as Timestamp).toDate(),
-            totalDistance: data['totalDistance'],
-            elapsedTime: data['elapsedTime'],
-            averageSpeed: data['averageSpeed'],
-            startPositionLat: startPosition?.latitude,
-            startPositionLng: startPosition?.longitude,
-            endPositionLat: endPosition?.latitude,
-            endPositionLng: endPosition?.longitude,
-            route: route,
-            id: activityId,// Include the Firestore document ID as the activity ID
-          );
+            LatLng? endPosition;
+            if (data['endPosition'] != null) {
+              endPosition = LatLng(data['endPosition']['latitude'], data['endPosition']['longitude']);
+            }
 
-          await dbHelper.insertActivity(activity);
-          }
+            List<LatLng> route = [];
+            if (data['route'] != null) {
+              for (var point in data['route']) {
+                route.add(LatLng(point['latitude'], point['longitude']));
+              }
+            }
+
+            Activity activity = Activity(
+              user: localUser,
+              startTime: (data['startTime'] as Timestamp).toDate(),
+              endTime: (data['endTime'] as Timestamp).toDate(),
+              totalDistance: data['totalDistance'],
+              elapsedTime: data['elapsedTime'],
+              averageSpeed: data['averageSpeed'],
+              startPositionLat: startPosition?.latitude,
+              startPositionLng: startPosition?.longitude,
+              endPositionLat: endPosition?.latitude,
+              endPositionLng: endPosition?.longitude,
+              route: route,
+              id: activityId,
+            );
+
+            await dbHelper.insertActivity(activity);
 
         }
         Fluttertoast.showToast(msg: "Activities synchronized!", toastLength: Toast.LENGTH_LONG);
@@ -165,6 +162,7 @@ class AuthService {
       throw 'An error occurred while syncing activities: $e';
     }
   }
+
 
 
 
