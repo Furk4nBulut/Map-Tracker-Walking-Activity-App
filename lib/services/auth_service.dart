@@ -48,7 +48,6 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
-          await signOut(context);
 
 
 
@@ -63,7 +62,9 @@ class AuthService {
           await _syncUserActivitiesFromFirestore(localUser);
 
           navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
+
         }
+
 
 
 
@@ -159,6 +160,18 @@ class AuthService {
     } catch (e) {
       print('An error occurred while syncing activities: $e');
       throw 'An error occurred while syncing activities: $e';
+    }
+  }
+
+
+
+  Future<void> syncUserActivities(BuildContext context, LocalUser localUser) async {
+    try {
+      await _syncUserActivitiesFromFirestore(localUser);
+      Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      print("Aktiviteleri senkronize ederken hata oluştu: $e");
+      Fluttertoast.showToast(msg: "Aktiviteleri senkronize ederken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
     }
   }
 

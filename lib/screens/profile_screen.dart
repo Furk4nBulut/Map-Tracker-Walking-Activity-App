@@ -8,6 +8,7 @@ import 'package:map_tracker/model/activity_model.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart'; // DatabaseHelper kullanılacak
 import 'package:intl/intl.dart'; // Tarih biçimlendirme için
+import 'package:map_tracker/services/auth_service.dart'; // AuthService
 
 class ProfilePage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -213,7 +214,27 @@ class ProfilePage extends StatelessWidget {
                       ));
                     },
                   ),
-                  SizedBox(height: 16.0),
+                  SizedBox(height: 8.0),
+
+                  _buildProfileButton(
+                    icon: Icons.sync,
+                    text: 'Verileri Senkronize Et',
+                    onPressed: () async {
+                      try {
+                        final LocalUser? user = await dbHelper.getCurrentUser();
+                        if (user != null) {
+                          await AuthService().syncUserActivities(context, user);
+                        }
+                      } catch (e) {
+                        print("Hata oluştu: $e");
+                        // Handle error as needed
+                      }
+                    },
+                  ),
+
+
+
+                  SizedBox(height: 8.0),
                   _buildProfileButton(
                     icon: Icons.logout,
                     text: 'Çıkış Yap',
