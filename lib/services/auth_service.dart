@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
-import 'package:map_tracker/services/local_db_service.dart'; // Assuming you have DatabaseHelper defined
+import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_tracker/model/activity_model.dart';
@@ -27,7 +27,6 @@ class AuthService {
         await _registerUser(name: name, surname: surname, email: email, password: password);
         Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
 
-        // Yerel veritabanına kullanıcıyı kaydet
         await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
         Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
       }
@@ -45,7 +44,7 @@ class AuthService {
       if (userCredential.user != null) {
         var localUser = await dbHelper.getUserByEmail(email);
         if (localUser == null) {
-          // User is not in local database, add them
+
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
@@ -54,12 +53,9 @@ class AuthService {
 
           Fluttertoast.showToast(msg: "KUllanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.Tekrar giriş yapınız!", toastLength: Toast.LENGTH_LONG);
         } else {
-          // User is in local database, update their details
-          var firstName = email.split('@')[0];
-          localUser.firstName = firstName;
-          localUser.password = password;  // Update password in case it has changed
+
           await dbHelper.updateUser(localUser);
-// Sync activities from Firestore to local database
+
           await _syncUserActivitiesFromFirestore(localUser);
 
 
@@ -76,66 +72,72 @@ class AuthService {
     }
   }
 
-  Future<User?> signInWithGoogle(BuildContext context) async {
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        return;
+      }
 
-    if (gUser == null) {
-      return null; // The user canceled the sign-in
-    }
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-    final GoogleSignInAuthentication gAuth = await gUser.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: gAuth.accessToken,
-      idToken: gAuth.idToken,
-    );
-
-    final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
-    final User? firebaseUser = userCredential.user;
-
-    if (firebaseUser != null) {
-      final String email = firebaseUser.email!;
-      final String displayName = firebaseUser.displayName ?? '';
-      final String firstName = firebaseUser.email!.split('@').first;
-      final String lastName = firebaseUser.displayName ?? '';
-      final String password = firebaseUser.uid;
-      final String userId = firebaseUser.uid;
-
-      // Save user information to the local database
-      LocalUser localUser = LocalUser(
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        password: password, // Password is not used in this case
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
+      final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
+      final User? firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        final String email = firebaseUser.email!;
+        final String displayName = firebaseUser.displayName ?? '';
+        final String firstName = displayName.split(' ').first;
+        final String lastName = displayName.split(' ').length > 1 ? displayName.split(' ').last : '';
+        final String password = googleUser.id;
 
 
-      await dbHelper.insertUser(localUser);
-      // Save user information to Firestore
-      await _registerGoogleUser(
-        id: userId,
-        name: firstName,
-        surname: lastName,
-        email: email,
-        password: password,
-      );
+        var localUser = await dbHelper.getUserByEmail(email);
+        if (localUser == null) {
+
+          localUser = LocalUser(
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+            password: password,
+          );
+          await dbHelper.insertUser(localUser);
+          await _registerGoogleUser(
+            name: firstName,
+            surname: lastName,
+            email: email,
+            password: password,
+            id: firebaseUser.uid,
+          );
+        } else {
+          localUser.firstName = firstName;
+          localUser.lastName = lastName;
+          localUser.password = password;
+          await dbHelper.updateUser(localUser);
+        }
 
 
-
-      // Sync activities from Firestore to local database
-      await _syncUserActivitiesFromFirestore(localUser);
-
-      // Sign in locally
-      await signIn(context, email: email, password: password);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Google ile giriş yapılamadı: $e", toastLength: Toast.LENGTH_LONG);
     }
-
-    return firebaseUser;
   }
 
 
+
+
   Future<void> signOut(BuildContext context) async {
+    dbHelper.logout();
     await firebaseAuth.signOut();
-    Navigator.of(context).pop(); // Ana sayfaya dönmek için
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.of(context).pop();
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => WelcomeScreen()));
   }
 
