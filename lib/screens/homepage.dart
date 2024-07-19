@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:map_tracker/screens/profile_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
@@ -8,6 +9,8 @@ import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomA
 import 'package:map_tracker/screens/stat_page.dart'; // Import the ActivityHistoryScreen widget
 import 'package:map_tracker/model/user_model.dart'; // Import the User model
 import 'package:map_tracker/services/local_db_service.dart'; // Import the DatabaseHelper
+import 'package:map_tracker/screens/welcome_screen.dart'; // Import the WelcomeScreen
+import 'package:map_tracker/screens/welcome_screen.dart'; // Import the WelcomeScreen
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,9 +32,19 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadCurrentUser() async {
     LocalUser? userFromDb = await dbHelper.getCurrentUser();
-    setState(() {
-      localUser = userFromDb;
-    });
+    if (userFromDb == null) {
+      // Navigate to WelcomeScreen if no user is found
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+      );
+      Fluttertoast.showToast(msg: "Kullanıcı bulunamadı. Lütfen giriş yapın.", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0); // Add this line
+
+    } else {
+      setState(() {
+        localUser = userFromDb;
+      });
+    }
   }
 
   void _onItemTapped(int index) {
