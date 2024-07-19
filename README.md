@@ -2,6 +2,7 @@
 # Map Tracker Yürüyüş Aktivitesi Uygulaması
 
 Bu proje, Flutter kullanarak geliştirilen bir yürüyüş aktivitesi uygulamasıdır. Uygulama, kullanıcıların yürüyüş/koşu aktivitelerini başlatıp bitirmelerini, bu aktivitelerin süresini ve mesafesini hesaplamalarını, ve verileri SQLite/SpatiaLite veritabanına kaydetmelerini sağlar. Ayrıca geçmiş aktiviteleri görüntüleme ve detaylarını inceleme imkanı sunar.
+**Not: İlk Flutter projem olup 0'dan öğrenme sürecimi kapsamaktadır. Kodlarım profesyonel bir yapıda olmayabilir.**
 ![uygulama.png](uygulama.png)
 
 ## Özellikler
@@ -83,6 +84,4 @@ Bu proje, Flutter kullanarak geliştirilen bir yürüyüş aktivitesi uygulamas�
 
 Herhangi bir sorun veya öneriniz olursa lütfen benimle iletişime geçin.
 ```
-
-Bu düzenleme, resimlerin boyutunu 150 piksel genişliğinde yaparak telefon ekranlarında daha uygun hale getirir.
 ---
