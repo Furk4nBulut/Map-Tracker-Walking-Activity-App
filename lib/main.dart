@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Montserrat',
         ),
       ),
+
       home: const SplashScreen(),
     );
   }

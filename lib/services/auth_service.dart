@@ -72,61 +72,31 @@ class AuthService {
     }
   }
 
-  Future<void> signInWithGoogle(BuildContext context) async {
+  Future<User?> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+      final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
       final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
-      final User? firebaseUser = userCredential.user;
 
+      User? firebaseUser = userCredential.user;
       if (firebaseUser != null) {
-        final String email = firebaseUser.email!;
-        final String displayName = firebaseUser.displayName ?? '';
-        final String firstName = displayName.split(' ').first;
-        final String lastName = displayName.split(' ').length > 1 ? displayName.split(' ').last : '';
-        final String password = googleUser.id;
-
-
-        var localUser = await dbHelper.getUserByEmail(email);
+        var localUser = await dbHelper.getUserByEmail(firebaseUser.email!);
         if (localUser == null) {
-
-          localUser = LocalUser(
-            email: email,
-            firstName: firstName,
-            lastName: lastName,
-            password: password,
-          );
+          localUser = LocalUser(email: firebaseUser.email!, firstName: firebaseUser.displayName?.split(' ')[0] ?? '', lastName: firebaseUser.displayName?.split(' ')[1] ?? '', password: '');
           await dbHelper.insertUser(localUser);
-          await _registerGoogleUser(
-            name: firstName,
-            surname: lastName,
-            email: email,
-            password: password,
-            id: firebaseUser.uid,
-          );
+          await _registerGoogleUser(name: localUser.firstName, surname: localUser.lastName, email: localUser.email, password: '', id: firebaseUser.uid);
+          Fluttertoast.showToast(msg: "Google kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz. Tekrar giriş yapınız!", toastLength: Toast.LENGTH_LONG);
         } else {
-          localUser.firstName = firstName;
-          localUser.lastName = lastName;
-          localUser.password = password;
           await dbHelper.updateUser(localUser);
+          await _syncUserActivitiesFromFirestore(localUser);
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage()));
         }
-
-
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Google ile giriş yapılamadı: $e", toastLength: Toast.LENGTH_LONG);
+      Fluttertoast.showToast(msg: 'Google oturum açma başarısız: $e', toastLength: Toast.LENGTH_LONG);
     }
+    return null;
   }
 
 

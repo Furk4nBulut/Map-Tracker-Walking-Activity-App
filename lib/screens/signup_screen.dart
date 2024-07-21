@@ -346,7 +346,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         children: [
                           InkWell(
                             onTap: () async {
-                              locator.get<AuthService>().signInWithGoogle(context);
+                              locator.get<AuthService>().signInWithGoogle(context).then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(), settings: RouteSettings(arguments: value))));
                             },
                             child: Image.asset('assets/images/google.png'),
                           ),

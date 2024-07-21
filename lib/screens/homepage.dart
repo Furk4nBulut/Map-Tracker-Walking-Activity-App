@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_helper_utils/flutter_helper_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:map_tracker/screens/profile_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
 import 'package:map_tracker/screens/activity_record_screen.dart';
-import 'package:map_tracker/screens/partials/navbar.dart'; // Import the BottomNavBar widget
-import 'package:map_tracker/screens/partials/appbar.dart'; // Import the CustomAppBar widget
-import 'package:map_tracker/screens/stat_page.dart'; // Import the ActivityHistoryScreen widget
-import 'package:map_tracker/model/user_model.dart'; // Import the User model
-import 'package:map_tracker/services/local_db_service.dart'; // Import the DatabaseHelper
-import 'package:map_tracker/screens/welcome_screen.dart'; // Import the WelcomeScreen
-import 'package:map_tracker/screens/welcome_screen.dart'; // Import the WelcomeScreen
+import 'package:map_tracker/screens/partials/navbar.dart';
+import 'package:map_tracker/screens/partials/appbar.dart';
+import 'package:map_tracker/screens/stat_page.dart';
+import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/screens/welcome_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   DatabaseHelper dbHelper = DatabaseHelper();
   LocalUser? localUser;
+  User? firebaseUser;
   int _selectedIndex = 0;
 
   @override
@@ -32,19 +34,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadCurrentUser() async {
     LocalUser? userFromDb = await dbHelper.getCurrentUser();
-    if (userFromDb == null) {
-      // Navigate to WelcomeScreen if no user is found
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => WelcomeScreen()),
-      );
-      Fluttertoast.showToast(msg: "Kullanıcı bulunamadı. Lütfen giriş yapın.", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.BOTTOM, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 16.0); // Add this line
-
-    } else {
-      setState(() {
-        localUser = userFromDb;
-      });
-    }
+    setState(() {
+      localUser = userFromDb;
+      firebaseUser = FirebaseAuth.instance.currentUser;
+    });
   }
 
   void _onItemTapped(int index) {
@@ -89,12 +82,10 @@ class _HomePageState extends State<HomePage> {
           index: _selectedIndex,
           children: [
             _buildHomeScreen(),
-            StatisticPage(), // You can pass null here or handle differently if user is not logged in
-
+            StatisticPage(),
             NewActivityScreen(),
-
             ActivityHistoryScreen(),
-            ProfilePage(), // You can pass null here or handle differently if user is not logged in
+            ProfilePage(),
           ],
         ),
         extendBody: true,
@@ -109,7 +100,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHomeScreen() {
     final displayName = localUser?.firstName != null && localUser?.lastName != null
         ? "${localUser!.firstName} ${localUser!.lastName}"
-        : 'Misafir'; // Default guest name or handle differently if not logged in
+        : firebaseUser?.displayName ?? "Misafir";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -132,10 +123,17 @@ class _HomePageState extends State<HomePage> {
         children: [
           if (localUser != null)
             ListTile(
-              title: Text("Adı Soyad: ${localUser!.firstName} ${localUser!.lastName}"),
-              subtitle: Text("Email: ${localUser!.email}"),
+              title: Text("Email: ${localUser!.email}"),
               leading: CircleAvatar(
                 child: const Icon(Icons.person),
+              ),
+            )
+          else if (firebaseUser != null)
+            ListTile(
+              title: Text("Adı Soyad: ${firebaseUser!.displayName}"),
+              subtitle: Text("Email: ${firebaseUser!.email}"),
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(firebaseUser!.photoURL ?? ''),
               ),
             )
           else

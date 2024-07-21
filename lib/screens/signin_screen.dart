@@ -234,8 +234,27 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           InkWell(
                             onTap: () async {
-                              locator.get<AuthService>().signInWithGoogle(context);
+                              try {
+                                var user = await locator.get<AuthService>().signInWithGoogle(context);
+                                if (user != null) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => HomePage(),
+                                    settings: RouteSettings(arguments: user),
+                                  ));
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: "Google ile giriş başarısız!",
+                                    toastLength: Toast.LENGTH_LONG,
+                                  );
+                                }
+                              } catch (e) {
+                                Fluttertoast.showToast(
+                                  msg: e.toString(),
+                                  toastLength: Toast.LENGTH_LONG,
+                                );
+                              }
                             },
+
                             child: Image.asset('assets/images/google.png'),
                           ),
                         ],
