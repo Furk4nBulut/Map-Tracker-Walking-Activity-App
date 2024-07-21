@@ -3,21 +3,33 @@ import 'package:intl/intl.dart'; // For date formatting
 import 'package:map_tracker/model/activity_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
-import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart'; // Adjust this import as per your project structure
 import 'package:map_tracker/utils/constants.dart'; // Adjust this import as per your project structure
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StatisticPage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
 
   Future<Map<String, dynamic>> _getUserStatistics() async {
     try {
-      LocalUser? currentUser = await dbHelper.getCurrentUser();
-      if (currentUser == null) {
-        throw 'Kullanıcı oturumu açmamış.';
+      // Try to get local user
+      LocalUser? localUser = await dbHelper.getCurrentUser();
+      if (localUser != null) {
+        // Fetch statistics from local DB
+        return _getLocalUserStatistics(localUser);
+      } else {
+        // Fetch statistics from Firebase
+        return await _getFirebaseUserStatistics();
       }
+    } catch (e) {
+      throw ('İstatistikler alınırken hata oluştu: $e');
+    }
+  }
 
-      List<Activity> userActivities = await dbHelper.getUserActivities(currentUser.id!);
+  Future<Map<String, dynamic>> _getLocalUserStatistics(LocalUser localUser) async {
+    try {
+      List<Activity> userActivities = await dbHelper.getUserActivities(localUser.id!);
 
       double totalDistance = 0.0;
       Duration totalDuration = Duration();
@@ -46,7 +58,55 @@ class StatisticPage extends StatelessWidget {
         'averageSpeed': averageSpeed,
       };
     } catch (e) {
-      throw ('Kullanıcı istatistikleri alınırken hata oluştu: $e');
+      throw ('Yerel kullanıcı istatistikleri alınırken hata oluştu: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> _getFirebaseUserStatistics() async {
+    try {
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) {
+        throw 'Kullanıcı oturumu açmamış.';
+      }
+
+      QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(firebaseUser.uid)
+          .collection('activities')
+          .get();
+
+      double totalDistance = 0.0;
+      Duration totalDuration = Duration();
+      int activityCount = snapshot.docs.length;
+
+      for (var doc in snapshot.docs) {
+        double distance = doc.data()['totalDistance']?.toDouble() ?? 0.0;
+        Timestamp startTimeTimestamp = doc.data()['startTime'];
+        Timestamp? endTimeTimestamp = doc.data()['endTime'];
+
+        totalDistance += distance;
+        if (endTimeTimestamp != null) {
+          Duration activityDuration = endTimeTimestamp.toDate().difference(startTimeTimestamp.toDate());
+          totalDuration += activityDuration;
+        }
+      }
+
+      double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
+      Duration averageDuration = activityCount > 0 ? totalDuration ~/ activityCount : Duration();
+
+      // Calculate average speed
+      double averageSpeed = totalDuration.inHours > 0 ? totalDistance / totalDuration.inHours : 0.0;
+
+      return {
+        'totalDistance': totalDistance,
+        'totalDuration': totalDuration,
+        'averageDistance': averageDistance,
+        'averageDuration': averageDuration,
+        'activityCount': activityCount,
+        'averageSpeed': averageSpeed,
+      };
+    } catch (e) {
+      throw ('Firebase kullanıcı istatistikleri alınırken hata oluştu: $e');
     }
   }
 
