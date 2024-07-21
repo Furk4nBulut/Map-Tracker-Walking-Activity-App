@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   TextSpan(
-                    text: "\n\n1. ",
+                    text: "\n\n",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[800],
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   TextSpan(
-                    text: "\n\n2. ",
+                    text: "\n\n",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[800],
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   TextSpan(
-                    text: "\n\n3. ",
+                    text: "\n\n",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[800],
@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   TextSpan(
-                    text: "\n\n4. ",
+                    text: "\n\n",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[800],
@@ -235,6 +235,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+
 
   }
 
