@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/screens/activity_record_screen.dart';
@@ -15,23 +16,42 @@ class ProfilePage extends StatelessWidget {
 
   Future<Map<String, dynamic>> _fetchUserStatistics() async {
     try {
-      final LocalUser? user = await dbHelper.getCurrentUser();
-      if (user == null) {
-        throw 'Kullanıcı oturumu açmamış.';
-      }
+      final LocalUser? localUser = await dbHelper.getCurrentUser();
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
-      List<Activity> userActivities = await dbHelper.getUserActivities(user.id!);
+      if (firebaseUser != null) {
+        // Fetch data from Firebase if user is logged in
+        return _fetchUserStatisticsFromFirebase(firebaseUser);
+      } else if (localUser != null) {
+        // Fetch data from local database if user is not logged in to Firebase
+        return _fetchUserStatisticsFromLocal(localUser);
+      } else {
+        throw 'Kullanıcı bilgileri bulunamadı.';
+      }
+    } catch (e) {
+      throw ('Kullanıcı istatistikleri alınırken hata oluştu: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchUserStatisticsFromFirebase(User user) async {
+    try {
+      final userActivities = FirebaseFirestore.instance
+          .collection('user')
+          .doc(user.uid)
+          .collection('activities');
+
+      final activitiesSnapshot = await userActivities.get();
 
       double totalDistance = 0.0;
       Duration totalDuration = Duration();
-      int activityCount = userActivities.length;
+      int activityCount = activitiesSnapshot.size;
       double averageSpeed = 0.0;
 
-      for (var activity in userActivities) {
-        totalDistance += activity.totalDistance ?? 0.0;
-        if (activity.startTime != null && activity.endTime != null) {
-          totalDuration += activity.endTime!.difference(activity.startTime!);
-        }
+      for (var doc in activitiesSnapshot.docs) {
+        totalDistance += doc['totalDistance'] ?? 0.0;
+        Timestamp startTime = doc['startTime'];
+        Timestamp endTime = doc['endTime'];
+        totalDuration += endTime.toDate().difference(startTime.toDate());
       }
 
       double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
@@ -51,7 +71,65 @@ class ProfilePage extends StatelessWidget {
         'averageSpeed': averageSpeed,
       };
     } catch (e) {
-      throw ('Kullanıcı istatistikleri alınırken hata oluştu: $e');
+      throw ('Firebase kullanıcı istatistikleri alınırken hata oluştu: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchUserStatisticsFromLocal(LocalUser user) async {
+    List<Activity> userActivities = await dbHelper.getUserActivities(user.id!);
+
+    double totalDistance = 0.0;
+    Duration totalDuration = Duration();
+    int activityCount = userActivities.length;
+    double averageSpeed = 0.0;
+
+    for (var activity in userActivities) {
+      totalDistance += activity.totalDistance ?? 0.0;
+      if (activity.startTime != null && activity.endTime != null) {
+        totalDuration += activity.endTime!.difference(activity.startTime!);
+      }
+    }
+
+    double averageDistance = activityCount > 0 ? totalDistance / activityCount : 0.0;
+    Duration averageDuration = activityCount > 0 ? totalDuration ~/ activityCount : Duration();
+
+    if (totalDuration.inHours > 0) {
+      averageSpeed = totalDistance / totalDuration.inHours;
+    }
+
+    return {
+      'totalDistance': totalDistance,
+      'totalDuration': totalDuration,
+      'averageDistance': averageDistance,
+      'averageDuration': averageDuration,
+      'activityCount': activityCount,
+      'averageSpeed': averageSpeed,
+    };
+  }
+
+  Future<Map<String, String>> _fetchUserProfile() async {
+    try {
+      final LocalUser? localUser = await dbHelper.getCurrentUser();
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (localUser != null) {
+        return {
+          'name': localUser.firstName ?? 'Bilinmiyor',
+          'email': localUser.email ?? 'Email bilinmiyor',
+          'photoURL': '',
+        };
+
+      } else if (firebaseUser != null) {
+        return {
+          'name': firebaseUser.displayName ?? 'Bilinmiyor',
+          'email': firebaseUser.email ?? 'Email bilinmiyor',
+          'photoURL': firebaseUser.photoURL ?? '',
+        };
+      } else {
+        throw 'Kullanıcı bilgileri bulunamadı.';
+      }
+    } catch (e) {
+      throw ('Kullanıcı profili alınırken hata oluştu: $e');
     }
   }
 
@@ -59,8 +137,8 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Profil", automaticallyImplyLeading: true),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _fetchUserStatistics(),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: Future.wait([_fetchUserStatistics(), _fetchUserProfile()]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -74,7 +152,9 @@ class ProfilePage extends StatelessWidget {
             return Center(child: Text('Veriler yüklenemedi.'));
           }
 
-          Map<String, dynamic> stats = snapshot.data!;
+          final stats = snapshot.data![0];
+          final profile = snapshot.data![1];
+
           double totalDistance = stats['totalDistance'];
           Duration totalDuration = stats['totalDuration'];
           double averageDistance = stats['averageDistance'];
@@ -102,10 +182,10 @@ class ProfilePage extends StatelessWidget {
                         padding: EdgeInsets.all(6),
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage: FirebaseAuth.instance.currentUser?.photoURL != null
-                              ? NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!)
+                          backgroundImage: profile['photoURL'] != ''
+                              ? NetworkImage(profile['photoURL']!)
                               : null,
-                          child: FirebaseAuth.instance.currentUser?.photoURL == null
+                          child: profile['photoURL'] == ''
                               ? const Icon(Icons.person, size: 50)
                               : null,
                         ),
@@ -113,7 +193,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      FirebaseAuth.instance.currentUser?.displayName ?? 'Bilinmiyor',
+                      profile['name']!,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -122,7 +202,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      FirebaseAuth.instance.currentUser?.email ?? 'Email bilinmiyor',
+                      profile['email']!,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.black54,
@@ -221,9 +301,9 @@ class ProfilePage extends StatelessWidget {
                       text: 'Verileri Senkronize Et',
                       onPressed: () async {
                         try {
-                          final LocalUser? user = await dbHelper.getCurrentUser();
-                          if (user != null) {
-                            await AuthService().syncUserActivities(context, user);
+                          final LocalUser? localUser = await dbHelper.getCurrentUser();
+                          if (localUser != null) {
+                            await AuthService().syncUserActivities(context, localUser);
                           }
                         } catch (e) {
                           print("Hata oluştu: $e");
