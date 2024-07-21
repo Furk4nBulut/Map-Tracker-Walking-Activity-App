@@ -104,6 +104,8 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _buildWeatherWidget(),
+          _buildSectionDivider(),
+
           _buildUserInfo(),
           _buildSectionDivider(),
           Padding(
