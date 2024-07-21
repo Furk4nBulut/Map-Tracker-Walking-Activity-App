@@ -11,6 +11,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/partials/navbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewActivityScreen extends StatefulWidget {
   const NewActivityScreen({Key? key}) : super(key: key);
@@ -33,6 +35,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   late GoogleMapController _mapController;
   Set<Polyline> _polylines = {};
   LocalUser? _currentUser;
+  User? _firebaseUser;
 
   @override
   void initState() {
@@ -40,6 +43,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     _initializeLocation();
     _fetchWeatherData();
     _loadCurrentUser();
+    _loadFirebaseUser();
   }
 
   @override
@@ -99,6 +103,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     setState(() {});
   }
 
+  Future<void> _loadFirebaseUser() async {
+    _firebaseUser = FirebaseAuth.instance.currentUser;
+  }
+
   void _startActivity() {
     setState(() {
       _activityStarted = true;
@@ -123,16 +131,13 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _activityStarted = false;
       _endTime = DateTime.now();
       _timer?.cancel();
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+
     });
 
     LatLng? startPosition = _route.isNotEmpty ? _route.first : null;
     LatLng? endPosition = _route.isNotEmpty ? _route.last : null;
 
-    if (_currentUser == null) {
+    if (_currentUser == null && _firebaseUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Kullanıcı bilgisi alınamadı.')),
       );
@@ -140,30 +145,51 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     }
 
     try {
-      await ActivityService().saveActivity(
-        user: _currentUser!,
-        startTime: _startTime!,
-        endTime: _endTime!,
-        totalDistance: _totalDistance,
-        elapsedTime: _elapsedSeconds,
-        startPosition: startPosition,
-        endPosition: endPosition,
-        route: _route,
-        averageSpeed: _averageSpeed,
-      );
+      if (_currentUser != null) {
+        // Save to local database if Firebase user is not logged in
+        await ActivityService().saveActivity(
+          user: _currentUser!,
+          startTime: _startTime!,
+          endTime: _endTime!,
+          totalDistance: _totalDistance,
+          elapsedTime: _elapsedSeconds,
+          startPosition: startPosition,
+          endPosition: endPosition,
+          route: _route,
+          averageSpeed: _averageSpeed,
+        );
+
+
+      } else if (_firebaseUser != null) {
+        // Save to Firestore if Firebase user is logged in
+        await FirebaseFirestore.instance
+            .collection('user')
+            .doc(_firebaseUser!.uid)
+            .collection('activities')
+            .add({
+          'startTime': _startTime,
+          'endTime': _endTime,
+          'totalDistance': _totalDistance,
+          'elapsedTime': _elapsedSeconds,
+          'startPositionLat': startPosition?.latitude,
+          'startPositionLng': startPosition?.longitude,
+          'endPositionLat': endPosition?.latitude,
+          'endPositionLng': endPosition?.longitude,
+          'route': _route.map((point) => {'lat': point.latitude, 'lng': point.longitude}).toList(),
+          'averageSpeed': _averageSpeed,
+        });
+      }
+
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
 
-      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
       );
-
     }
-
   }
 
   void _updateActivityStats(Position position) {
