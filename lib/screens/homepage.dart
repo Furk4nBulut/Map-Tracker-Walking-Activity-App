@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_helper_utils/flutter_helper_utils.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:map_tracker/screens/profile_screen.dart';
 import 'package:map_tracker/screens/new_activity_screen.dart';
 import 'package:map_tracker/screens/activity_record_screen.dart';
+import 'package:map_tracker/screens/stat_page.dart';
 import 'package:map_tracker/screens/partials/navbar.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
-import 'package:map_tracker/screens/stat_page.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
-import 'package:map_tracker/screens/welcome_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -105,6 +102,7 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        _buildWeatherWidget(),
         _buildUserInfo(),
         Expanded(
           child: Center(
@@ -141,7 +139,6 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(16.0),
               child: Text("Giriş Yapılmadı"),
             ),
-          _buildWeatherWidget(),
         ],
       ),
     );
@@ -149,7 +146,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildWeatherWidget() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: WeatherWidget(),
     );
   }

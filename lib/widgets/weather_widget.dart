@@ -177,74 +177,81 @@ class _WeatherWidgetState extends State<WeatherWidget> {
 
   Widget _buildWeatherWidget() {
     return Container(
-        margin: const EdgeInsets.all(0),
-        padding: const EdgeInsets.all(10),
-
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [basarsoft_color_light, basarsoft_color],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: basarsoft_color.withOpacity(0.6),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(0), // Optional: add border radius if needed
+      margin: const EdgeInsets.all(0),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [basarsoft_color_light, basarsoft_color],
         ),
-    child: Column(
+        boxShadow: [
+          BoxShadow(
+            color: basarsoft_color.withOpacity(0.6),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        borderRadius: BorderRadius.circular(0),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Stack(
             children: [
-              Row(
-                children: [
-                  if (_weather?.weatherIcon != null)
-                    Image.network(
-                      "http://openweathermap.org/img/wn/${_weather!.weatherIcon}@2x.png",
-                      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                        print("Error loading image: $exception");
-                        return const Icon(Icons.error);
-                      },
-                      width: 50,
-                      height: 50,
-                    )
-                  else
-                    const Icon(Icons.error),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${_weather?.areaName ?? "Unknown"}, ${_weather?.country ?? "Unknown"}",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "${_weather?.temperature?.celsius?.toInt() ?? "Unknown"}° ${_weather?.weatherDescription ?? "Unknown"}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ],
+              Positioned(
+                left: 95,
+                child: Row(
+                  children: [
+                    if (_weather?.weatherIcon != null)
+                      Image.network(
+                        "http://openweathermap.org/img/wn/${_weather!.weatherIcon}@2x.png",
+                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                          print("Error loading image: $exception");
+                          return const Icon(Icons.error);
+                        },
+                        width: 70,
+                        height: 50,
+                      )
+                    else
+                      const Icon(Icons.error),
+                    const SizedBox(width: 10),
+                  ],
+                ),
               ),
-              IconButton(
-                onPressed: _fetchUserLocation,
-                icon: const Icon(Icons.refresh, color: Colors.white),
-                tooltip: 'Refresh',
+              Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${_weather?.areaName ?? "Unknown"}, ${_weather?.country ?? "Unknown"}",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "${_weather?.temperature?.celsius?.toInt() ?? "Unknown"}° ${_weather?.weatherDescription ?? "Unknown"}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  onPressed: _fetchUserLocation,
+                  icon: const Icon(Icons.refresh, color: Colors.white),
+                  tooltip: 'Yenile',
+                ),
               ),
             ],
           ),
@@ -255,10 +262,10 @@ class _WeatherWidgetState extends State<WeatherWidget> {
           ),
           const SizedBox(height: 12),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     DateFormat("h:mm a").format(DateTime.now()),
@@ -279,7 +286,6 @@ class _WeatherWidgetState extends State<WeatherWidget> {
                   ),
                 ],
               ),
-              // Add more widgets here as needed
             ],
           ),
         ],
@@ -287,4 +293,3 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     );
   }
 }
-
