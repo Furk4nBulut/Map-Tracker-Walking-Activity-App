@@ -235,7 +235,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           InkWell(
                             onTap: () async {
                               try {
-                                var user = await locator.get<AuthService>().signInWithGoogle(context);
+                                var user = await locator.get<AuthService>().signInWithGoogle();
                                 if (user != null) {
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => HomePage(),

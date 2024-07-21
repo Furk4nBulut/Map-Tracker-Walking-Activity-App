@@ -72,35 +72,22 @@ class AuthService {
     }
   }
 
-  Future<User?> signInWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
-      final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
-      final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
+  Future<User?> signInWithGoogle() async {
+    // Oturum açma sürecini başlat
+    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
-      User? firebaseUser = userCredential.user;
-      if (firebaseUser != null) {
-        var localUser = await dbHelper.getUserByEmail(firebaseUser.email!);
-        if (localUser == null) {
-          localUser = LocalUser(email: firebaseUser.email!, firstName: firebaseUser.displayName?.split(' ')[0] ?? '', lastName: firebaseUser.displayName?.split(' ')[1] ?? '', password: '');
-          await dbHelper.insertUser(localUser);
-          await _registerGoogleUser(name: localUser.firstName, surname: localUser.lastName, email: localUser.email, password: '', id: firebaseUser.uid);
-          Fluttertoast.showToast(msg: "Google kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz. Tekrar giriş yapınız!", toastLength: Toast.LENGTH_LONG);
-        } else {
-          await dbHelper.updateUser(localUser);
-          await _syncUserActivitiesFromFirestore(localUser);
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage()));
-        }
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: 'Google oturum açma başarısız: $e', toastLength: Toast.LENGTH_LONG);
-    }
-    return null;
+    // Süreç içerisinden bilgileri al
+    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+
+    // Kullanıcı nesnesi oluştur
+    final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
+
+    // Kullanıcı girişini sağla
+    final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
+    log(userCredential.user!.email.toString());
+    return userCredential.user;
+
   }
-
-
-
 
   Future<void> signOut(BuildContext context) async {
     dbHelper.logout();
