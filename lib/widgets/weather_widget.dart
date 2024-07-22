@@ -200,7 +200,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
           Stack(
             children: [
               Positioned(
-                left: 95,
+                left: 80,
                 child: Row(
                   children: [
                     if (_weather?.weatherIcon != null)

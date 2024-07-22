@@ -166,7 +166,7 @@ class ProfilePage extends StatelessWidget {
           String formattedAverageDuration = _formatDuration(averageDuration);
 
           return ListView(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.only(bottom: 90.0,top: 5.0),
             children: [
               Center(
                 child: Column(

@@ -192,7 +192,7 @@ class ActivityHistoryScreen extends StatelessWidget {
 
   Widget buildActivityList(List<Activity> activities, BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 1.0),
+      padding: const EdgeInsets.only(bottom: 70.0),
       child: ListView.builder(
         padding: EdgeInsets.all(10.0),
         itemCount: activities.length,
