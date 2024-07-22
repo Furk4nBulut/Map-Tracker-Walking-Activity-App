@@ -386,38 +386,41 @@ class ProfilePage extends StatelessWidget {
     required String text,
     required VoidCallback onPressed,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: basarsoft_color,
-          padding: EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
+    return Padding(
+      padding: const EdgeInsets.only(left: 10.0,right: 10.0), // Burada istediğiniz padding değerini ayarlayabilirsiniz
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: basarsoft_color,
+            padding: EdgeInsets.symmetric(vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0),
+            ),
           ),
-        ),
-        icon: Icon(
-          icon,
-          size: 24,
-          color: Colors.white,
-        ),
-        label: Text(
-          text,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          icon: Icon(
+            icon,
+            size: 24,
             color: Colors.white,
-            shadows: [
-              Shadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 2,
-                offset: Offset(1, 1),
-              ),
-            ],
+          ),
+          label: Text(
+            text,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 2,
+                  offset: Offset(1, 1),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-}
+  }
