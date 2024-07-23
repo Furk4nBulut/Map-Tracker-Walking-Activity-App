@@ -7,389 +7,214 @@
     <link rel="icon" href="assets/map-tracker/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
-        :root {
-            --basarsoft-color: #02205C;
-            --basarsoft-color-light: #00A5FF;
-            --white: #ffffff;
-            --gray-light: #f4f4f4;
-            --github-color: #333;
-            --linkedin-color: #0077b5;
-            --email-color: #c71667;
-        }
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #e9ecef;
-            padding-top: 130px;
-            padding-bottom: 95px;
+            font-family: 'Roboto', sans-serif;
         }
         header {
-            background: linear-gradient(135deg, var(--basarsoft-color), var(--basarsoft-color-light));
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
+            margin-bottom: 1rem;
         }
-        header h1 {
-            margin: 0;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .navbar-brand img {
+            height: 50px;
         }
-        header img {
-            max-width: 50px;
-            margin-right: 15px;
-            border-radius: 50%;
-            border: 2px solid var(--white);
-        }
-        header nav {
-            margin-top: 10px;
-        }
-        header nav ul {
+        .card-body ul {
             list-style: none;
             padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
         }
-        header nav ul li {
-            display: inline;
-        }
-        header nav ul li a {
-            color: var(--white);
-            font-size: 1.2em;
-        }
-        header nav ul li a:hover {
-            color: var(--basarsoft-color-light);
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            color: var(--basarsoft-color);
-            border-bottom: 2px solid var(--basarsoft-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-        .section {
-            margin-bottom: 40px;
-        }
-        .section img {
-            display: block;
-            margin: 20px auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .note, .highlight {
-            background: #eaf4ff;
-            border-left: 5px solid var(--basarsoft-color);
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        pre {
-            background: #f4f4f4;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        a {
-            color: var(--basarsoft-color);
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .icon {
-            margin-right: 8px;
-            color: var(--basarsoft-color);
-        }
-        img {
-            max-width: 5%;
-            height: auto;
-        }
-        .btn {
-            background-color: var(--basarsoft-color);
-            color: var(--white);
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-align: center;
-            display: inline-block;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            background-color: var(--basarsoft-color-light);
+        .card-body ul li {
+            margin-bottom: 0.5rem;
         }
         footer {
-            background: linear-gradient(135deg, var(--basarsoft-color), var(--basarsoft-color-light));
-            color: #fff;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            background-color: #f8f9fa;
         }
-        footer ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+        .footer-links a {
+            color: #007bff;
         }
-        footer ul li {
-            display: inline;
-        }
-        footer ul li a {
-            color: #fff;
+        .footer-links a:hover {
             text-decoration: none;
-            font-weight: bold;
-        }
-        footer ul li a:hover {
-            text-decoration: underline;
         }
 
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.1em;
-            }
-            header nav ul {
-                flex-direction: column;
-                gap: 10px;
-            }
-            header nav ul li a {
-                font-size: 0.8em;
-            }
-            .container {
-                padding: 15px;
-            }
-            .section img {
-                max-width: 50%;
-            }
-            .note, .highlight {
-                padding: 15px;
-            }
-            .btn {
-                padding: 8px 16px;
-                font-size: 0.7em;
-            }
+         /* Navbar center alignment */
+        .navbar-nav {
+            flex-direction: row;
         }
-        @media (max-width: 480px) {
-            header {
-                padding: 8px;
-            }
-            header h1 {
-                font-size: 0.8em;
-            }
-            header nav ul {
-                gap: 5px;
-            }
-            header nav ul li a {
-                font-size: 0.7em;
-            }
-            .container {
-                padding: 10px;
-            }
-            h2 {
-                font-size: 1.3em;
-            }
-            .section img {
-                max-width: 50%;
-            }
-            .note, .highlight {
-                padding: 10px;
-            }
-            .btn {
-                padding: 6px 12px;
-                font-size: 0.8em;
-            }
+        .navbar-nav .nav-item {
+            margin: 0 10px;
+        }
+        .navbar-nav .nav-link {
+            padding: 10px 15px;
+        }
+        .navbar-nav .nav-item.active .nav-link {
+            font-weight: bold;
         }
     </style>
 </head>
+<body>
 
-    <header>
-        <h1>
-            <img src="assets/map-tracker/logo.png" alt="Logo"l>
+<header>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="assets/map-tracker/logo.png" alt="Logo" class="mr-2" style="height: 50px;">
             Map Tracker Yürüyüş Aktivitesi Uygulaması
-        </h1>
-        <hr>
-        <nav>
-<!-- tanıtım seection yönlendime-->
-            <ul>
-                <li><a href="#tanitim">Tanıtım</a></li>
-                <li><a href="#ozellikler">Özellikler</a></li>
-                <li><a href="#kurulum">Kurulum</a></li>
-                <li><a href="#kaynaklar-ve-araclar">Kaynaklar ve Araçlar</a></li>
-                <li><a href="#gelistirici-hakkinda">Geliştirici Hakkında</a></li>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarText">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#tanitim">Tanıtım <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#ozellikler">Özellikler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#kurulum">Kurulum</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#kaynaklar-ve-araclar">Kaynaklar ve Araçlar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#gelistirici-hakkinda">Geliştirici Hakkında</a>
+                </li>
             </ul>
-        </nav>
+        </div>
+    </nav>
+</header>
 
-    </header>
-    <body>
+<main class="container my-4">
 
-    <div class="container" id="tanitim">
+    <!-- Tanıtım Section -->
+    <section id="tanitim" class="mb-5">
         <h2><i class="fa fa-info-circle" aria-hidden="true"></i> Tanıtım</h2>
-        <p>Bu proje, Flutter kullanarak geliştirilen bir yürüyüş aktivitesi uygulamasıdır. Uygulama, kullanıcıların yürüyüş/koşu aktivitelerini başlatıp bitirmelerini, bu aktivitelerin süresini ve mesafesini hesaplamalarını ve verileri SQLite/SpatiaLite veritabanına kaydetmelerini sağlar. Ayrıca geçmiş aktiviteleri görüntüleme ve detaylarını inceleme imkanı sunar. Uygulamanın diğer önemli özellikleri arasında şunlar bulunmaktadır:</p>
-        <ul>
-            <li>Kullanıcı dostu arayüz ile kolay gezinme ve kullanım.</li>
-            <li>Gerçek zamanlı konum ve rota takibi ile doğru mesafe ve süre hesaplaması.</li>
-            <li>Aktivitelerin hem lokal veritabanına hem de Firebase Firestore'a senkronize edilmesi.</li>
-            <li>Offline mod sayesinde internet bağlantısı olmadan da aktivite verilerini kaydedebilme.</li>
-            <li>Gelişmiş raporlama ve istatistik özellikleri ile kullanıcı performansının izlenmesi.</li>
-        </ul>
-        <div class="section">
-            <img src="assets/map-tracker/uygulama.png" alt="uygulama" style="max-width:50%">
-        </div>
-        <div class="note">
-            <p><strong>Not:</strong> Bu proje benim ilk Flutter projem olup, 0'dan öğrenerek 3 haftada geliştirdiğim bir çalışmadır. Proje süresince edindiğim deneyimleri ve karşılaştığım zorlukları bu uygulama üzerinde pratiğe dökerek kendimi geliştirdim. Bu nedenle, projede bazı eksiklikler veya hatalar olabilir. Geri bildirimleriniz benim için çok değerli.</p>
-        </div>
-    </div>
-
-
-        </div>
-        <div class="container" id="ozellikler">
-        <h2><i class="fas fa-star icon"></i>Özellikler</h2>
-
-        <div class="section">
-            <h3><i class="fas fa-mobile-alt icon"></i>1. Splash Ekranı</h3>
-            <p>Uygulama açıldığında 2-3 saniyelik bir logo animasyonu gösterilir.</p>
-            <img src="assets/map-tracker/Screenshot_20240719_125540.png" alt="Splash Ekranı">
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-user icon"></i>2. Giriş/Kayıt Ekranı</h3>
-            <p>Google hesabı ile giriş (authentication) yapılır. Kullanıcılar mail, ad, soyad, şifre gibi bilgilerle kayıt olabilir. Kayıt bilgileri Firebase üzerinde tutulur ve login aşamasında bu bilgilerle giriş yapılabilir.</p>
-            <img src="assets/map-tracker/Screenshot_20240719_125557.png" alt="Giriş Ekranı">
-            <img src="assets/map-tracker/Screenshot_20240719_125604.png" alt="Kayıt Ekranı">
-            <img src="assets/map-tracker/Screenshot_20240719_125610.png" alt="Giriş/Kayıt Ekranı">
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-tachometer-alt icon"></i>3. Dashboard</h3>
-            <p>Kullanıcının genel profili ve spor durumu (toplam mesafe, toplam süre, aktivite sayısı) gösterilir. Kullanıcının yeni aktivite başlatabileceği ve geçmiş aktiviteleri görüntüleyebileceği butonlar bulunur.</p>
-            <img src="assets/map-tracker/Screenshot_20240719_125727.png" alt="Dashboard">
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-walking icon"></i>4. Yeni Aktivite Ekranı </h3>
-            <p>Kullanıcı, bu ekranda yürüyüş/koşu aktivitesini başlatıp bitirebilir. Aktif olunan süreçte kullanıcı, mevcut konumunu ve rota bilgisini harita üzerinde görebilir. Aktif aktivitenin toplam mesafesi, geçen süresi ve ortalama hızı anlık olarak güncellenir. Aktivite sonuçları Google Firestore veritabanına kaydedilir. Güncel hava durumu bilgisi OpenWeatherMap API'sinden alınır ve gösterilir.</p>
-            <img src="assets/map-tracker/Screenshot_20240719_125701.png" alt="Yeni Aktivite Ekranı">
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-history icon"></i>5. Aktivite Geçmiş Hareketleri İçin Liste Ekranı </h3>
-            <p>Kullanıcının geçmiş aktivitelerini listeleyen bir ekran. Liste satırlarında tarih, yapılan mesafe ve detay butonları yer alır.</p>
-            <img src="assets/map-tracker/Screenshot_20240719_125712.png" alt="Aktivite Geçmiş Hareketleri">
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-info-circle icon"></i>6. Aktivite Geçmiş Detay Ekranı</h3>
-            <p>Geçmiş aktiviteler listesinden seçilen detay ekranı açılır. Rota, toplam mesafe ve süre Google Firestore veritabanından alınarak gösterilir.</p>
-            <img src="assets/map-tracker/Screenshot_20240719_125718.png" alt="Aktivite Geçmiş Detay">
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-database icon"></i>7. Firebase ve Firestore Veritabanı</h3>
-            <p>Firebase ve Firestore yapılandırması ve veri formatları ile ilgili örnek kayıtlar ve ekran görüntüleri proje içine eklenmelidir.</p>
-            <img src="assets/map-tracker/img.png" alt="Firebase Veritabanı">
-            <img src="assets/map-tracker/img_1.png" alt="Firebase Veritabanı">
-            <img src="assets/map-tracker/img_2.png" alt="Firebase Veritabanı">
-        </div>
-
-        <div class="highlight">
-            <p><strong>Önemli Not:</strong> Bu projenin son aşamasında bazı hatalar alınabilir. Hataların giderilmesi ve uygulamanın geliştirilmesi amacıyla geri bildirimlerinizi paylaşmanız önemlidir.</p>
-        </div>
-        </div>
-<!-- Kurulum section-->
-<div class="container" id="kurulum">
-    <h2><i class="fas fa-download icon"></i>Kurulum</h2>
-    <p>Projeyi klonlayın ve gerekli paketleri yükleyin.</p>
-    <pre class="code-block">
-        <code>git clone https://github.com/Furk4nBulut/Map-Tracker-Flutter.git</code>
-    </pre>
-    <pre class="code-block">
-        <code>cd Map-Tracker-Flutter</code>
-    </pre>
-    <pre class="code-block">
-        <code>flutter pub get</code>
-    </pre>
-    <p>Uygulamayı çalıştırın.</p>
-    <pre class="code-block">
-        <code>flutter run</code>
-    </pre>
-</div>
-
-        <!-- kaynaklar ve araçlar section-->
-
-
-        <div class="container" id="kaynaklar-ve-araclar">
-
-
-        <h2><i class="fas fa-tools icon"></i>Kaynaklar ve Araçlar</h2>
-        <ul>
-            <li><i class="fas fa-external-link-alt icon"></i><a href="https://flutter.dev/">Flutter</a></li>
-            <li><i class="fas fa-external-link-alt icon"></i><a href="https://firebase.google.com/">Firebase</a></li>
-            <li><i class="fas fa-external-link-alt icon"></i><a href="https://pub.dev/packages/sqflite">sqflite</a></li>
-            <li><i class="fas fa-external-link-alt icon"></i><a href="https://openweathermap.org/api">OpenWeatherMap API</a></li>
-        </ul>
-    </div>
-
-    <!-- about developer -->
-    <div class="container" id="gelistirici-hakkinda">
-        <h2><i class="fas fa-user icon"></i>Geliştirici Hakkında</h2>
-        <p>Merhaba, ben <strong>Furkan Bulut</strong>.Bilgisayar Mühendisliği öğrencisiyim. Bu projeyi Flutter öğrenirken geliştirdim. Flutter ile mobil uygulama geliştirme konusunda kendimi geliştirmek istiyorum. Projem hakkında geri bildirimlerinizi paylaşarak bana destek olabilirsiniz.</p>
-        <div class="note">
-            <p>     <h2><i class="fas fa-users icon"></i>Katkıda Bulunanlar</h2>
-                <p><a href="https://github.com/Furk4nBulut/Map-Tracker-Flutter">Furkan Bulut</a></p>
-
-                <h2><i class="fas fa-envelope icon"></i>İletişim</h2>
+        <div class="card">
+            <div class="card-body">
+                <p>Bu proje, Flutter kullanarak geliştirilen bir yürüyüş aktivitesi uygulamasıdır. Uygulama, kullanıcıların yürüyüş/koşu aktivitelerini başlatıp bitirmelerini, bu aktivitelerin süresini ve mesafesini hesaplamalarını ve verileri SQLite/SpatiaLite veritabanına kaydetmelerini sağlar. Ayrıca geçmiş aktiviteleri görüntüleme ve detaylarını inceleme imkanı sunar. Uygulamanın diğer önemli özellikleri arasında şunlar bulunmaktadır:</p>
                 <ul>
-                    <li><a href="mailto:Furkanbtng@gmail.com">Gmail</a></li>
-                    <li><a href="https://www.linkedin.com/in/furkanblt/">LinkedIn</a></li>
-                    <li><a href="https://furk4nbulut.github.io/">Website</a></li>
+                    <li>Kullanıcı dostu arayüz ile kolay gezinme ve kullanım.</li>
+                    <li>Gerçek zamanlı konum ve rota takibi ile doğru mesafe ve süre hesaplaması.</li>
+                    <li>Aktivitelerin hem lokal veritabanına hem de Firebase Firestore'a senkronize edilmesi.</li>
+                    <li>Offline mod sayesinde internet bağlantısı olmadan da aktivite verilerini kaydedebilme.</li>
+                    <li>Gelişmiş raporlama ve istatistik özellikleri ile kullanıcı performansının izlenmesi.</li>
                 </ul>
-
-                <p>Herhangi bir sorun veya öneriniz olursa lütfen benimle iletişime geçin.</p>
-
-            </p>
+                <div class="text-center my-4">
+                    <img src="assets/map-tracker/uygulama.png" alt="uygulama" class="img-fluid" style="max-width: 50%;">
+                </div>
+                <div class="alert alert-info" role="alert">
+                    <strong>Not:</strong> Bu proje benim ilk Flutter projem olup, 0'dan öğrenerek 3 haftada geliştirdiğim bir çalışmadır. Proje süresince edindiğim deneyimleri ve karşılaştığım zorlukları bu uygulama üzerinde pratiğe dökerek kendimi geliştirdim. Bu nedenle, projede bazı eksiklikler veya hatalar olabilir. Geri bildirimleriniz benim için çok değerli.
+                </div>
+            </div>
         </div>
-    </div>
-</body>
+    </section>
 
-    <footer>
-        <p>&copy; 2024 Map Tracker Uygulaması. Tüm Hakları Saklıdır.</p>
-        <ul>
-            <li><a href="https://github.com/Furk4nBulut" target="_blank"><i class="fab fa-github icon"></i> GitHub</a></li>
-            <li><a href="https://www.linkedin.com/in/furkanbulut/" target="_blank"><i class="fab fa-linkedin icon"></i> LinkedIn</a></li>
-            <li><a href="mailto:furkanbtng@gmail.com"><i class="fas fa-envelope icon"></i> Email</a></li>
-        </ul>
-    </footer>
+    <!-- Özellikler Section -->
+    <section id="ozellikler" class="mb-5">
+        <h2><i class="fas fa-star"></i> Özellikler</h2>
+        <div class="card-deck">
+            <div class="card">
+                <img src="assets/map-tracker/Screenshot_20240719_125540.png" class="card-img-top" alt="Splash Ekranı">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-mobile-alt"></i> 1. Splash Ekranı</h5>
+                    <p class="card-text">Uygulama açıldığında 2-3 saniyelik bir logo animasyonu gösterilir.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="assets/map-tracker/Screenshot_20240719_125557.png" class="card-img-top" alt="Giriş Ekranı">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user"></i> 2. Giriş/Kayıt Ekranı</h5>
+                    <p class="card-text">Google hesabı ile giriş (authentication) yapılır. Kullanıcılar mail, ad, soyad, şifre gibi bilgilerle kayıt olabilir. Kayıt bilgileri Firebase üzerinde tutulur ve login aşamasında bu bilgilerle giriş yapılabilir.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="assets/map-tracker/Screenshot_20240719_125727.png" class="card-img-top" alt="Dashboard">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-tachometer-alt"></i> 3. Dashboard</h5>
+                    <p class="card-text">Kullanıcının genel profili ve spor durumu (toplam mesafe, toplam süre, aktivite sayısı) gösterilir. Kullanıcının yeni aktivite başlatabileceği ve geçmiş aktiviteleri görüntüleyebileceği butonlar bulunur.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="assets/map-tracker/Screenshot_20240719_125701.png" class="card-img-top" alt="Yeni Aktivite Ekranı">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-walking"></i> 4. Yeni Aktivite Ekranı</h5>
+                    <p class="card-text">Kullanıcı, bu ekranda yürüyüş/koşu aktivitesini başlatıp bitirebilir. Aktif olunan süreçte kullanıcı, mevcut konumunu ve rota bilgisini harita üzerinde görebilir. Aktif aktivitenin toplam mesafesi, geçen süresi ve ortalama hızı anlık olarak güncellenir. Aktivite sonuçları Google Firestore veritabanına kaydedilir. Güncel hava durumu bilgisi OpenWeatherMap API'sinden alınır ve gösterilir.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="assets/map-tracker/Screenshot_20240719_125712.png" class="card-img-top" alt="Aktivite Geçmiş Hareketleri">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-history"></i> 5. Aktivite Geçmiş Hareketleri İçin Liste Ekranı</h5>
+                    <p class="card-text">Kullanıcının geçmiş aktivitelerini listeleyen bir
+                    <p class="card-text">Kullanıcının geçmiş aktivitelerini listeleyen bir ekran içerir. Bu liste, tarih ve süre gibi temel bilgileri içerir ve her aktiviteye tıklayarak detaylarına erişilebilir. Ayrıca, bu ekran, kullanıcıların aktivitelerinin zaman, mesafe ve hız gibi verilerini görselleştirmesine yardımcı olur.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="assets/map-tracker/Screenshot_20240719_125727.png" class="card-img-top" alt="Aktivite Detayları Ekranı">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle"></i> 6. Aktivite Detayları Ekranı</h5>
+                    <p class="card-text">Kullanıcı, bu ekran üzerinden belirli bir aktivitenin detaylarını görebilir. Detaylar arasında aktivitenin başladığı ve bittiği konumlar, toplam mesafe, süre, ortalama hız gibi veriler yer alır. Harita üzerinde rota da gösterilir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kurulum Section -->
+    <section id="kurulum" class="mb-5">
+        <h2><i class="fas fa-cogs"></i> Kurulum</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Flutter Kurulumu</h5>
+                <p>Projeyi çalıştırmak için Flutter SDK'sının kurulu olması gerekir. Flutter SDK'sını [Flutter'ın resmi web sitesinden](https://flutter.dev/docs/get-started/install) indirip kurabilirsiniz.</p>
+                <h5 class="card-title">Proje Bağımlılıkları</h5>
+                <p>Projenin bağımlılıklarını yüklemek için terminalde proje dizinine gidip şu komutu çalıştırın:</p>
+                <pre><code>flutter pub get</code></pre>
+                <h5 class="card-title">Firebase Kurulumu</h5>
+                <p>Firebase konfigürasyon dosyasını projenize eklemelisiniz. Firebase konsolundan bir proje oluşturun ve ilgili `google-services.json` dosyasını indirin. Bu dosyayı proje dizininize ekleyin ve gerekli Firebase ayarlarını yapın.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kaynaklar ve Araçlar Section -->
+    <section id="kaynaklar-ve-araclar" class="mb-5">
+        <h2><i class="fas fa-tools"></i> Kaynaklar ve Araçlar</h2>
+        <div class="card">
+            <div class="card-body">
+                <ul>
+                    <li><a href="https://flutter.dev" target="_blank">Flutter</a> - Mobil uygulama geliştirme framework'ü</li>
+                    <li><a href="https://firebase.google.com" target="_blank">Firebase</a> - Backend hizmetleri ve veritabanı</li>
+                    <li><a href="https://pub.dev" target="_blank">Pub.dev</a> - Flutter paketleri ve eklentiler</li>
+                    <li><a href="https://openweathermap.org" target="_blank">OpenWeatherMap</a> - Hava durumu API'si</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geliştirici Hakkında Section -->
+    <section id="gelistirici-hakkinda" class="mb-5">
+        <h2><i class="fas fa-user-tie"></i> Geliştirici Hakkında</h2>
+        <div class="card">
+            <div class="card-body">
+                <p>Bu proje, <strong>Furkan Bulut</strong> tarafından geliştirilmiştir. Proje, yürüyüş aktiviteleri uygulaması geliştirme sürecindeki deneyimlerinizi paylaşmak amacıyla oluşturulmuştur. Yazılım geliştirme konusunda derinlemesine bilgi sahibi ve mobil uygulama geliştirmede tutkuluyum. İletişim için:</p>
+                <ul>
+                    <li><a href="mailto:furkanbtng@gmail.com">Email</a></li>
+                    <li><a href="https://github.com/Furk4nBulut" target="_blank">GitHub Profilim</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer py-3">
+    <div class="container text-center">
+        <p>&copy; 2024 Furkan Bulut. Tüm hakları saklıdır.</p>
+        <p>Projenin kodlarına ve diğer detaylarına <a href="https://github.com/Furk4nBulut/Map-Tracker-Flutter" target="_blank">buradan</a> ulaşabilirsiniz.</p>
+    </div>
+</footer>
+
 </body>
 </html>
