@@ -61,6 +61,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "860454957556-4ttitrsh2ff6rmaft0t5350k3rv9vhb4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.map_tracker",
+            "certificate_hash": "33df10303444e10cbac2a49f3b6a3f7c5b6a64c5"
+          }
+        },
+        {
           "client_id": "860454957556-4689t9guddnf5oe8q9l4ko13haf4tpbc.apps.googleusercontent.com",
           "client_type": 3
         }
