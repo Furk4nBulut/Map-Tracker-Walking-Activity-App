@@ -4,16 +4,69 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/model/activity_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../model/user_model.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
   final String activityId;
 
   const ActivityDetailScreen({Key? key, required this.activityId}) : super(key: key);
 
+  Future<Activity?> _fetchActivity() async {
+    // Önce yerel veritabanından aktiviteyi çek
+    final localActivity = await DatabaseHelper().getActivityById(activityId);
+    if (localActivity != null) {
+      return localActivity;
+    }
+
+    // Yerel veritabanında veri yoksa Firestore'dan çek
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      return null; // Kullanıcı girişi yoksa Firestore'dan veri çekme
+    }
+
+    final doc = await FirebaseFirestore.instance
+        .collection('user')
+        .doc(firebaseUser.uid)
+        .collection('activities')
+        .doc(activityId)
+        .get();
+
+    if (!doc.exists) {
+      return null; // Firestore'da da veri yoksa null dön
+    }
+
+    final data = doc.data()!;
+    return Activity(
+      id: doc.id,
+      user: LocalUser(
+        id: 0, // Firestore'dan gelen kullanıcı bilgisi yoksa varsayılan değer
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+      ),
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: (data['endTime'] as Timestamp).toDate(),
+      totalDistance: data['totalDistance'],
+      elapsedTime: data['elapsedTime'],
+      averageSpeed: data['averageSpeed'],
+      startPositionLat: data['startPositionLat'],
+      startPositionLng: data['startPositionLng'],
+      endPositionLat: data['endPositionLat'],
+      endPositionLng: data['endPositionLng'],
+      route: List<Map<String, dynamic>>.from(data['route'])
+          .map((point) => LatLng(point['lat'], point['lng']))
+          .toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Activity?>(
-      future: DatabaseHelper().getActivityById(activityId), // Fetch activity from local DB
+      future: _fetchActivity(), // Önce yerel, sonra Firestore'dan veri çek
       builder: (context, AsyncSnapshot<Activity?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
