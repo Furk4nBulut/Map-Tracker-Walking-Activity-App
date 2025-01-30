@@ -29,6 +29,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+
+        resValue "string", "maps_api_key", project.hasProperty("MAPS_API_KEY") ? project.MAPS_API_KEY : ""
     }
 
     buildTypes {
