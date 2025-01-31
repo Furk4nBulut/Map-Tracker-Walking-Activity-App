@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_tracker/model/user_model.dart';
+import 'package:map_tracker/screens/activity_detail_screen.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
@@ -131,7 +132,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _activityStarted = false;
       _endTime = DateTime.now();
       _timer?.cancel();
-
     });
 
     LatLng? startPosition = _route.isNotEmpty ? _route.first : null;
@@ -143,26 +143,30 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       );
       return;
     }
-
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
     try {
+      String? activityId;
+
+      // Yerel veritabanına kaydetme işlemi
       if (_currentUser != null) {
-        // Save to local database if Firebase user is not logged in
-        await ActivityService().saveActivity(
+        activityId = await ActivityService().saveActivityToLocal(
           user: _currentUser!,
           startTime: _startTime!,
           endTime: _endTime!,
           totalDistance: _totalDistance,
           elapsedTime: _elapsedSeconds,
+          averageSpeed: _averageSpeed,
           startPosition: startPosition,
           endPosition: endPosition,
           route: _route,
-          averageSpeed: _averageSpeed,
         );
+      }
 
-
-      } else if (_firebaseUser != null) {
-        // Save to Firestore if Firebase user is logged in
-        await FirebaseFirestore.instance
+      // Firestore'a kaydetme işlemi
+      if (_firebaseUser != null) {
+        DocumentReference ref = await FirebaseFirestore.instance
             .collection('user')
             .doc(_firebaseUser!.uid)
             .collection('activities')
@@ -178,19 +182,34 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           'route': _route.map((point) => {'lat': point.latitude, 'lng': point.longitude}).toList(),
           'averageSpeed': _averageSpeed,
         });
+
+        activityId = ref.id; // Firestore'dan dönen doküman ID'si
       }
 
-      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
 
+      // Yerel veritabanından alınan activityId ile yönlendirme
+      if (activityId != null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ActivityDetailScreen(activityId: activityId!),
+          ),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
       );
     }
   }
+
+
 
   void _updateActivityStats(Position position) {
     if (_route.isNotEmpty) {

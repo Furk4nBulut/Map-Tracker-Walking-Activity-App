@@ -10,7 +10,8 @@ class ActivityService {
   final DatabaseHelper _dbHelper = DatabaseHelper();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> saveActivity({
+  // Aktiviteyi yerel veritabanına kaydetme
+  Future<String?> saveActivityToLocal({
     required LocalUser user,
     required DateTime startTime,
     required DateTime endTime,
@@ -22,18 +23,9 @@ class ActivityService {
     required List<LatLng> route,
   }) async {
     try {
-      // Save activity locally
       String activityId = generateUniqueId();
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
-      print(activityId);
+
+      // Yerel veritabanına kaydet
       await _dbHelper.insertActivity(Activity(
         id: activityId,
         user: user,
@@ -48,15 +40,32 @@ class ActivityService {
         endPositionLng: endPosition?.longitude,
         route: route,
       ));
+      return activityId; // Aktivite ID'sini döndür
+    } catch (e) {
+      throw 'Yerel veritabanına kaydederken hata oluştu: $e';
+    }
+  }
 
+  // Aktiviteyi Firestore'a kaydetme
+  Future<void> saveActivityToFirestore({
+    required String activityId,
+    required LocalUser user,
+    required DateTime startTime,
+    required DateTime endTime,
+    required double totalDistance,
+    required int elapsedTime,
+    required double averageSpeed,
+    required LatLng? startPosition,
+    required LatLng? endPosition,
+    required List<LatLng> route,
+  }) async {
+    try {
       final FirebaseAuth _auth = FirebaseAuth.instance;
-      User? firebaseuser = _auth.currentUser;
-      if (firebaseuser != null) {
+      User? firebaseUser = _auth.currentUser;
 
-
-        // Save activity to Firestore
-        // Firestore kaydı
-        await _firestore.collection('user').doc(firebaseuser.uid).collection('activities').doc(activityId).set({
+      if (firebaseUser != null) {
+        // Firestore'a kaydetme işlemi
+        await _firestore.collection('user').doc(firebaseUser.uid).collection('activities').doc(activityId).set({
           'userId': user.id,
           'startTime': startTime,
           'endTime': endTime,
@@ -73,14 +82,15 @@ class ActivityService {
         });
       }
     } catch (e) {
-      print('An error occurred while saving the activity: $e');
-      throw 'An error occurred while saving the activity: $e';
+      print('Firestore\'a kaydederken hata oluştu: $e');
+      throw 'Firestore\'a kaydederken hata oluştu: $e';
     }
   }
 
-  // Basit bir benzersiz ID oluşturma işlevi
   String generateUniqueId() {
     var uuid = Uuid();
-    return uuid.v4();
+    String id = uuid.v4();
+    return id;
   }
+
 }
