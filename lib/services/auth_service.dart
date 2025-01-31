@@ -24,11 +24,14 @@ class AuthService {
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-        await _registerUser(name: name, surname: surname, email: email, password: password);
-        Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
 
         await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
         Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
+
+        await _registerUser(name: name, surname: surname, email: email, password: password);
+        Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
+
+
       }
     } on FirebaseAuthException catch (e) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
