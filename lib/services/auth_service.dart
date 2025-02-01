@@ -109,16 +109,6 @@ class AuthService {
       "password": password
     });
   }
-  // register user for google with id field
-  Future<void> _registerGoogleUser({required String name, required String surname, required String email, required String password, required String id}) async {
-    await userCollection.doc(id).set({
-      "id": id,
-      "email" : email,
-      "name": name,
-      "surname": surname,
-      "password": password
-    });
-  }
 
   Future<void> _syncUserActivitiesFromFirestore(LocalUser localUser) async {
     try {
@@ -189,51 +179,5 @@ class AuthService {
       Fluttertoast.showToast(msg: "Aktiviteleri senkronize ederken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
     }
   }
-
-
-
-// syncuser to firestone
-  Future<void> _syncUserActivitiesToFirestore(LocalUser localuser) async {
-    try {
-      User? firebaseUser = firebaseAuth.currentUser;
-      LocalUser? localUser = await dbHelper.getUserByEmail(localuser.email);
-      var userid = localUser?.id;
-      if (firebaseUser != null) {
-        List<Activity> activities = await dbHelper.getUserActivities(userid!);
-        for (Activity activity in activities) {
-          await firestore
-              .collection('user')
-              .doc(firebaseUser.uid)
-              .collection('activities')
-              .doc(activity.id)
-              .set({
-            'startTime': activity.startTime,
-            'endTime': activity.endTime,
-            'totalDistance': activity.totalDistance,
-            'elapsedTime': activity.elapsedTime,
-            'averageSpeed': activity.averageSpeed,
-            'startPosition': {
-              'latitude': activity.startPositionLat,
-              'longitude': activity.startPositionLng,
-            },
-            'endPosition': {
-              'latitude': activity.endPositionLat,
-              'longitude': activity.endPositionLng,
-            },
-            'route': activity.route?.map((point) => {
-              'latitude': point.latitude,
-              'longitude': point.longitude,
-            }).toList(),
-          });
-        }
-        Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
-      }
-    } catch (e)
-    {
-      print("Aktiviteleri senkronize ederken hata oluştu: $e");
-      Fluttertoast.showToast(msg: "Buluta kaydedilemedi: $e", toastLength: Toast.LENGTH_LONG);
-    }
-  }
-
 
 }
