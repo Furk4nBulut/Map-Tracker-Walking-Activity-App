@@ -13,7 +13,6 @@ class LocalUser {
     required this.password,
   });
 
-  // User modelini Map'e dönüştüren yöntem
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -24,7 +23,6 @@ class LocalUser {
     };
   }
 
-  // Map'ten User modeline dönüştüren yöntem
   factory LocalUser.fromMap(Map<String, dynamic> map) {
     return LocalUser(
       id: map['id'],
@@ -34,19 +32,17 @@ class LocalUser {
       password: map['password'],
     );
   }
-  // create getter setter for user
+
+  // Getters
   String get getFirstName => firstName;
   String get getLastName => lastName;
   String get getEmail => email;
   String get getPassword => password;
   int? get getId => id;
 
-  // create setter for user
+  // Setters
   set setFirstName(String firstName) => this.firstName = firstName;
   set setLastName(String lastName) => this.lastName = lastName;
   set setEmail(String email) => this.email = email;
   set setPassword(String password) => this.password = password;
-
-
-
 }

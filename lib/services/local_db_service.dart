@@ -17,6 +17,13 @@ class DatabaseHelper {
     _database = await initDatabase();
     return _database!;
   }
+  Future<void> close() async {
+    final db = await database;
+    db.close();
+    _database = null;
+  }
+
+
 
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
@@ -117,7 +124,11 @@ class DatabaseHelper {
 
   Future<List<Activity>> getActivities() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(activityTable);
+    final List<Map<String, dynamic>> maps = await db.query(
+      activityTable,
+      orderBy: 'startTime DESC',  // Burada sıralama ekledik
+    );
+
     List<Activity> activities = [];
     for (var map in maps) {
       LocalUser? user = await getUserById(map['userId']);
@@ -127,6 +138,8 @@ class DatabaseHelper {
     }
     return activities;
   }
+
+
 
   Future<Activity?> getActivityById(String id) async {
     final db = await database;
@@ -149,7 +162,7 @@ class DatabaseHelper {
       activityTable,
       where: "userId = ?",
       whereArgs: [userId],
-      orderBy: "startTime DESC",
+      orderBy: "startTime DESC",  // Burada startTime DESC sıralaması doğru şekilde yapılacak
     );
     List<Activity> activities = [];
     LocalUser? user = await getUserById(userId);
@@ -174,4 +187,4 @@ class DatabaseHelper {
       return null;
     }
   }
-}
+  }

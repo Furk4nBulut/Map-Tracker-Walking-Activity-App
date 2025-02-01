@@ -15,7 +15,7 @@ class Activity {
   double? endPositionLat;
   double? endPositionLng;
   List<LatLng>? route;
-  late LocalUser user;  // Integrate user from user_model.dart
+  late LocalUser user;
 
   Activity({
     required this.id,
