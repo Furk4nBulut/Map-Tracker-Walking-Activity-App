@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "860454957556",
+    "firebase_url": "https://maptracker-e9e98-default-rtdb.firebaseio.com",
     "project_id": "maptracker-e9e98",
     "storage_bucket": "maptracker-e9e98.firebasestorage.app"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "860454957556-4332ajgu4eplcm036drv5v835s7c0hl0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.map_tracker",
+            "certificate_hash": "1a7054d37cb3b3ba30c6710f0845d6883d0afd56"
+          }
+        },
         {
           "client_id": "860454957556-m1g5lr2p8tnvu5kbn5807k6svnm2lm16.apps.googleusercontent.com",
           "client_type": 1,
@@ -66,6 +75,14 @@
           "android_info": {
             "package_name": "com.map_tracker",
             "certificate_hash": "33df10303444e10cbac2a49f3b6a3f7c5b6a64c5"
+          }
+        },
+        {
+          "client_id": "860454957556-s7b8ugi2ehqa3e6bb3dg2gcvebighr0q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.map_tracker",
+            "certificate_hash": "1a7054d37cb3b3ba30c6710f0845d6883d0afd56"
           }
         },
         {

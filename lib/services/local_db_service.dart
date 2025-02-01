@@ -10,6 +10,13 @@ class DatabaseHelper {
   static const String activityTable = 'activities';
   LocalUser? localUser;
 
+  // Private constructor
+  DatabaseHelper._privateConstructor();
+  DatabaseHelper();
+  // Singleton instance
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+
+  // Get database instance
   Future<Database> get database async {
     if (_database != null) {
       return _database!;
@@ -17,13 +24,12 @@ class DatabaseHelper {
     _database = await initDatabase();
     return _database!;
   }
+
   Future<void> close() async {
     final db = await database;
     db.close();
     _database = null;
   }
-
-
 
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
@@ -126,7 +132,7 @@ class DatabaseHelper {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       activityTable,
-      orderBy: 'startTime DESC',  // Burada sıralama ekledik
+      orderBy: 'startTime DESC',
     );
 
     List<Activity> activities = [];
@@ -138,8 +144,6 @@ class DatabaseHelper {
     }
     return activities;
   }
-
-
 
   Future<Activity?> getActivityById(String id) async {
     final db = await database;
@@ -156,13 +160,14 @@ class DatabaseHelper {
     }
     return null;
   }
+
   Future<List<Activity>> getUserActivities(int userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       activityTable,
       where: "userId = ?",
       whereArgs: [userId],
-      orderBy: "startTime DESC",  // Burada startTime DESC sıralaması doğru şekilde yapılacak
+      orderBy: "startTime DESC",
     );
     List<Activity> activities = [];
     LocalUser? user = await getUserById(userId);
@@ -187,4 +192,4 @@ class DatabaseHelper {
       return null;
     }
   }
-  }
+}
