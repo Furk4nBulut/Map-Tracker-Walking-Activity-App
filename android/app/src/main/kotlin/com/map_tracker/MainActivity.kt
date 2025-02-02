@@ -1,4 +1,4 @@
-package com.example.map_tracker
+package com.map_tracker
 
 import io.flutter.embedding.android.FlutterActivity
 
