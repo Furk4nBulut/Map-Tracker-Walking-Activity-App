@@ -93,7 +93,7 @@ class AuthService {
   }
 
   Future<void> signOut(BuildContext context) async {
-    dbHelper.logout();
+    dbHelper.logout(context);
     await firebaseAuth.signOut();
     await FirebaseAuth.instance.signOut();
 

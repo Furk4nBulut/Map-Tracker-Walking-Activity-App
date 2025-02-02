@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -103,9 +105,12 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('currentUserId');
+  Future<void> logout(BuildContext context) async {
+    try {
+      await (await SharedPreferences.getInstance()).remove('currentUserId');
+    } catch (e) {
+      debugPrint('Error signing out: $e');
+    }
   }
 
   Future<int> updateUser(LocalUser user) async {
