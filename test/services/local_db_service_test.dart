@@ -163,27 +163,31 @@ void main() {
 
   test('logout işlevini test et', () async {
     // Kullanıcı oluştur
-    LocalUser user = LocalUser(
+    final user = LocalUser(
       id: 1,
       firstName: 'Furkan',
       lastName: 'Bulut',
       email: 'furkan@example.com',
       password: 'password123',
     );
+
+    // Kullanıcıyı veritabanına ekle
     await databaseHelper.insertUser(user);
 
-    // Login işlemi yap
+    // Kullanıcı giriş yapsın
     await databaseHelper.login(user);
 
     // Logout işlemi yap
     await databaseHelper.logout();
 
-    // Mevcut kullanıcıyı sorgula
-    LocalUser? currentUser = await databaseHelper.getCurrentUser();
+    // SharedPreferences'tan kullanıcı ID'sinin silindiğini kontrol et
+    final prefs = await SharedPreferences.getInstance();
+    final currentUserId = prefs.getString('currentUserId');
 
-    // Mevcut kullanıcıyı doğrula
-    expect(currentUser, isNull);
+    // Kullanıcının çıkış yaptığını doğrula
+    expect(currentUserId, isNull);
   });
+
 
   test('getUserActivities işlevini test et', () async {
     // Kullanıcı oluştur

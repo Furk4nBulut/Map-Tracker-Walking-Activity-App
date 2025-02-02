@@ -105,13 +105,14 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<void> logout(BuildContext context) async {
+  Future<void> logout() async {
     try {
       await (await SharedPreferences.getInstance()).remove('currentUserId');
     } catch (e) {
       debugPrint('Error signing out: $e');
     }
   }
+
 
   Future<int> updateUser(LocalUser user) async {
     final db = await database;
