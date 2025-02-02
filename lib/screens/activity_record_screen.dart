@@ -42,8 +42,10 @@ class ActivityHistoryScreen extends StatelessWidget {
 
                 if (activities == null || activities.isEmpty) {
                   // Yerel veritabanında veri yoksa Firestore'dan çek
-                  return _fetchActivitiesFromFirestore(localUser.id! as String);
+                  return _fetchActivitiesFromFirestore(localUser.id!.toString());
+
                 }
+
 
                 return buildActivityList(activities, context);
               },
