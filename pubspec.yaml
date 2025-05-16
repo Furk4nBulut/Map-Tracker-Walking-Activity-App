@@ -50,6 +50,7 @@ dependencies:
   flutter_animate: ^4.5.0
   cloud_firestore: ^5.0.2
   fluttertoast: ^8.2.6
+
   get_it: ^7.7.0
   google_fonts: ^6.2.1
   geolocator: ^12.0.0
