@@ -9,6 +9,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // Eğer kotlinx-metadata-jvm açıkça kullanıyorsanız:
+        classpath "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0" // veya en güncel sürüm
     }
 }
 
