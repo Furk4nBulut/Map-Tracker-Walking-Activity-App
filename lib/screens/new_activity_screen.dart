@@ -10,8 +10,6 @@ import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 import 'dart:async';
-import 'package:map_tracker/services/auth_service.dart';
-import 'package:map_tracker/screens/partials/navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -24,16 +22,18 @@ class NewActivityScreen extends StatefulWidget {
 
 class _NewActivityScreenState extends State<NewActivityScreen> {
   Position? _currentPosition;
-  late StreamSubscription<Position> _positionStream;
+  StreamSubscription<Position>? _positionStream;
   bool _activityStarted = false;
   DateTime? _startTime;
   DateTime? _endTime;
-  double _totalDistance = 0;
+  double _totalDistance = 0.0;
   int _elapsedSeconds = 0;
-  double _averageSpeed = 0;
+  double _averageSpeed = 0.0;
   Timer? _timer;
   List<osm.GeoPoint> _route = [];
   osm.MapController? _mapController;
+  bool _mapInitialized = false;
+  String? _errorMessage;
 
   LocalUser? _currentUser;
   User? _firebaseUser;
@@ -41,30 +41,67 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
-    _fetchWeatherData();
+    _initializeLocationAndMap();
     _loadCurrentUser();
     _loadFirebaseUser();
   }
 
   @override
   void dispose() {
-    _positionStream.cancel();
+    _positionStream?.cancel();
     _timer?.cancel();
     _mapController?.dispose();
     super.dispose();
   }
 
-  Future<void> _initializeLocation() async {
+  Future<void> _initializeLocationAndMap() async {
     try {
-      _currentPosition = await _getCurrentLocation();
-      _mapController = osm.MapController(
-        initPosition: _currentPosition != null
-            ? osm.GeoPoint(latitude: _currentPosition!.latitude, longitude: _currentPosition!.longitude)
-            : osm.GeoPoint(latitude: 0, longitude: 0),
+      // Check and request location permissions
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() => _errorMessage = 'Konum servisleri devre dışı.');
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() => _errorMessage = 'Konum izinleri reddedildi.');
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        setState(() => _errorMessage = 'Konum izinleri kalıcı olarak reddedildi.');
+        return;
+      }
+
+      // Get initial position
+      _currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
       );
-      await _mapController?.setZoom(zoomLevel: 15);
-      _positionStream = Geolocator.getPositionStream().listen((Position position) {
+
+      // Initialize map controller
+      _mapController = osm.MapController(
+        initPosition: osm.GeoPoint(
+          latitude: _currentPosition!.latitude,
+          longitude: _currentPosition!.longitude,
+        ),
+      );
+
+      // Set map initialized flag
+      setState(() {
+        _mapInitialized = true;
+        _errorMessage = null;
+      });
+
+      // Start listening to position updates
+      _positionStream = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 5,
+        ),
+      ).listen((Position position) {
         setState(() {
           _currentPosition = position;
           if (_activityStarted) {
@@ -73,37 +110,12 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             _centerMapOnCurrentLocation();
           }
         });
+      }, onError: (e) {
+        setState(() => _errorMessage = 'Konum güncellenirken hata: $e');
       });
     } catch (e) {
-      print('Error initializing location: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Konum bilgisi alınamadı.')),
-      );
+      setState(() => _errorMessage = 'Konum veya harita başlatılırken hata: $e');
     }
-  }
-
-  Future<Position> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      throw 'Konum servisleri devre dışı.';
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw 'Konum izinleri reddedildi.';
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      throw 'Konum izinleri kalıcı olarak reddedildi.';
-    }
-
-    return await Geolocator.getCurrentPosition();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -113,28 +125,42 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
   Future<void> _loadFirebaseUser() async {
     _firebaseUser = FirebaseAuth.instance.currentUser;
+    setState(() {});
   }
 
   void _startActivity() {
+    if (_currentPosition == null || _mapController == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Harita veya konum hazır değil.')),
+      );
+      return;
+    }
+
     setState(() {
       _activityStarted = true;
       _startTime = DateTime.now();
-      _route.clear();
+      _totalDistance = 0.0;
+      _elapsedSeconds = 0;
+      _averageSpeed = 0.0;
+      _route = [];
       _updateRoute(_currentPosition!);
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        setState(() {
-          _elapsedSeconds++;
-          if (_totalDistance > 0) {
-            _averageSpeed = _totalDistance / (_elapsedSeconds / 3600); // km/s
-          }
-        });
-      });
-
-      _centerMapOnCurrentLocation();
     });
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+        if (_totalDistance > 0 && _elapsedSeconds > 0) {
+          _averageSpeed = _totalDistance / (_elapsedSeconds / 3600); // km/h
+        }
+      });
+    });
+
+    _centerMapOnCurrentLocation();
   }
 
   void _finishActivity() async {
+    if (!_activityStarted) return;
+
     setState(() {
       _activityStarted = false;
       _endTime = DateTime.now();
@@ -154,6 +180,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     try {
       String? activityId;
 
+      // Save to local database if LocalUser exists
       if (_currentUser != null) {
         activityId = await ActivityService().saveActivityToLocal(
           user: _currentUser!,
@@ -168,32 +195,35 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         );
       }
 
+      // Save to Firestore if FirebaseUser exists
       if (_firebaseUser != null) {
-        DocumentReference ref = await FirebaseFirestore.instance
+        activityId ??= ActivityService().generateUniqueId();
+        await FirebaseFirestore.instance
             .collection('user')
             .doc(_firebaseUser!.uid)
             .collection('activities')
-            .add({
+            .doc(activityId)
+            .set({
           'startTime': _startTime,
           'endTime': _endTime,
           'totalDistance': _totalDistance,
           'elapsedTime': _elapsedSeconds,
+          'averageSpeed': _averageSpeed,
           'startPositionLat': startPosition?.latitude,
           'startPositionLng': startPosition?.longitude,
           'endPositionLat': endPosition?.latitude,
           'endPositionLng': endPosition?.longitude,
-          'route': _route.map((point) => {
+          'route': _route
+              .map((point) => {
             'lat': point.latitude,
             'lng': point.longitude,
-          }).toList(),
-          'averageSpeed': _averageSpeed,
+          })
+              .toList(),
         });
-
-        activityId = ref.id;
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
+        const SnackBar(content: Text('Aktivite kaydedildi.')),
       );
 
       if (activityId != null) {
@@ -203,16 +233,13 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Aktivite ID alınamadı, ana sayfaya yönlendiriliyorsunuz.')),
-        );
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Aktivite kaydedilirken bir hata oluştu: $e')),
+        SnackBar(content: Text('Aktivite kaydedilirken hata: $e')),
       );
     }
   }
@@ -232,74 +259,112 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   }
 
   void _updateRoute(Position position) async {
-    final newPoint = osm.GeoPoint(latitude: position.latitude, longitude: position.longitude);
+    if (_mapController == null) return;
+
+    final newPoint = osm.GeoPoint(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+
     setState(() {
       _route.add(newPoint);
     });
-    if (_route.length > 1 && _mapController != null) {
-      await _mapController!.drawRoad(
-        _route.first,
-        _route.last,
-        roadType: osm.RoadType.foot,
-        roadOption: const osm.RoadOption(
-          roadColor: Colors.blue,
-          roadWidth: 5,
-        ),
-      );
-    }
-  }
 
-  Future<void> _fetchWeatherData() async {
-    // Weather data fetching remains unchanged
-  }
-
-  Widget _buildMap() {
-    return Expanded(
-      child: Stack(
-        children: [
-          osm.OSMFlutter(
-            controller: _mapController!,
-            osmOption: const osm.OSMOption(),
-            mapIsLoading: const Center(child: CircularProgressIndicator()),
-            onMapIsReady: (isReady) async {
-              if (isReady && _currentPosition != null) {
-                await _mapController!.enableTracking();
-                await _mapController!.setZoom(zoomLevel: 15);
-              }
-            },
+    if (_route.length > 1) {
+      try {
+        await _mapController!.addMarker(
+          newPoint,
+          markerIcon: const osm.MarkerIcon(
+            icon: Icon(Icons.location_pin, color: Colors.red, size: 40),
           ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: "Yeni Aktivite"),
-      body: _mapController == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          WeatherWidget(),
-          _buildMap(),
-          _buildActivityStats(),
-          _buildActivityButtons(),
-        ],
-      ),
-    );
+        );
+        await _mapController!.drawRoad(
+          _route[_route.length - 2],
+          newPoint,
+          roadType: osm.RoadType.foot,
+          roadOption: const osm.RoadOption(
+            roadColor: Colors.blue,
+            roadWidth: 5,
+          ),
+        );
+      } catch (e) {
+        debugPrint('Error drawing route: $e');
+      }
+    }
   }
 
   void _centerMapOnCurrentLocation() async {
-    if (_currentPosition != null && _mapController != null) {
-      await _mapController!.currentLocation();
+    if (_currentPosition == null || _mapController == null) return;
+
+    try {
+      await _mapController!.changeLocation(
+        osm.GeoPoint(
+          latitude: _currentPosition!.latitude,
+          longitude: _currentPosition!.longitude,
+        ),
+      );
       await _mapController!.setZoom(zoomLevel: 15);
+    } catch (e) {
+      debugPrint('Error centering map: $e');
     }
+  }
+
+  Widget _buildMap() {
+    if (_errorMessage != null) {
+      return Expanded(
+        child: Center(
+          child: Text(
+            _errorMessage!,
+            style: const TextStyle(color: Colors.red, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    if (!_mapInitialized || _mapController == null) {
+      return const Expanded(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return Expanded(
+      child: osm.OSMFlutter(
+        controller: _mapController!,
+        osmOption: const osm.OSMOption(
+          enableRotationByGesture: false,
+          zoomOption: osm.ZoomOption(
+            initZoom: 15,
+            minZoomLevel: 10,
+            maxZoomLevel: 18,
+          ),
+        ),
+        mapIsLoading: const Center(child: CircularProgressIndicator()),
+        onMapIsReady: (isReady) async {
+          if (isReady && _currentPosition != null) {
+            try {
+              await _mapController!.enableTracking(enableStopFollow: false);
+              await _mapController!.addMarker(
+                osm.GeoPoint(
+                  latitude: _currentPosition!.latitude,
+                  longitude: _currentPosition!.longitude,
+                ),
+                markerIcon: const osm.MarkerIcon(
+                  icon: Icon(Icons.my_location, color: Colors.blue, size: 40),
+                ),
+              );
+            } catch (e) {
+              debugPrint('Error on map ready: $e');
+            }
+          }
+        },
+      ),
+    );
   }
 
   Widget _buildActivityStats() {
     return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 6, left: 8, right: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -312,14 +377,14 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           _buildDivider(),
           _buildStatItem(
             'Süre',
-            '$_elapsedSeconds saniye',
+            '$_elapsedSeconds s',
             Icons.timer,
             Colors.blue,
           ),
           _buildDivider(),
           _buildStatItem(
             'Hız',
-            '${_averageSpeed.toStringAsFixed(2)} km/s',
+            '${_averageSpeed.toStringAsFixed(2)} km/h',
             Icons.speed,
             Colors.deepOrange,
           ),
@@ -363,7 +428,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           ElevatedButton.icon(
-            onPressed: _activityStarted ? null : _startActivity,
+            onPressed: _activityStarted || !_mapInitialized ? null : _startActivity,
             icon: const Icon(Icons.play_arrow),
             label: const Text('Başlat'),
             style: ElevatedButton.styleFrom(
@@ -386,6 +451,21 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomAppBar(title: "Yeni Aktivite"),
+      body: Column(
+        children: [
+          const WeatherWidget(),
+          _buildMap(),
+          _buildActivityStats(),
+          _buildActivityButtons(),
         ],
       ),
     );
