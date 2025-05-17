@@ -1,17 +1,16 @@
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/activity_model.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 
 class ActivityService {
   final DatabaseHelper _dbHelper;
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
-  // Tüm dependency'leri constructor üzerinden alıyoruz
   ActivityService({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
@@ -20,7 +19,6 @@ class ActivityService {
         _auth = auth ?? FirebaseAuth.instance,
         _dbHelper = dbHelper ?? DatabaseHelper();
 
-  // Aktiviteyi yerel veritabanına kaydetme
   Future<String?> saveActivityToLocal({
     required LocalUser user,
     required DateTime startTime,
@@ -28,9 +26,9 @@ class ActivityService {
     required double totalDistance,
     required int elapsedTime,
     required double averageSpeed,
-    required LatLng? startPosition,
-    required LatLng? endPosition,
-    required List<LatLng> route,
+    required osm.GeoPoint? startPosition,
+    required osm.GeoPoint? endPosition,
+    required List<osm.GeoPoint> route,
   }) async {
     try {
       String activityId = generateUniqueId();
@@ -57,7 +55,6 @@ class ActivityService {
     }
   }
 
-  // Aktiviteyi Firestore'a kaydetme
   Future<void> saveActivityToFirestore({
     required String activityId,
     required LocalUser user,
@@ -66,9 +63,9 @@ class ActivityService {
     required double totalDistance,
     required int elapsedTime,
     required double averageSpeed,
-    required LatLng? startPosition,
-    required LatLng? endPosition,
-    required List<LatLng> route,
+    required osm.GeoPoint? startPosition,
+    required osm.GeoPoint? endPosition,
+    required List<osm.GeoPoint> route,
   }) async {
     try {
       User? firebaseUser = _auth.currentUser;
@@ -78,7 +75,7 @@ class ActivityService {
 
       final activityData = {
         'userId': user.id,
-        'startTime': startTime.toIso8601String(), // DateTime'ı string olarak kaydediyoruz
+        'startTime': startTime.toIso8601String(),
         'endTime': endTime.toIso8601String(),
         'totalDistance': totalDistance,
         'elapsedTime': elapsedTime,
@@ -89,9 +86,10 @@ class ActivityService {
         'endPosition': endPosition != null
             ? {'latitude': endPosition.latitude, 'longitude': endPosition.longitude}
             : null,
-        'route': route
-            .map((latLng) => {'latitude': latLng.latitude, 'longitude': latLng.longitude})
-            .toList(),
+        'route': route.map((geoPoint) => {
+          'latitude': geoPoint.latitude,
+          'longitude': geoPoint.longitude
+        }).toList(),
       };
 
       await _firestore

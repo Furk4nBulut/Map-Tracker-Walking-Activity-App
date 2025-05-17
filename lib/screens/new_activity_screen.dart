@@ -8,7 +8,7 @@ import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/services/activity_service.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/weather_widget.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 import 'dart:async';
 import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/partials/navbar.dart';
@@ -32,9 +32,9 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   int _elapsedSeconds = 0;
   double _averageSpeed = 0;
   Timer? _timer;
-  List<LatLng> _route = [];
-  late GoogleMapController _mapController;
-  Set<Polyline> _polylines = {};
+  List<osm.GeoPoint> _route = [];
+  osm.MapController? _mapController;
+
   LocalUser? _currentUser;
   User? _firebaseUser;
 
@@ -51,12 +51,19 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   void dispose() {
     _positionStream.cancel();
     _timer?.cancel();
+    _mapController?.dispose();
     super.dispose();
   }
 
   Future<void> _initializeLocation() async {
     try {
       _currentPosition = await _getCurrentLocation();
+      _mapController = osm.MapController(
+        initPosition: _currentPosition != null
+            ? osm.GeoPoint(latitude: _currentPosition!.latitude, longitude: _currentPosition!.longitude)
+            : osm.GeoPoint(latitude: 0, longitude: 0),
+      );
+      await _mapController?.setZoom(zoomLevel: 15);
       _positionStream = Geolocator.getPositionStream().listen((Position position) {
         setState(() {
           _currentPosition = position;
@@ -134,8 +141,8 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       _timer?.cancel();
     });
 
-    LatLng? startPosition = _route.isNotEmpty ? _route.first : null;
-    LatLng? endPosition = _route.isNotEmpty ? _route.last : null;
+    osm.GeoPoint? startPosition = _route.isNotEmpty ? _route.first : null;
+    osm.GeoPoint? endPosition = _route.isNotEmpty ? _route.last : null;
 
     if (_currentUser == null && _firebaseUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,13 +150,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       );
       return;
     }
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => HomePage()),
-    );
+
     try {
       String? activityId;
 
-      // Yerel veritabanına kaydetme işlemi
       if (_currentUser != null) {
         activityId = await ActivityService().saveActivityToLocal(
           user: _currentUser!,
@@ -164,7 +168,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         );
       }
 
-      // Firestore'a kaydetme işlemi
       if (_firebaseUser != null) {
         DocumentReference ref = await FirebaseFirestore.instance
             .collection('user')
@@ -179,18 +182,20 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           'startPositionLng': startPosition?.longitude,
           'endPositionLat': endPosition?.latitude,
           'endPositionLng': endPosition?.longitude,
-          'route': _route.map((point) => {'lat': point.latitude, 'lng': point.longitude}).toList(),
+          'route': _route.map((point) => {
+            'lat': point.latitude,
+            'lng': point.longitude,
+          }).toList(),
           'averageSpeed': _averageSpeed,
         });
 
-        activityId = ref.id; // Firestore'dan dönen doküman ID'si
+        activityId = ref.id;
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aktivite tamamlandı. Veriler kaydedildi.')),
       );
 
-      // Yerel veritabanından alınan activityId ile yönlendirme
       if (activityId != null) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -198,6 +203,9 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           ),
         );
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Aktivite ID alınamadı, ana sayfaya yönlendiriliyorsunuz.')),
+        );
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomePage()),
         );
@@ -208,8 +216,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       );
     }
   }
-
-
 
   void _updateActivityStats(Position position) {
     if (_route.isNotEmpty) {
@@ -225,81 +231,58 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     }
   }
 
-  void _updateRoute(Position position) {
+  void _updateRoute(Position position) async {
+    final newPoint = osm.GeoPoint(latitude: position.latitude, longitude: position.longitude);
     setState(() {
-      _route.add(LatLng(position.latitude, position.longitude));
-      _polylines = {
-        Polyline(
-          polylineId: PolylineId('route'),
-          points: _route,
-          color: Colors.blue,
-          width: 5,
-        ),
-      };
+      _route.add(newPoint);
     });
+    if (_route.length > 1 && _mapController != null) {
+      await _mapController!.drawRoad(
+        _route.first,
+        _route.last,
+        roadType: osm.RoadType.foot,
+        roadOption: const osm.RoadOption(
+          roadColor: Colors.blue,
+          roadWidth: 5,
+        ),
+      );
+    }
   }
 
   Future<void> _fetchWeatherData() async {
-    // Fetch weather data asynchronously
+    // Weather data fetching remains unchanged
   }
 
   Widget _buildMap() {
     return Expanded(
       child: Stack(
         children: [
-          GoogleMap(
-            initialCameraPosition: _currentPosition != null
-                ? CameraPosition(
-              target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-              zoom: 15,
-            )
-                : CameraPosition(
-              target: LatLng(0, 0),
-              zoom: 15,
-            ),
-            myLocationEnabled: true,
-            polylines: _polylines,
-            onMapCreated: (GoogleMapController controller) {
-              _mapController = controller;
+          osm.OSMFlutter(
+            controller: _mapController!,
+            osmOption: const osm.OSMOption(),
+            mapIsLoading: const Center(child: CircularProgressIndicator()),
+            onMapIsReady: (isReady) async {
+              if (isReady && _currentPosition != null) {
+                await _mapController!.enableTracking();
+                await _mapController!.setZoom(zoomLevel: 15);
+              }
             },
-            markers: _buildMarkers(), // Add markers for start and end points
           ),
         ],
       ),
     );
   }
 
-  Set<Marker> _buildMarkers() {
-    Set<Marker> markers = {};
-    if (_route.isNotEmpty) {
-      markers.add(
-        Marker(
-          markerId: MarkerId('start'),
-          position: _route.first,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          infoWindow: InfoWindow(title: 'Start'),
-        ),
-      );
-      markers.add(
-        Marker(
-          markerId: MarkerId('end'),
-          position: _route.last,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          infoWindow: InfoWindow(title: 'Finish'),
-        ),
-      );
-    }
-    return markers;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Yeni Aktivite"),
-      body: Column(
+      body: _mapController == null
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: [
-          WeatherWidget(), // Weather widget
-          _buildMap(), // Integrated into the column
+          WeatherWidget(),
+          _buildMap(),
           _buildActivityStats(),
           _buildActivityButtons(),
         ],
@@ -307,14 +290,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     );
   }
 
-  void _centerMapOnCurrentLocation() {
+  void _centerMapOnCurrentLocation() async {
     if (_currentPosition != null && _mapController != null) {
-      _mapController.animateCamera(
-        CameraUpdate.newLatLngZoom(
-          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-          15,
-        ),
-      );
+      await _mapController!.currentLocation();
+      await _mapController!.setZoom(zoomLevel: 15);
     }
   }
 
@@ -354,12 +333,12 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(icon, size: 30, color: color),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Text(
           title,
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(fontSize: 16, color: Colors.grey[700]),
@@ -372,8 +351,8 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     return Container(
       height: 100,
       width: 1,
-      color: basarsoft_color, // Adjust color to match your theme
-      margin: const EdgeInsets.symmetric(horizontal: 25), // Add some horizontal margin
+      color: basarsoft_color,
+      margin: const EdgeInsets.symmetric(horizontal: 25),
     );
   }
 
@@ -385,25 +364,25 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         children: [
           ElevatedButton.icon(
             onPressed: _activityStarted ? null : _startActivity,
-            icon: Icon(Icons.play_arrow),
+            icon: const Icon(Icons.play_arrow),
             label: const Text('Başlat'),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: basarsoft_color,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: TextStyle(fontSize: 18),
+              textStyle: const TextStyle(fontSize: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
           ElevatedButton.icon(
             onPressed: _activityStarted ? _finishActivity : null,
-            icon: Icon(Icons.stop),
+            icon: const Icon(Icons.stop),
             label: const Text('Bitir'),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: Colors.red,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: TextStyle(fontSize: 18),
+              textStyle: const TextStyle(fontSize: 18),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),

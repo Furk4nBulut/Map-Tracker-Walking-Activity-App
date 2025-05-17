@@ -1,0 +1,37 @@
+lib/
+├── model/
+│   ├── activity_model.dart
+│   └── user_model.dart
+├── screens/
+│   ├── activity_detail_screen.dart
+│   ├── activity_record_screen.dart
+│   ├── forget_passsword_screen.dart
+│   ├── homepage.dart
+│   ├── new_activity_screen.dart
+│   ├── profile_screen.dart
+│   ├── signin_screen.dart
+│   ├── signup_screen.dart
+│   ├── splash_screen.dart
+│   ├── stat_page.dart
+│   ├── welcome_screen.dart
+│   └── partials/
+│       ├── appbar.dart
+│       └── navbar.dart
+├── services/
+│   ├── provider/
+│   │   ├── auth_provider.dart
+│   │   ├── activity_provider.dart
+│   │   └── local_db_service.dart
+│   └── auth_service.dart
+├── theme/
+│   └── theme.dart
+├── utils/
+│   └── constants.dart
+├── widgets/
+│   ├── custom_scaffold.dart
+│   ├── user_info_widget.dart
+│   ├── weather_widget.dart
+│   ├── welcome_button.dart
+│   ├── firebase_options.dart
+│   └── locator.dart
+└── main.dart

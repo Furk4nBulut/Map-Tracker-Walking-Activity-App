@@ -62,13 +62,13 @@ dependencies:
   flutter_icons_plus: ^1.0.3
 
 
-
+  flutter_osm_plugin: ^1.2.3
+  uuid: ^4.5.0
 
 
   # Database
   sqflite:
   path:
-  google_maps_flutter:
   persistent_bottom_nav_bar_v2: ^5.3.0
   flutter_launcher_icons: ^0.13.1
   fl_chart: ^0.40.0

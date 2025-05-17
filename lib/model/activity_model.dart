@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:map_tracker/model/user_model.dart';
-import 'dart:convert';  // Add this import
+import 'dart:convert';
 
 class Activity {
   String? id;
@@ -14,7 +14,7 @@ class Activity {
   double? startPositionLng;
   double? endPositionLat;
   double? endPositionLng;
-  List<LatLng>? route;
+  List<GeoPoint>? route;
   late LocalUser user;
 
   Activity({
@@ -66,7 +66,7 @@ class Activity {
       endPositionLng: map['endPositionLng'],
       route: map['route'] != null
           ? List<Map<String, dynamic>>.from(jsonDecode(map['route']))
-          .map((point) => LatLng(point['lat'], point['lng']))
+          .map((point) => GeoPoint(latitude: point['lat'], longitude: point['lng']))
           .toList()
           : [],
     );
