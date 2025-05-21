@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'locator.dart';
@@ -10,15 +9,24 @@ import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase başlat
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Servisleri başlat
   setupLocator();
+
+  // AuthProvider'ı başlat
+  final authProvider = locator.get<AuthProvider>();
+  await authProvider.init(); // <--- Yeni eklenen satır
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>(
-          create: (context) => locator.get<AuthProvider>(),
+        ChangeNotifierProvider<AuthProvider>.value(
+          value: authProvider,
         ),
       ],
       child: const MyApp(),
@@ -41,9 +49,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Montserrat',
         ),
       ),
-
       home: const SplashScreen(),
     );
   }
 }
-
