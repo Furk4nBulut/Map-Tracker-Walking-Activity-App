@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+
 import 'locator.dart';
 import 'services/provider/auth_provider.dart';
-import 'utils/constants.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
+import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,19 +16,18 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Servisleri başlat
+  // Servisleri kur
   setupLocator();
 
-  // AuthProvider'ı başlat
+  // AuthProvider örneğini oluştur ve init et
   final authProvider = locator.get<AuthProvider>();
-  await authProvider.init(); // <--- Yeni eklenen satır
+  await authProvider.init();
 
+  // Uygulamayı başlat
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>.value(
-          value: authProvider,
-        ),
+        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
       ],
       child: const MyApp(),
     ),
@@ -35,7 +35,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
