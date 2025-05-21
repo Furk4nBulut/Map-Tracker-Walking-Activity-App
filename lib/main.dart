@@ -1,30 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-
 import 'locator.dart';
 import 'services/provider/auth_provider.dart';
+import 'utils/constants.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
-import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   setupLocator();
-
-  final authProvider = locator.get<AuthProvider>();
-  await authProvider.init(); // Burada init çağrısını yapıyoruz, otomatik giriş için
-
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>.value(
-          value: authProvider,
+        ChangeNotifierProvider<AuthProvider>(
+          create: (context) => locator.get<AuthProvider>(),
         ),
       ],
       child: const MyApp(),
@@ -33,7 +27,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +41,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Montserrat',
         ),
       ),
+
       home: const SplashScreen(),
     );
   }
