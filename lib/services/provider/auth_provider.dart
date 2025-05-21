@@ -1,39 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService;
-
-  AuthProvider(this._authService);
-
   SharedPreferences? _prefs;
+  GoogleSignIn _googleSignIn = GoogleSignIn();
   GoogleSignInAccount? _user;
+
+  GoogleSignInAccount? get user => _user;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
-    // Gerekirse AuthService'i de burada başlatabilirsin
+
+    // Burada otomatik giriş denemesi yapıyoruz
+    try {
+      final existingUser = await _googleSignIn.signInSilently();
+      if (existingUser != null) {
+        _user = existingUser;
+        await _prefs?.setString("email", existingUser.email);
+        notifyListeners();
+      }
+    } catch (e) {
+      print("Silent sign-in error: $e");
+    }
   }
 
   Future<void> signInWithGoogle() async {
     try {
-      final googleSignIn = GoogleSignIn();
-      final user = await googleSignIn.signIn();
+      final user = await _googleSignIn.signIn();
       if (user != null) {
         _user = user;
         await _prefs?.setString("email", user.email);
         notifyListeners();
       }
     } catch (e) {
-      print("Google Sign-In error: $e");
+      print("Google Sign-In Error: $e");
     }
   }
 
-  GoogleSignInAccount? get user => _user;
-
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
+    await _googleSignIn.signOut();
     _user = null;
     await _prefs?.clear();
     notifyListeners();

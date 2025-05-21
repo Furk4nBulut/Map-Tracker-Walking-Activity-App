@@ -11,23 +11,21 @@ import 'utils/constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase başlat
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Servisleri kur
   setupLocator();
 
-  // AuthProvider örneğini oluştur ve init et
   final authProvider = locator.get<AuthProvider>();
-  await authProvider.init();
+  await authProvider.init(); // Burada init çağrısını yapıyoruz, otomatik giriş için
 
-  // Uygulamayı başlat
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+        ChangeNotifierProvider<AuthProvider>.value(
+          value: authProvider,
+        ),
       ],
       child: const MyApp(),
     ),

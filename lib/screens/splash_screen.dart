@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:map_tracker/screens/welcome_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:map_tracker/screens/welcome_screen.dart'; // login/giriş ekranı
+import 'package:map_tracker/screens/homepage.dart'; // giriş sonrası ana ekran
+import '../../../services/provider/auth_provider.dart'; // AuthProvider'ı import et
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -9,18 +12,32 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
   @override
   void initState() {
     super.initState();
-    _navigateToLogin();
+    _checkLogin();
   }
 
-  Future<void> _navigateToLogin() async {
+  Future<void> _checkLogin() async {
+    // Burada 3 saniye bekleme yerine direkt login kontrolünü yapabiliriz.
     await Future.delayed(const Duration(seconds: 3));
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-    );
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    if (authProvider.user != null) {
+      // Kullanıcı zaten login olmuş, anasayfaya git
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      // Kullanıcı yok, login ekranına git
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      );
+    }
   }
 
   @override
