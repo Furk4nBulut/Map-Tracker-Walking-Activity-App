@@ -12,6 +12,8 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
 
 class NewActivityScreen extends StatefulWidget {
   const NewActivityScreen({Key? key}) : super(key: key);
@@ -59,7 +61,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       // Check and request location permissions
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        setState(() => _errorMessage = 'Konum servisleri devre dışı.');
+        setState(() => _errorMessage = LocaleKeys.locationServicesDisabled.tr());
         return;
       }
 
@@ -67,12 +69,12 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          setState(() => _errorMessage = 'Konum izinleri reddedildi.');
+          setState(() => _errorMessage = LocaleKeys.locationPermissionDenied.tr());
           return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        setState(() => _errorMessage = 'Konum izinleri kalıcı olarak reddedildi.');
+        setState(() => _errorMessage = LocaleKeys.locationPermissionDeniedForever.tr());
         return;
       }
 
@@ -111,10 +113,10 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           }
         });
       }, onError: (e) {
-        setState(() => _errorMessage = 'Konum güncellenirken hata: $e');
+        setState(() => _errorMessage = LocaleKeys.locationUpdateError.tr(args: [e.toString()]));
       });
     } catch (e) {
-      setState(() => _errorMessage = 'Konum veya harita başlatılırken hata: $e');
+      setState(() => _errorMessage = LocaleKeys.locationOrMapInitError.tr(args: [e.toString()]));
     }
   }
 
@@ -131,7 +133,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   void _startActivity() {
     if (_currentPosition == null || _mapController == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harita veya konum hazır değil.')),
+        SnackBar(content: Text(LocaleKeys.mapOrLocationNotReady.tr())),
       );
       return;
     }
@@ -172,7 +174,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
     if (_currentUser == null && _firebaseUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kullanıcı bilgisi alınamadı.')),
+        SnackBar(content: Text(LocaleKeys.userInfoNotFound.tr())),
       );
       return;
     }
@@ -223,7 +225,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aktivite kaydedildi.')),
+        SnackBar(content: Text(LocaleKeys.activitySaved.tr())),
       );
 
       if (activityId != null) {
@@ -239,7 +241,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Aktivite kaydedilirken hata: $e')),
+        SnackBar(content: Text(LocaleKeys.activitySaveError.tr(args: [e.toString()]))),
       );
     }
   }
@@ -369,22 +371,22 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildStatItem(
-            'Mesafe',
-            '${_totalDistance.toStringAsFixed(2)} km',
+            LocaleKeys.distanceLabel.tr(),
+            '${_totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
             Icons.directions_walk,
             Colors.green,
           ),
           _buildDivider(),
           _buildStatItem(
-            'Süre',
-            '$_elapsedSeconds s',
+            LocaleKeys.durationLabel.tr(),
+            '$_elapsedSeconds ${LocaleKeys.secondUnit.tr()}',
             Icons.timer,
             Colors.blue,
           ),
           _buildDivider(),
           _buildStatItem(
-            'Hız',
-            '${_averageSpeed.toStringAsFixed(2)} km/h',
+            LocaleKeys.speedLabel.tr(),
+            '${_averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}',
             Icons.speed,
             Colors.deepOrange,
           ),
@@ -430,7 +432,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           ElevatedButton.icon(
             onPressed: _activityStarted || !_mapInitialized ? null : _startActivity,
             icon: const Icon(Icons.play_arrow),
-            label: const Text('Başlat'),
+            label: Text(LocaleKeys.startButton.tr()),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: basarsoft_color,
@@ -442,7 +444,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           ElevatedButton.icon(
             onPressed: _activityStarted ? _finishActivity : null,
             icon: const Icon(Icons.stop),
-            label: const Text('Bitir'),
+            label: Text(LocaleKeys.stopButton.tr()),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: Colors.red,
@@ -459,7 +461,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: "Yeni Aktivite"),
+      appBar: CustomAppBar(title: LocaleKeys.newActivityTitle.tr()),
       body: Column(
         children: [
           const WeatherWidget(),

@@ -73,7 +73,23 @@
   "minuteUnit": "dakika",
   "secondUnit": "saniye",
   "kmUnit": "km",
-  "kmPerHourUnit": "km/saat"
+  "kmPerHourUnit": "km/saat",
+
+  "newActivityTitle": "Yeni Aktivite",
+  "locationServicesDisabled": "Konum servisleri devre dışı.",
+  "locationPermissionDenied": "Konum izinleri reddedildi.",
+  "locationPermissionDeniedForever": "Konum izinleri kalıcı olarak reddedildi.",
+  "locationUpdateError": "Konum güncellenirken hata: {error}",
+  "locationOrMapInitError": "Konum veya harita başlatılırken hata: {error}",
+  "mapOrLocationNotReady": "Harita veya konum hazır değil.",
+  "userInfoNotFound": "Kullanıcı bilgisi alınamadı.",
+  "activitySaved": "Aktivite kaydedildi.",
+  "activitySaveError": "Aktivite kaydedilirken hata: {error}",
+  "distanceLabel": "Mesafe",
+  "durationLabel": "Süre",
+  "speedLabel": "Hız",
+  "startButton": "Başlat",
+  "stopButton": "Bitir"
 
 
 

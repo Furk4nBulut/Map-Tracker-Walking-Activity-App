@@ -70,7 +70,23 @@
   "minuteUnit": "minute",
   "secondUnit": "second",
   "kmUnit": "km",
-  "kmPerHourUnit": "km/h"
+  "kmPerHourUnit": "km/h",
+
+  "newActivityTitle": "New Activity",
+  "locationServicesDisabled": "Location services are disabled.",
+  "locationPermissionDenied": "Location permissions are denied.",
+  "locationPermissionDeniedForever": "Location permissions are permanently denied.",
+  "locationUpdateError": "Error updating location: {error}",
+  "locationOrMapInitError": "Error initializing location or map: {error}",
+  "mapOrLocationNotReady": "Map or location is not ready.",
+  "userInfoNotFound": "User information could not be retrieved.",
+  "activitySaved": "Activity saved.",
+  "activitySaveError": "Error saving activity: {error}",
+  "distanceLabel": "Distance",
+  "durationLabel": "Duration",
+  "speedLabel": "Speed",
+  "startButton": "Start",
+  "stopButton": "Stop"
 
 
 }

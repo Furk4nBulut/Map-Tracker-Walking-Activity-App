@@ -68,5 +68,20 @@ abstract class  LocaleKeys {
   static const secondUnit = 'secondUnit';
   static const kmUnit = 'kmUnit';
   static const kmPerHourUnit = 'kmPerHourUnit';
+  static const newActivityTitle = 'newActivityTitle';
+  static const locationServicesDisabled = 'locationServicesDisabled';
+  static const locationPermissionDenied = 'locationPermissionDenied';
+  static const locationPermissionDeniedForever = 'locationPermissionDeniedForever';
+  static const locationUpdateError = 'locationUpdateError';
+  static const locationOrMapInitError = 'locationOrMapInitError';
+  static const mapOrLocationNotReady = 'mapOrLocationNotReady';
+  static const userInfoNotFound = 'userInfoNotFound';
+  static const activitySaved = 'activitySaved';
+  static const activitySaveError = 'activitySaveError';
+  static const distanceLabel = 'distanceLabel';
+  static const durationLabel = 'durationLabel';
+  static const speedLabel = 'speedLabel';
+  static const startButton = 'startButton';
+  static const stopButton = 'stopButton';
 
 }
