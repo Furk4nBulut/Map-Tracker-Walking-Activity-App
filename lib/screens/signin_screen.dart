@@ -9,6 +9,9 @@ import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/utils/localizaton_constants.dart';
 
 final locator = GetIt.instance;
 
@@ -32,7 +35,6 @@ class _SignInScreenState extends State<SignInScreen> {
   Future<void> login() async {
     if (_formSignInKey.currentState!.validate()) {
       try {
-        // Attempt Firebase login
         await _authService.signIn(
           context,
           email: _emailController.text.trim(),
@@ -44,6 +46,14 @@ class _SignInScreenState extends State<SignInScreen> {
           toastLength: Toast.LENGTH_LONG,
         );
       }
+    }
+  }
+
+  void _toggleLanguage() {
+    if (context.locale == LocalizationConstants.EN_LOCALE) {
+      context.setLocale(LocalizationConstants.TR_LOCALE);
+    } else {
+      context.setLocale(LocalizationConstants.EN_LOCALE);
     }
   }
 
@@ -75,25 +85,39 @@ class _SignInScreenState extends State<SignInScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Giriş Yap',
+                        LocaleKeys.signInTitle.tr(),
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
                           color: basarsoft_color,
                         ),
                       ),
-                      const SizedBox(height: 40.0),
+                      const SizedBox(height: 20.0),
+                      ElevatedButton(
+                        onPressed: _toggleLanguage,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: basarsoft_color,
+                        ),
+                        child: Text(
+                          LocaleKeys.languageToggle.tr(),
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
                       TextFormField(
                         controller: _emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Lütfen bir e-posta adresi girin';
+                            return LocaleKeys.emailRequired.tr();
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Email',
+                          labelText: LocaleKeys.emailLabel.tr(),
+                          hintText: LocaleKeys.emailHint.tr(),
                           hintStyle: const TextStyle(color: Colors.black),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -116,13 +140,13 @@ class _SignInScreenState extends State<SignInScreen> {
                         obscuringCharacter: '*',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Lütfen bir şifre girin';
+                            return LocaleKeys.passwordRequired.tr();
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: 'Şifre',
-                          hintText: 'Şifre',
+                          labelText: LocaleKeys.passwordLabel.tr(),
+                          hintText: LocaleKeys.passwordHint.tr(),
                           hintStyle: const TextStyle(color: Colors.black),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -146,9 +170,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: basarsoft_color,
                           ),
-                          child: const Text(
-                            'Giriş Yap',
-                            style: TextStyle(
+                          child: Text(
+                            LocaleKeys.signInButton.tr(),
+                            style: const TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -166,14 +190,14 @@ class _SignInScreenState extends State<SignInScreen> {
                               color: Colors.grey.withOpacity(0.5),
                             ),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
                               vertical: 0,
                               horizontal: 10,
                             ),
                             child: Text(
-                              'Diğer Giriş Yöntemleri',
-                              style: TextStyle(
+                              LocaleKeys.otherSignInMethods.tr(),
+                              style: const TextStyle(
                                 color: Colors.black45,
                               ),
                             ),
@@ -204,7 +228,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   );
                                 } else {
                                   Fluttertoast.showToast(
-                                    msg: "Google ile giriş başarısız!",
+                                    msg: LocaleKeys.googleSignInFailed.tr(),
                                     toastLength: Toast.LENGTH_LONG,
                                   );
                                 }
@@ -223,7 +247,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Henüz Bir Hesabın Yok Mu? '),
+                          Text(LocaleKeys.noAccount.tr()),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -234,7 +258,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               );
                             },
                             child: Text(
-                              'Kayıt Ol!',
+                              LocaleKeys.signUpLink.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: basarsoft_color,

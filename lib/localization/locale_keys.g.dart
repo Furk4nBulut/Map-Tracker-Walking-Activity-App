@@ -4,15 +4,35 @@
 
 abstract class  LocaleKeys {
   static const appTitle = 'appTitle';
-  static const signIn = 'signIn';
+  static const signInTitle = 'signInTitle';
+  static const emailLabel = 'emailLabel';
   static const emailHint = 'emailHint';
+  static const emailRequired = 'emailRequired';
+  static const passwordLabel = 'passwordLabel';
   static const passwordHint = 'passwordHint';
-  static const invalidEmail = 'invalidEmail';
-  static const invalidPassword = 'invalidPassword';
+  static const passwordRequired = 'passwordRequired';
+  static const signInButton = 'signInButton';
   static const otherSignInMethods = 'otherSignInMethods';
-  static const googleSignInFailed = 'googleSignInFailed';
   static const noAccount = 'noAccount';
-  static const signUp = 'signUp';
-  static const selectLanguage = 'selectLanguage';
+  static const signUpLink = 'signUpLink';
+  static const googleSignInFailed = 'googleSignInFailed';
+  static const signUpTitle = 'signUpTitle';
+  static const firstNameLabel = 'firstNameLabel';
+  static const firstNameHint = 'firstNameHint';
+  static const firstNameRequired = 'firstNameRequired';
+  static const lastNameLabel = 'lastNameLabel';
+  static const lastNameHint = 'lastNameHint';
+  static const lastNameRequired = 'lastNameRequired';
+  static const agreePersonalData = 'agreePersonalData';
+  static const signUpButton = 'signUpButton';
+  static const otherSignUpMethods = 'otherSignUpMethods';
+  static const alreadyHaveAccount = 'alreadyHaveAccount';
+  static const signInLink = 'signInLink';
+  static const signUpInProgress = 'signUpInProgress';
+  static const signUpError = 'signUpError';
+  static const formValidationError = 'formValidationError';
+  static const welcomeAppName = 'welcomeAppName';
+  static const welcomeSubtitle = 'welcomeSubtitle';
+  static const languageToggle = 'languageToggle';
 
 }

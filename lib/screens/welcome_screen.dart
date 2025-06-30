@@ -5,6 +5,10 @@ import 'package:map_tracker/theme/theme.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/widgets/welcome_button.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/utils/localizaton_constants.dart';
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
 
@@ -20,6 +24,14 @@ class WelcomeScreen extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (context) => SignUpScreen()),
     );
+  }
+
+  void _toggleLanguage(BuildContext context) {
+    if (context.locale == LocalizationConstants.EN_LOCALE) {
+      context.setLocale(LocalizationConstants.TR_LOCALE);
+    } else {
+      context.setLocale(LocalizationConstants.EN_LOCALE);
+    }
   }
 
   @override
@@ -38,7 +50,6 @@ class WelcomeScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Add your map logo here
                     Container(
                       decoration: BoxDecoration(
                         boxShadow: [
@@ -46,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
                             color: basarsoft_color.withOpacity(0.3),
                             spreadRadius: 10,
                             blurRadius: 15,
-                            offset: Offset(0, 3), // changes position of shadow
+                            offset: Offset(0, 3),
                           ),
                         ],
                       ),
@@ -57,15 +68,14 @@ class WelcomeScreen extends StatelessWidget {
                         semanticLabel: 'Map Tracker Logo',
                       ),
                     ),
-
-                    const SizedBox(height: 20.0), // Space between logo and text
+                    const SizedBox(height: 20.0),
                     RichText(
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
+                      text: TextSpan(
                         children: [
                           TextSpan(
-                            text: 'Map Tracker\n',
-                            style: TextStyle(
+                            text: LocaleKeys.welcomeAppName.tr(),
+                            style: const TextStyle(
                               fontSize: 50.0,
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
@@ -79,8 +89,8 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: '\nYürüyüş Aktivitesi Asistanı',
-                            style: TextStyle(
+                            text: '\n${LocaleKeys.welcomeSubtitle.tr()}',
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -96,6 +106,20 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () => _toggleLanguage(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: basarsoft_color,
+                      ),
+                      child: Text(
+                        LocaleKeys.languageToggle.tr(),
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -109,7 +133,7 @@ class WelcomeScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: WelcomeButton(
-                      buttonText: 'Giriş Yap',
+                      buttonText: LocaleKeys.signInButton.tr(),
                       onTap: SignInScreen(),
                       color: Colors.transparent,
                       textColor: Colors.white,
@@ -117,7 +141,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   Expanded(
                     child: WelcomeButton(
-                      buttonText: 'Kayıt Ol',
+                      buttonText: LocaleKeys.signUpButton.tr(),
                       onTap: const SignUpScreen(),
                       color: Colors.white,
                       textColor: basarsoft_color,
