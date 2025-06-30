@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_it/get_it.dart';
 import 'package:map_tracker/screens/signin_screen.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
 import 'package:map_tracker/utils/constants.dart';
@@ -7,7 +9,8 @@ import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
-import 'package:map_tracker/services/local_db_service.dart';
+
+final locator = GetIt.instance;
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -25,14 +28,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  final dnHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper();
 
   Future<void> _handleSignUp() async {
     try {
       final String firstName = _firstNameController.text.trim();
       final String lastName = _lastNameController.text.trim();
       final String email = _emailController.text.trim();
-      final String password = _passwordController.text;
+      final String password = _passwordController.text.trim();
 
       if (_formSignupKey.currentState!.validate() && agreePersonalData) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -41,27 +44,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         );
 
-        try {
-          // Online kayıt işlemi
-          await locator.get<AuthService>().signUp(
-            context,
-            name: firstName,
-            surname: lastName,
-            email: email,
-            password: password,
-          );
+        // Online kayıt işlemi
+        await locator.get<AuthService>().signUp(
+          context,
+          name: firstName,
+          surname: lastName,
+          email: email,
+          password: password,
+        );
 
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
-            ),
-          );
-        }
-
-        // İleri yönlendirme
-        Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
-
+        // Kayıt başarılıysa WelcomeScreen'e yönlendir
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -85,9 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         children: [
           const Expanded(
             flex: 1,
-            child: SizedBox(
-              height: 10,
-            ),
+            child: SizedBox(height: 10),
           ),
           Expanded(
             flex: 7,
@@ -120,9 +111,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           color: basarsoft_color,
                         ),
                       ),
-                      const SizedBox(
-                        height: 40.0,
-                      ),
+                      const SizedBox(height: 40.0),
                       Row(
                         children: [
                           Expanded(
@@ -137,19 +126,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Ad',
                                 hintText: 'Adınızı Giriniz',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black26,
-                                ),
+                                hintStyle: const TextStyle(color: Colors.black26),
                                 border: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: basarsoft_color,
-                                  ),
+                                  borderSide: const BorderSide(color: basarsoft_color),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: basarsoft_color,
-                                  ),
+                                  borderSide: const BorderSide(color: basarsoft_color),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
@@ -168,19 +151,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Soyad',
                                 hintText: 'Soyadınızı Giriniz',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black26,
-                                ),
+                                hintStyle: const TextStyle(color: Colors.black26),
                                 border: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: basarsoft_color,
-                                  ),
+                                  borderSide: const BorderSide(color: basarsoft_color),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    color: basarsoft_color,
-                                  ),
+                                  borderSide: const BorderSide(color: basarsoft_color),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
@@ -188,9 +165,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       TextFormField(
                         controller: _emailController,
                         validator: (value) {
@@ -202,26 +177,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         decoration: InputDecoration(
                           labelText: 'Email',
                           hintText: 'Email Adresi Giriniz',
-                          hintStyle: const TextStyle(
-                            color: Colors.black26,
-                          ),
+                          hintStyle: const TextStyle(color: Colors.black26),
                           border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: basarsoft_color,
-                            ),
+                            borderSide: const BorderSide(color: basarsoft_color),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: basarsoft_color,
-                            ),
+                            borderSide: const BorderSide(color: basarsoft_color),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       TextFormField(
                         controller: _passwordController,
                         obscureText: true,
@@ -235,26 +202,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         decoration: InputDecoration(
                           labelText: 'Şifre',
                           hintText: 'Şifre Giriniz',
-                          hintStyle: const TextStyle(
-                            color: Colors.black26,
-                          ),
+                          hintStyle: const TextStyle(color: Colors.black26),
                           border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: basarsoft_color,
-                            ),
+                            borderSide: const BorderSide(color: basarsoft_color),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                              color: basarsoft_color,
-                            ),
+                            borderSide: const BorderSide(color: basarsoft_color),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       Row(
                         children: [
                           Checkbox(
@@ -267,10 +226,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             activeColor: basarsoft_color,
                           ),
                           const Text(
-                            'Bilgilerimin işlenmesini  ',
-                            style: TextStyle(
-                              color: Colors.black45,
-                            ),
+                            'Bilgilerimin işlenmesini ',
+                            style: TextStyle(color: Colors.black45),
                           ),
                           Text(
                             'Kabul Ediyorum.',
@@ -281,18 +238,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 15.0,
-                      ),
+                      const SizedBox(height: 15.0),
                       SizedBox(
                         width: double.infinity,
-                        child:ElevatedButton(
+                        child: ElevatedButton(
                           onPressed: _handleSignUp,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: basarsoft_color, // Background color
-                            padding: EdgeInsets.symmetric(vertical: 10.0), // Adjust padding as needed
+                            backgroundColor: basarsoft_color,
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0), // Rounded corners
+                              borderRadius: BorderRadius.circular(20.0),
                             ),
                           ),
                           child: const Text(
@@ -304,11 +259,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                         ),
-
                       ),
-                      const SizedBox(
-                        height: 15.0,
-                      ),
+                      const SizedBox(height: 15.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -319,15 +271,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           const Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 0,
-                              horizontal: 10,
-                            ),
+                            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                             child: Text(
                               'Diğer Kayıt Yöntemleri',
-                              style: TextStyle(
-                                color: Colors.black45,
-                              ),
+                              style: TextStyle(color: Colors.black45),
                             ),
                           ),
                           Expanded(
@@ -338,39 +285,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 15.0,
-                      ),
+                      const SizedBox(height: 15.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           InkWell(
                             onTap: () async {
-                              locator.get<AuthService>().signInWithGoogle().then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(), settings: RouteSettings(arguments: value))));
+                              try {
+                                var user = await locator.get<AuthService>().signInWithGoogle(context);
+                                if (user != null) {
+                                  // Navigation is handled in AuthService
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: "Google ile giriş başarısız!",
+                                    toastLength: Toast.LENGTH_LONG,
+                                  );
+                                }
+                              } catch (e) {
+                                Fluttertoast.showToast(
+                                  msg: "Google ile giriş hatası: $e",
+                                  toastLength: Toast.LENGTH_LONG,
+                                );
+                              }
                             },
                             child: Image.asset('assets/images/google.png'),
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 25.0,
-                      ),
+                      const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
                             'Zaten Bir Hesabın Var Mı? ',
-                            style: TextStyle(
-                              color: Colors.black45,
-                            ),
+                            style: TextStyle(color: Colors.black45),
                           ),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignInScreen(),
-                                ),
+                                MaterialPageRoute(builder: (context) => const SignInScreen()),
                               );
                             },
                             child: Text(
@@ -383,9 +337,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
+                      const SizedBox(height: 20.0),
                     ],
                   ),
                 ),

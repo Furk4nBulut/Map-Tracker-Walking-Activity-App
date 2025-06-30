@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/model/activity_model.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
@@ -19,8 +21,35 @@ class AuthService {
 
   DatabaseHelper dbHelper = DatabaseHelper();
 
+  // İnternet bağlantısını kontrol eden yardımcı fonksiyon
+  Future<bool> checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // Kullanıcının oturum durumunu kontrol et
+  Future<bool> isUserLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    return isLoggedIn && firebaseAuth.currentUser != null;
+  }
+
   Future<void> signUp(BuildContext context, {required String name, required String surname, required String email, required String password}) async {
     try {
+      // İnternet bağlantısını kontrol et
+      bool isConnected = await checkInternetConnection();
+      if (!isConnected) {
+        Fluttertoast.showToast(
+          msg: "İnternet bağlantınızı kontrol edin ve tekrar deneyin.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        return;
+      }
+
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
         await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
@@ -28,17 +57,61 @@ class AuthService {
 
         await _registerUser(name: name, surname: surname, email: email, password: password);
         Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
+
+        // Oturum bayrağını ayarla
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
       }
     } on FirebaseAuthException catch (e) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
-      Fluttertoast.showToast(msg: 'İlk kayıtta internet bağlantısı gereklidir! İnternet bağlantınızı kontrol edin!', toastLength: Toast.LENGTH_LONG);
-      Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
+      String errorMessage;
+      switch (e.code) {
+        case 'email-already-in-use':
+          errorMessage = "Bu e-posta adresi zaten kullanılıyor.";
+          break;
+        case 'invalid-email':
+          errorMessage = "Geçersiz e-posta adresi.";
+          break;
+        case 'weak-password':
+          errorMessage = "Şifre çok zayıf. Daha güçlü bir şifre girin.";
+          break;
+        default:
+          errorMessage = e.message ?? "Kayıt olurken hata oluştu.";
+      }
+      Fluttertoast.showToast(msg: errorMessage, toastLength: Toast.LENGTH_LONG);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Kayıt olurken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
     }
   }
 
   Future<void> signIn(BuildContext context, {required String email, required String password}) async {
     final navigator = Navigator.of(context);
     try {
+      // İnternet bağlantısını kontrol et
+      bool isConnected = await checkInternetConnection();
+      if (!isConnected) {
+        Fluttertoast.showToast(
+          msg: "İnternet bağlantınızı kontrol edin ve tekrar deneyin.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        // Çevrimdışı giriş denemesi
+        var localUser = await dbHelper.getUserByEmail(email);
+        if (localUser != null && await dbHelper.login(localUser)) {
+          navigator.pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+          Fluttertoast.showToast(
+            msg: "Çevrimdışı giriş başarılı!",
+            toastLength: Toast.LENGTH_LONG,
+          );
+          return;
+        } else {
+          Fluttertoast.showToast(
+            msg: "Çevrimdışı giriş başarısız. Lütfen internet bağlantısıyla giriş yapın.",
+            toastLength: Toast.LENGTH_LONG,
+          );
+          return;
+        }
+      }
+
       final UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
         var localUser = await dbHelper.getUserByEmail(email);
@@ -46,44 +119,172 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
-
-          Fluttertoast.showToast(msg: "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz. Tekrar giriş yapınız!", toastLength: Toast.LENGTH_LONG);
+          Fluttertoast.showToast(
+            msg: "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.",
+            toastLength: Toast.LENGTH_LONG,
+          );
         } else {
           await dbHelper.updateUser(localUser);
           await _syncUserActivitiesFromFirestore(localUser);
-          navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
+          // Oturum bayrağını ayarla
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          navigator.pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+          Fluttertoast.showToast(msg: "Giriş başarılı!", toastLength: Toast.LENGTH_LONG);
         }
       }
     } on FirebaseAuthException catch (e) {
-      Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
+      String errorMessage;
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = "Kullanıcı bulunamadı. Lütfen kayıt olun.";
+          break;
+        case 'wrong-password':
+          errorMessage = "Yanlış şifre girdiniz.";
+          break;
+        case 'invalid-email':
+          errorMessage = "Geçersiz e-posta adresi.";
+          break;
+        default:
+          errorMessage = e.message ?? "Giriş yaparken hata oluştu.";
+      }
+      Fluttertoast.showToast(msg: errorMessage, toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Giriş yaparken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
     }
   }
 
-  Future<User?> signInWithGoogle() async {
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
-    final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
-    final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
-    log(userCredential.user!.email.toString());
-    return userCredential.user;
+  Future<User?> signInWithGoogle(BuildContext context) async {
+    try {
+      // İnternet bağlantısını kontrol et
+      bool isConnected = await checkInternetConnection();
+      if (!isConnected) {
+        Fluttertoast.showToast(
+          msg: "İnternet bağlantınızı kontrol edin ve tekrar deneyin.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        return null;
+      }
+
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut(); // Önceki oturumu temizle
+      final GoogleSignInAccount? gUser = await googleSignIn.signIn();
+      if (gUser == null) {
+        Fluttertoast.showToast(
+          msg: "Google ile giriş iptal edildi.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        return null; // Kullanıcı girişi iptal etti
+      }
+
+      final GoogleSignInAuthentication gAuth = await gUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: gAuth.accessToken,
+        idToken: gAuth.idToken,
+      );
+      final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        // Yerel veritabanına kullanıcıyı kaydet
+        var localUser = await dbHelper.getUserByEmail(userCredential.user!.email!);
+        if (localUser == null) {
+          localUser = LocalUser(
+            email: userCredential.user!.email!,
+            firstName: userCredential.user!.displayName?.split(' ').first ?? '',
+            lastName: userCredential.user!.displayName?.split(' ').last ?? '',
+            password: '', // Google Sign-In için şifre yok
+          );
+          await dbHelper.insertUser(localUser);
+          Fluttertoast.showToast(
+            msg: "Kullanıcı yerele kaydedildi.",
+            toastLength: Toast.LENGTH_LONG,
+          );
+        }
+
+        // Oturum bayrağını ayarla
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+
+
+
+        // Başarılı giriş mesajı
+        Fluttertoast.showToast(
+          msg: "Google ile giriş başarılı!",
+          toastLength: Toast.LENGTH_LONG,
+        );
+
+        // HomePage'e yönlendir
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+            settings: RouteSettings(arguments: userCredential.user),
+          ),
+        );
+        // Firestore'dan aktiviteleri senkronize et
+        await _syncUserActivitiesFromFirestore(localUser);
+        log(userCredential.user!.email.toString());
+        return userCredential.user;
+      }
+      return null;
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          errorMessage = "Bu e-posta başka bir giriş yöntemiyle kullanılıyor.";
+          break;
+        case 'invalid-credential':
+          errorMessage = "Geçersiz kimlik bilgileri. Lütfen tekrar deneyin.";
+          break;
+        case 'user-disabled':
+          errorMessage = "Bu hesap devre dışı bırakılmış.";
+          break;
+        default:
+          errorMessage = "Google ile giriş başarısız: ${e.message}";
+      }
+      Fluttertoast.showToast(
+        msg: errorMessage,
+        toastLength: Toast.LENGTH_LONG,
+      );
+      return null;
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Google ile giriş sırasında bilinmeyen bir hata oluştu: $e",
+        toastLength: Toast.LENGTH_LONG,
+      );
+      return null;
+    }
   }
 
   Future<void> signOut(BuildContext context) async {
-    dbHelper.logout();
-    await firebaseAuth.signOut();
-    await FirebaseAuth.instance.signOut();
+    try {
+      // Oturum bayrağını temizle
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('isLoggedIn');
+      await dbHelper.logout();
+      await firebaseAuth.signOut();
+      await GoogleSignIn().signOut(); // Google Sign-In oturumunu temizle
 
-    Navigator.of(context).pop();
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => WelcomeScreen()));
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            (Route<dynamic> route) => false,
+      );
+      Fluttertoast.showToast(msg: "Çıkış yapıldı.", toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Çıkış yaparken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+    }
   }
 
   Future<void> _registerUser({required String name, required String surname, required String email, required String password}) async {
-    await userCollection.doc().set({
-      "email": email,
-      "name": name,
-      "surname": surname,
-      "password": password
-    });
+    try {
+      await userCollection.doc(firebaseAuth.currentUser!.uid).set({
+        "email": email,
+        "name": name,
+        "surname": surname,
+        "password": password,
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Kullanıcı kaydı Firestore'a yapılırken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+    }
   }
 
   Future<void> _syncUserActivitiesFromFirestore(LocalUser localUser) async {
@@ -144,11 +345,11 @@ class AuthService {
 
           await dbHelper.insertActivity(activity);
         }
-        Fluttertoast.showToast(msg: "Activities synchronized!", toastLength: Toast.LENGTH_LONG);
+        Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
       }
     } catch (e) {
-      print('An error occurred while syncing activities: $e');
-      throw 'An error occurred while syncing activities: $e';
+      debugPrint('Aktiviteleri senkronize ederken hata oluştu: $e');
+      throw 'Aktiviteleri senkronize ederken hata oluştu: $e';
     }
   }
 
@@ -157,7 +358,7 @@ class AuthService {
       await _syncUserActivitiesFromFirestore(localUser);
       Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
     } catch (e) {
-      print("Aktiviteleri senkronize ederken hata oluştu: $e");
+      debugPrint("Aktiviteleri senkronize ederken hata oluştu: $e");
       Fluttertoast.showToast(msg: "Aktiviteleri senkronize ederken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
     }
   }
