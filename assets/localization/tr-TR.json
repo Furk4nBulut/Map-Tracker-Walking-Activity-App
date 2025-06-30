@@ -1,0 +1,13 @@
+{
+  "appTitle": "Harita Takip Uygulaması",
+  "signIn": "Giriş Yap",
+  "emailHint": "E-posta",
+  "passwordHint": "Şifre",
+  "invalidEmail": "Lütfen bir e-posta adresi girin",
+  "invalidPassword": "Lütfen bir şifre girin",
+  "otherSignInMethods": "Diğer Giriş Yöntemleri",
+  "googleSignInFailed": "Google ile giriş başarısız!",
+  "noAccount": "Henüz bir hesabın yok mu? ",
+  "signUp": "Kayıt Ol!",
+  "selectLanguage": "Dil Seç"
+}

@@ -1,0 +1,13 @@
+{
+  "appTitle": "Map Tracker App",
+  "signIn": "Sign In",
+  "emailHint": "Email",
+  "passwordHint": "Password",
+  "invalidEmail": "Please enter an email address",
+  "invalidPassword": "Please enter a password",
+  "otherSignInMethods": "Other Sign-In Methods",
+  "googleSignInFailed": "Google Sign-In Failed!",
+  "noAccount": "Don't have an account yet? ",
+  "signUp": "Sign Up!",
+  "selectLanguage": "Select Language"
+}
