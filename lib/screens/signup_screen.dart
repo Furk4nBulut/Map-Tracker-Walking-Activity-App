@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:map_tracker/screens/signin_screen.dart';
-import 'package:map_tracker/screens/welcome_screen.dart';
+import 'package:map_tracker/screens/welcome_screen.dart' show WelcomeScreen;
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/services/auth_service.dart';
@@ -86,14 +86,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _toggleLanguage() {
-    if (context.locale == LocalizationConstants.EN_LOCALE) {
-      context.setLocale(LocalizationConstants.TR_LOCALE);
-    } else {
-      context.setLocale(LocalizationConstants.EN_LOCALE);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -132,20 +124,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
                           color: basarsoft_color,
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      ElevatedButton(
-                        onPressed: _toggleLanguage,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: basarsoft_color,
-                        ),
-                        child: Text(
-                          LocaleKeys.languageToggle.tr(),
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.white,
-                          ),
                         ),
                       ),
                       const SizedBox(height: 20.0),
@@ -216,33 +194,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       const SizedBox(height: 25.0),
                       TextFormField(
-                          controller: _emailController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return LocaleKeys.emailRequired.tr();
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            labelText: LocaleKeys.emailLabel.tr(),
-                            hintText: LocaleKeys.emailHint.tr(),
-                            hintStyle: const TextStyle(
-                              color: Colors.black26,
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: basarsoft_color,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: basarsoft_color,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                        controller: _emailController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return LocaleKeys.emailRequired.tr();
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: LocaleKeys.emailLabel.tr(),
+                          hintText: LocaleKeys.emailHint.tr(),
+                          hintStyle: const TextStyle(
+                            color: Colors.black26,
                           ),
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: basarsoft_color,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: basarsoft_color,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 25.0),
                       TextFormField(
                         controller: _passwordController,

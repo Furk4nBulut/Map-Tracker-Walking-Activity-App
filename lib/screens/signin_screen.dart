@@ -49,14 +49,6 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
-  void _toggleLanguage() {
-    if (context.locale == LocalizationConstants.EN_LOCALE) {
-      context.setLocale(LocalizationConstants.TR_LOCALE);
-    } else {
-      context.setLocale(LocalizationConstants.EN_LOCALE);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -90,20 +82,6 @@ class _SignInScreenState extends State<SignInScreen> {
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
                           color: basarsoft_color,
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      ElevatedButton(
-                        onPressed: _toggleLanguage,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: basarsoft_color,
-                        ),
-                        child: Text(
-                          LocaleKeys.languageToggle.tr(),
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.white,
-                          ),
                         ),
                       ),
                       const SizedBox(height: 20.0),
