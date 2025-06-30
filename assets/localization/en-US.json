@@ -32,5 +32,22 @@
   "welcomeAppName": "Map Tracker",
   "welcomeSubtitle": "Hiking Activity Assistant",
   "languageToggle": "Switch Language",
-  "googleSignInError": "Google sign-in error: {error}"
+  "googleSignInError": "Google sign-in error: {error}",
+
+
+
+  "homeTitle": "Home",
+  "emailField": "Email",
+  "fullName": "Full Name",
+  "notSignedIn": "Not Signed In",
+  "appDescription": "This application helps you manage your hiking and running activities more effectively. Here are some features of the app:",
+  "featureTrackingTitle": "Track your hiking and running activities",
+  "featureTrackingDescription": "The app tracks your current location via GPS during each new hiking or running activity and draws your route on the map.",
+  "featureRealTimeDataTitle": "Real-time data display",
+  "featureRealTimeDataDescription": "You can view real-time information such as distance, duration, and average speed recorded during the activity.",
+  "featureDataStorageTitle": "Data storage and analysis",
+  "featureDataStorageDescription": "Once you complete your activity, this information is saved in the app's database. You can later review, analyze, and examine your past activities in detail.",
+  "featureWeatherTitle": "Weather information",
+  "featureWeatherDescription": "The app provides weather information, allowing you to plan according to weather conditions.",
+  "appSummary": "With the app, you can gain comprehensive insights into both your current and past activities, helping you manage your sports habits more effectively."
 }

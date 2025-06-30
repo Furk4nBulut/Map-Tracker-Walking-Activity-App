@@ -37,5 +37,19 @@ abstract class  LocaleKeys {
   static const welcomeSubtitle = 'welcomeSubtitle';
   static const languageToggle = 'languageToggle';
   static const googleSignInError = 'googleSignInError';
+  static const homeTitle = 'homeTitle';
+  static const emailField = 'emailField';
+  static const fullName = 'fullName';
+  static const notSignedIn = 'notSignedIn';
+  static const appDescription = 'appDescription';
+  static const featureTrackingTitle = 'featureTrackingTitle';
+  static const featureTrackingDescription = 'featureTrackingDescription';
+  static const featureRealTimeDataTitle = 'featureRealTimeDataTitle';
+  static const featureRealTimeDataDescription = 'featureRealTimeDataDescription';
+  static const featureDataStorageTitle = 'featureDataStorageTitle';
+  static const featureDataStorageDescription = 'featureDataStorageDescription';
+  static const featureWeatherTitle = 'featureWeatherTitle';
+  static const featureWeatherDescription = 'featureWeatherDescription';
+  static const appSummary = 'appSummary';
 
 }

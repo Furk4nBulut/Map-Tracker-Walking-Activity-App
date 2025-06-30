@@ -9,6 +9,8 @@ import 'package:map_tracker/screens/partials/navbar.dart';
 import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -71,7 +73,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         appBar: _selectedIndex == 0
             ? CustomAppBar(
-          title: "Ana Sayfa",
+          title: LocaleKeys.homeTitle.tr(),
           automaticallyImplyLeading: false,
         )
             : null,
@@ -116,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: "Bu uygulama, yürüyüş ve koşu aktivitelerinizi daha etkili bir şekilde yönetmenize yardımcı olur. İşte uygulamanın sunduğu bazı özellikler:",
+                      text: LocaleKeys.appDescription.tr(),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -134,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                       child: Icon(Icons.location_on, color: Colors.blue[800], size: 20),
                     ),
                     TextSpan(
-                      text: " Yürüyüş ve koşu aktivitelerinizi takip eder: ",
+                      text: " ${LocaleKeys.featureTrackingTitle.tr()}: ",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -142,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     TextSpan(
-                      text: "Uygulama, başladığınız her yeni yürüyüş veya koşu aktivitesinde mevcut konumunuzu GPS üzerinden takip eder ve harita üzerinde rotanızı çizer.",
+                      text: LocaleKeys.featureTrackingDescription.tr(),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[800],
@@ -159,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                       child: Icon(Icons.access_time, color: Colors.green[800], size: 20),
                     ),
                     TextSpan(
-                      text: " Anlık veri görüntüleme: ",
+                      text: " ${LocaleKeys.featureRealTimeDataTitle.tr()}: ",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -167,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     TextSpan(
-                      text: "Aktivite sırasında kaydedilen mesafe, süre ve ortalama hız gibi bilgileri anlık olarak görüntüleyebilirsiniz.",
+                      text: LocaleKeys.featureRealTimeDataDescription.tr(),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[800],
@@ -184,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                       child: Icon(Icons.storage, color: Colors.orange[800], size: 20),
                     ),
                     TextSpan(
-                      text: " Veri kaydetme ve analiz: ",
+                      text: " ${LocaleKeys.featureDataStorageTitle.tr()}: ",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -192,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     TextSpan(
-                      text: "Aktivitenizi tamamladığınızda, bu bilgiler uygulama içindeki veritabanına kaydedilir. Daha sonra bu verileri gözden geçirebilir, analiz edebilir ve geçmiş aktivitelerinizi detaylı bir şekilde inceleyebilirsiniz.",
+                      text: LocaleKeys.featureDataStorageDescription.tr(),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[800],
@@ -209,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                       child: Icon(Icons.wb_sunny, color: Colors.yellow[800], size: 20),
                     ),
                     TextSpan(
-                      text: " Hava durumu bilgileri: ",
+                      text: " ${LocaleKeys.featureWeatherTitle.tr()}: ",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -217,14 +219,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     TextSpan(
-                      text: "Uygulama, hava durumu bilgilerini sunarak hava koşullarına göre planlama yapmanıza olanak tanır.",
+                      text: LocaleKeys.featureWeatherDescription.tr(),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[800],
                       ),
                     ),
                     TextSpan(
-                      text: "\n\nUygulama sayesinde, hem mevcut hem de geçmiş aktivitelerinizle ilgili kapsamlı bilgiler edinerek spor alışkanlıklarınızı daha etkin bir şekilde yönetebilirsiniz.",
+                      text: "\n\n${LocaleKeys.appSummary.tr()}",
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[800],
@@ -250,7 +252,7 @@ class _HomePageState extends State<HomePage> {
           if (localUser != null)
             ListTile(
               title: Text(
-                "Email: ${localUser!.email}",
+                "${LocaleKeys.emailField.tr()}: ${localUser!.email}",
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black87,
@@ -263,14 +265,14 @@ class _HomePageState extends State<HomePage> {
           else if (firebaseUser != null)
             ListTile(
               title: Text(
-                "Adı Soyad: ${firebaseUser!.displayName}",
+                "${LocaleKeys.fullName.tr()}: ${firebaseUser!.displayName}",
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black87,
                 ),
               ),
               subtitle: Text(
-                "Email: ${firebaseUser!.email}",
+                "${LocaleKeys.emailField.tr()}: ${firebaseUser!.email}",
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -281,14 +283,14 @@ class _HomePageState extends State<HomePage> {
               ),
             )
           else
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
-                "Giriş Yapılmadı",
+                LocaleKeys.notSignedIn.tr(),
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                ),
+                    fontSize: 16,
+                    color: Colors.black54,
+                    ),
               ),
             ),
         ],

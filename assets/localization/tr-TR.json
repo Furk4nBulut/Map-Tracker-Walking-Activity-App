@@ -32,5 +32,21 @@
   "welcomeAppName": "Map Tracker",
   "welcomeSubtitle": "Yürüyüş Aktivitesi Asistanı",
   "languageToggle": "Dili Değiştir",
-  "googleSignInError": "Google ile giriş hatası: {error}"
+  "googleSignInError": "Google ile giriş hatası: {error}",
+
+
+  "homeTitle": "Ana Sayfa",
+  "emailField": "E-posta",
+  "fullName": "Adı Soyad",
+  "notSignedIn": "Giriş Yapılmadı",
+  "appDescription": "Bu uygulama, yürüyüş ve koşu aktivitelerinizi daha etkili bir şekilde yönetmenize yardımcı olur. İşte uygulamanın sunduğu bazı özellikler:",
+  "featureTrackingTitle": "Yürüyüş ve koşu aktivitelerinizi takip eder",
+  "featureTrackingDescription": "Uygulama, başladığınız her yeni yürüyüş veya koşu aktivitesinde mevcut konumunuzu GPS üzerinden takip ederыз ve harita üzerinde rotanızı çizer.",
+  "featureRealTimeDataTitle": "Anlık veri görüntüleme",
+  "featureRealTimeDataDescription": "Aktivite sırasında kaydedilen mesafe, süre ve ortalama hız gibi bilgileri anlık olarak görüntüleyebilirsiniz.",
+  "featureDataStorageTitle": "Veri kaydetme ve analiz",
+  "featureDataStorageDescription": "Aktivitenizi tamamladığınızda, bu bilgiler uygulama içindeki veritabanına kaydedilir. Daha sonra bu verileri gözden geçirebilir, analiz edebilir ve geçmiş aktivitelerinizi detaylı bir şekilde inceleyebilirsiniz.",
+  "featureWeatherTitle": "Hava durumu bilgileri",
+  "featureWeatherDescription": "Uygulama, hava durumu bilgilerini sunarak hava koşullarına göre planlama yapmanıza olanak tanır.",
+  "appSummary": "Uygulama sayesinde, hem mevcut hem de geçmiş aktivitelerinizle ilgili kapsamlı bilgiler edinerek spor alışkanlıklarınızı daha etkin bir şekilde yönetebilirsiniz."
 }
