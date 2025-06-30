@@ -96,5 +96,22 @@ abstract class  LocaleKeys {
   static const noActivityFound = 'noActivityFound';
   static const startDateLabel = 'startDateLabel';
   static const endDateLabel = 'endDateLabel';
+  static const profileTitle = 'profileTitle';
+  static const userStatsError = 'userStatsError';
+  static const unknown = 'unknown';
+  static const unknownEmail = 'unknownEmail';
+  static const totalDistanceLabel = 'totalDistanceLabel';
+  static const averageDistanceLabel = 'averageDistanceLabel';
+  static const totalDurationLabel = 'totalDurationLabel';
+  static const averageDurationLabel = 'averageDurationLabel';
+  static const activityCountLabel = 'activityCountLabel';
+  static const newActivityButton = 'newActivityButton';
+  static const activityHistoryButton = 'activityHistoryButton';
+  static const syncDataButton = 'syncDataButton';
+  static const logoutButton = 'logoutButton';
+  static const syncSuccess = 'syncSuccess';
+  static const logoutSuccess = 'logoutSuccess';
+  static const minuteUnitShort = 'minuteUnitShort';
+  static const secondUnitShort = 'secondUnitShort';
 
 }

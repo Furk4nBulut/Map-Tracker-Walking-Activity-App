@@ -101,6 +101,34 @@
   "activityDetailTitle": "Activity Detail",
   "noActivityFound": "Activity not found.",
   "startDateLabel": "Start Date",
-  "endDateLabel": "End Date"
+  "endDateLabel": "End Date",
+
+
+
+
+
+  "profileTitle": "Profile",
+  "userStatsError": "Error fetching user statistics: {error}",
+  "unknown": "Unknown",
+  "unknownEmail": "Email unknown",
+  "totalDistanceLabel": "Total Distance",
+  "averageDistanceLabel": "Average Distance",
+  "totalDurationLabel": "Total Duration",
+  "averageDurationLabel": "Average Duration",
+  "activityCountLabel": "Activity Count",
+  "newActivityButton": "New Activity",
+  "activityHistoryButton": "Activity History",
+  "syncDataButton": "Sync Data",
+  "logoutButton": "Log Out",
+
+
+
+  "syncSuccess": "Data synced successfully.",
+  "logoutSuccess": "Logged out successfully.",
+  "minuteUnitShort": "min",
+  "secondUnitShort": "s"
+
+
+
 
 }

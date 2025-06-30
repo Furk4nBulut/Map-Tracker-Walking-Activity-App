@@ -105,7 +105,33 @@
   "activityDetailTitle": "Aktivite Detayı",
   "noActivityFound": "Aktivite bulunamadı.",
   "startDateLabel": "Başlangıç Tarihi",
-  "endDateLabel": "Bitiş Tarihi"
+  "endDateLabel": "Bitiş Tarihi",
 
 
+
+
+
+
+
+
+  "profileTitle": "Profil",
+  "userStatsError": "Kullanıcı istatistikleri alınırken hata oluştu: {error}",
+  "unknown": "Bilinmiyor",
+  "unknownEmail": "Email bilinmiyor",
+  "totalDistanceLabel": "Toplam Mesafe",
+  "averageDistanceLabel": "Ortalama Mesafe",
+  "totalDurationLabel": "Toplam Süre",
+  "averageDurationLabel": "Ortalama Süre",
+  "activityCountLabel": "Aktivite Sayısı",
+  "newActivityButton": "Yeni Aktivite",
+  "activityHistoryButton": "Aktivite Geçmişim",
+  "syncDataButton": "Verileri Senkronize Et",
+  "logoutButton": "Çıkış Yap",
+
+
+
+  "syncSuccess": "Veriler başarıyla senkronize edildi.",
+  "logoutSuccess": "Başarıyla çıkış yapıldı.",
+  "minuteUnitShort": "dk",
+  "secondUnitShort": "sn"
 }
