@@ -49,5 +49,28 @@
   "featureDataStorageDescription": "Once you complete your activity, this information is saved in the app's database. You can later review, analyze, and examine your past activities in detail.",
   "featureWeatherTitle": "Weather information",
   "featureWeatherDescription": "The app provides weather information, allowing you to plan according to weather conditions.",
-  "appSummary": "With the app, you can gain comprehensive insights into both your current and past activities, helping you manage your sports habits more effectively."
+  "appSummary": "With the app, you can gain comprehensive insights into both your current and past activities, helping you manage your sports habits more effectively.",
+
+
+
+
+  "statisticsTitle": "Statistics",
+  "statsError": "An error occurred while fetching statistics: {error}",
+  "localStatsError": "An error occurred while fetching local user statistics: {error}",
+  "firebaseStatsError": "An error occurred while fetching Firebase user statistics: {error}",
+  "userNotSignedIn": "User is not signed in.",
+  "dataLoadFailed": "Data could not be loaded.",
+  "totalDistance": "Total Distance",
+  "averageDistance": "Average Distance",
+  "totalDuration": "Total Duration",
+  "averageDuration": "Average Duration",
+  "averageSpeed": "Average Speed",
+  "activityCount": "Activity Count",
+  "hourUnit": "hour",
+  "minuteUnit": "minute",
+  "secondUnit": "second",
+  "kmUnit": "km",
+  "kmPerHourUnit": "km/h"
+
+
 }

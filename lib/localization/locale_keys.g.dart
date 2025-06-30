@@ -51,5 +51,22 @@ abstract class  LocaleKeys {
   static const featureWeatherTitle = 'featureWeatherTitle';
   static const featureWeatherDescription = 'featureWeatherDescription';
   static const appSummary = 'appSummary';
+  static const statisticsTitle = 'statisticsTitle';
+  static const statsError = 'statsError';
+  static const localStatsError = 'localStatsError';
+  static const firebaseStatsError = 'firebaseStatsError';
+  static const userNotSignedIn = 'userNotSignedIn';
+  static const dataLoadFailed = 'dataLoadFailed';
+  static const totalDistance = 'totalDistance';
+  static const averageDistance = 'averageDistance';
+  static const totalDuration = 'totalDuration';
+  static const averageDuration = 'averageDuration';
+  static const averageSpeed = 'averageSpeed';
+  static const activityCount = 'activityCount';
+  static const hourUnit = 'hourUnit';
+  static const minuteUnit = 'minuteUnit';
+  static const secondUnit = 'secondUnit';
+  static const kmUnit = 'kmUnit';
+  static const kmPerHourUnit = 'kmPerHourUnit';
 
 }

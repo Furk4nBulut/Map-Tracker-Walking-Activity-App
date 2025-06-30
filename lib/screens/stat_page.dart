@@ -7,6 +7,8 @@ import 'package:map_tracker/screens/partials/appbar.dart'; // Adjust this import
 import 'package:map_tracker/utils/constants.dart'; // Adjust this import as per your project structure
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
 
 class StatisticPage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -23,7 +25,7 @@ class StatisticPage extends StatelessWidget {
         return await _getFirebaseUserStatistics();
       }
     } catch (e) {
-      throw ('İstatistikler alınırken hata oluştu: $e');
+      throw LocaleKeys.statsError.tr(args: [e.toString()]);
     }
   }
 
@@ -58,7 +60,7 @@ class StatisticPage extends StatelessWidget {
         'averageSpeed': averageSpeed,
       };
     } catch (e) {
-      throw ('Yerel kullanıcı istatistikleri alınırken hata oluştu: $e');
+      throw LocaleKeys.localStatsError.tr(args: [e.toString()]);
     }
   }
 
@@ -66,7 +68,7 @@ class StatisticPage extends StatelessWidget {
     try {
       final User? firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser == null) {
-        throw 'Kullanıcı oturumu açmamış.';
+        throw LocaleKeys.userNotSignedIn.tr();
       }
 
       QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
@@ -106,7 +108,7 @@ class StatisticPage extends StatelessWidget {
         'averageSpeed': averageSpeed,
       };
     } catch (e) {
-      throw ('Firebase kullanıcı istatistikleri alınırken hata oluştu: $e');
+      throw LocaleKeys.firebaseStatsError.tr(args: [e.toString()]);
     }
   }
 
@@ -114,7 +116,7 @@ class StatisticPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'İstatistikler', // Adjust title as per your preference
+        title: LocaleKeys.statisticsTitle.tr(),
         automaticallyImplyLeading: true,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -125,11 +127,11 @@ class StatisticPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
+            return Center(child: Text(LocaleKeys.statsError.tr(args: [snapshot.error.toString()])));
           }
 
           if (!snapshot.hasData) {
-            return Center(child: Text('Veriler yüklenemedi.'));
+            return Center(child: Text(LocaleKeys.dataLoadFailed.tr()));
           }
 
           Map<String, dynamic> stats = snapshot.data!;
@@ -151,37 +153,37 @@ class StatisticPage extends StatelessWidget {
               children: [
                 _buildStatItem(
                   icon: Icons.directions_walk,
-                  title: 'Toplam Mesafe',
-                  subtitle: '${totalDistance.toStringAsFixed(2)} km',
+                  title: LocaleKeys.totalDistance.tr(),
+                  subtitle: '${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
                   iconColor: Colors.green,
                 ),
                 _buildStatItem(
                   icon: Icons.add_road,
-                  title: 'Ortalama Mesafe',
-                  subtitle: '${averageDistance.toStringAsFixed(2)} km',
+                  title: LocaleKeys.averageDistance.tr(),
+                  subtitle: '${averageDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
                   iconColor: Colors.green,
                 ),
                 _buildStatItem(
                   icon: Icons.timer_outlined,
-                  title: 'Toplam Süre',
+                  title: LocaleKeys.totalDuration.tr(),
                   subtitle: formattedTotalDuration,
                   iconColor: basarsoft_color_light,
                 ),
                 _buildStatItem(
                   icon: Icons.timelapse_rounded,
-                  title: 'Ortalama Süre',
+                  title: LocaleKeys.averageDuration.tr(),
                   subtitle: formattedAverageDuration,
                   iconColor: Colors.blueAccent,
                 ),
                 _buildStatItem(
                   icon: Icons.speed_outlined,
-                  title: 'Ortalama Hız',
-                  subtitle: '${formattedAverageSpeed} km/saat',
+                  title: LocaleKeys.averageSpeed.tr(),
+                  subtitle: '${formattedAverageSpeed} ${LocaleKeys.kmPerHourUnit.tr()}',
                   iconColor: Colors.red,
                 ),
                 _buildStatItem(
                   icon: Icons.fitness_center,
-                  title: 'Aktivite Sayısı',
+                  title: LocaleKeys.activityCount.tr(),
                   subtitle: '$activityCount',
                   iconColor: Colors.white,
                 ),
@@ -195,7 +197,7 @@ class StatisticPage extends StatelessWidget {
   }
 
   String _formatDuration(Duration duration) {
-    return '${duration.inHours} saat ${duration.inMinutes.remainder(60)} dakika ${duration.inSeconds.remainder(60)} saniye';
+    return '${duration.inHours} ${LocaleKeys.hourUnit.tr()} ${duration.inMinutes.remainder(60)} ${LocaleKeys.minuteUnit.tr()} ${duration.inSeconds.remainder(60)} ${LocaleKeys.secondUnit.tr()}';
   }
 
   Widget _buildStatItem({
@@ -218,13 +220,13 @@ class StatisticPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: basarsoft_color,
-                border: Border.all(color: basarsoft_color_light, width: 3), // White border around the circle
-              ),
-              padding: EdgeInsets.all(12),
-              child: Icon(icon, color: iconColor, size: 40),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: basarsoft_color,
+                  border: Border.all(color: basarsoft_color_light, width: 3), // White border around the circle
+                ),
+                padding: EdgeInsets.all(12),
+                child: Icon(icon, color: iconColor, size: 40),
             ),
             SizedBox(width: 20),
             Column(

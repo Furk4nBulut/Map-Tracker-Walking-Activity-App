@@ -48,5 +48,34 @@
   "featureDataStorageDescription": "Aktivitenizi tamamladığınızda, bu bilgiler uygulama içindeki veritabanına kaydedilir. Daha sonra bu verileri gözden geçirebilir, analiz edebilir ve geçmiş aktivitelerinizi detaylı bir şekilde inceleyebilirsiniz.",
   "featureWeatherTitle": "Hava durumu bilgileri",
   "featureWeatherDescription": "Uygulama, hava durumu bilgilerini sunarak hava koşullarına göre planlama yapmanıza olanak tanır.",
-  "appSummary": "Uygulama sayesinde, hem mevcut hem de geçmiş aktivitelerinizle ilgili kapsamlı bilgiler edinerek spor alışkanlıklarınızı daha etkin bir şekilde yönetebilirsiniz."
+  "appSummary": "Uygulama sayesinde, hem mevcut hem de geçmiş aktivitelerinizle ilgili kapsamlı bilgiler edinerek spor alışkanlıklarınızı daha etkin bir şekilde yönetebilirsiniz.",
+
+
+
+
+
+
+
+
+  "statisticsTitle": "İstatistikler",
+  "statsError": "İstatistikler alınırken hata oluştu: {error}",
+  "localStatsError": "Yerel kullanıcı istatistikleri alınırken hata oluştu: {error}",
+  "firebaseStatsError": "Firebase kullanıcı istatistikleri alınırken hata oluştu: {error}",
+  "userNotSignedIn": "Kullanıcı oturumu açmamış.",
+  "dataLoadFailed": "Veriler yüklenemedi.",
+  "totalDistance": "Toplam Mesafe",
+  "averageDistance": "Ortalama Mesafe",
+  "totalDuration": "Toplam Süre",
+  "averageDuration": "Ortalama Süre",
+  "averageSpeed": "Ortalama Hız",
+  "activityCount": "Aktivite Sayısı",
+  "hourUnit": "saat",
+  "minuteUnit": "dakika",
+  "secondUnit": "saniye",
+  "kmUnit": "km",
+  "kmPerHourUnit": "km/saat"
+
+
+
+
 }
