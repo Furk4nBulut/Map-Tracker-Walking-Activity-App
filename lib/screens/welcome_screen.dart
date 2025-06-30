@@ -40,6 +40,18 @@ class WelcomeScreen extends StatelessWidget {
     return CustomScaffold(
       child: Column(
         children: [
+          // Buraya appbar gibi üstte dil değiştirme butonu
+          SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+              alignment: Alignment.center,
+              child: const LanguageSwitcher(
+                transparentBackground: true,
+                showLabel: true,  // Burada yazı istersen true yapabilirsin7
+              ),
+            ),
+          ),
+
           Flexible(
             flex: 8,
             child: Container(
@@ -62,12 +74,14 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.map_outlined,
-                        size: 200.0,
-                        color: Colors.white,
+                      child: Image.asset(
+                        'assets/images/map_tracker_logo.png',
+                        width: 200.0,
+                        height: 200.0,
+                        fit: BoxFit.contain,
                         semanticLabel: 'Map Tracker Logo',
                       ),
+
                     ),
                     const SizedBox(height: 20.0),
                     RichText(
@@ -108,14 +122,12 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20.0),
-                    const LanguageSwitcher(transparentBackground: true,showLabel: true,),
-
-
                   ],
                 ),
               ),
             ),
           ),
+
           Flexible(
             flex: 1,
             child: Align(
@@ -146,4 +158,5 @@ class WelcomeScreen extends StatelessWidget {
       ),
     );
   }
+
 }
