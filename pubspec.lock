@@ -289,14 +289,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
-  dart_helper_utils:
-    dependency: transitive
-    description:
-      name: dart_helper_utils
-      sha256: "135d1960e48f44b47ac1ce273a3da5aa20a19b4b446a774476df43be3803e920"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.0"
   dart_jsonwebtoken:
     dependency: transitive
     description:
@@ -329,6 +321,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  easy_localization:
+    dependency: "direct main"
+    description:
+      name: easy_localization
+      sha256: "0f5239c7b8ab06c66440cfb0e9aa4b4640429c6668d5a42fe389c5de42220b12"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.7+1"
+  easy_logger:
+    dependency: transitive
+    description:
+      name: easy_logger
+      sha256: c764a6e024846f33405a2342caf91c62e357c24b02c04dbc712ef232bf30ffb7
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   ed25519_edwards:
     dependency: transitive
     description:
@@ -498,10 +506,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_helper_utils
-      sha256: "840a0f9180177c1a0140f14dd18e1081357d29226efd39b80e9a9ccde5abe4b9"
+      sha256: bc3e673e73be0ad10cb0997d7532050a7a604fdc3d6f0a141f6042982af30a77
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.0"
+    version: "4.0.1"
   flutter_icons_plus:
     dependency: "direct main"
     description:
@@ -526,6 +534,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_login:
     dependency: "direct main"
     description:
@@ -844,10 +857,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.19.0"
+    version: "0.20.2"
   intl_phone_number_input:
     dependency: transitive
     description:
