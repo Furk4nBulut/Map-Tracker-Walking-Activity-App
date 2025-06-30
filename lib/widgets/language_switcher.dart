@@ -65,8 +65,8 @@ class LanguageSwitcher extends StatelessWidget {
                 LocaleKeys.languageToggle.tr(),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                   shadows: [
                     Shadow(
                       color: Colors.black54,
