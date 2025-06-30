@@ -113,5 +113,8 @@ abstract class  LocaleKeys {
   static const logoutSuccess = 'logoutSuccess';
   static const minuteUnitShort = 'minuteUnitShort';
   static const secondUnitShort = 'secondUnitShort';
+  static const languageEnglish = 'languageEnglish';
+  static const languageTurkish = 'languageTurkish';
+  static const languageGerman = 'languageGerman';
 
 }

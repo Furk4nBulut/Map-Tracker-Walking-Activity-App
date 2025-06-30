@@ -1,11 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:map_tracker/screens/welcome_screen.dart';
-import 'package:map_tracker/services/auth_service.dart';
-import 'package:map_tracker/screens/partials/appbar.dart';
 import 'package:map_tracker/screens/homepage.dart';
+import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/utils/constants.dart';
+import 'package:map_tracker/widgets/language_switcher.dart'; // Dil Değiştirici
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool automaticallyImplyLeading;
@@ -13,7 +12,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     Key? key,
     required this.title,
-    this.automaticallyImplyLeading = true, // Default to false
+    this.automaticallyImplyLeading = true,
   }) : super(key: key);
 
   @override
@@ -33,54 +32,53 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: Colors.black,
           ),
         ],
-
       ),
       backgroundColor: basarsoft_color,
-
-
-
       automaticallyImplyLeading: automaticallyImplyLeading,
       leading: automaticallyImplyLeading
           ? IconButton(
-        icon: const Icon(Icons.home_outlined,
+        icon: const Icon(
+          Icons.home_outlined,
           shadows: [
             Shadow(
               offset: Offset(2.0, 2.0),
               blurRadius: 3.0,
               color: Colors.black,
             ),
-          ],),
+          ],
+        ),
         color: Colors.white,
         onPressed: () {
-          //home page back button direkt yönlednrme home page e
           Navigator.of(context).pop();
-
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
         },
       )
           : null,
-
-
-
-
       actions: <Widget>[
+        // 🌐 Dil Değiştirici (Bayrak Şekli)
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 6.0),
+          child: LanguageSwitcher(
+          ),
+        ),
         IconButton(
-          icon: const Icon(Icons.exit_to_app,
-          shadows: [
-            Shadow(
-              offset: Offset(2.0, 2.0),
-              blurRadius: 3.0,
-              color: Colors.black,
-            ),
-          ],),
+          icon: const Icon(
+            Icons.exit_to_app,
+            shadows: [
+              Shadow(
+                offset: Offset(2.0, 2.0),
+                blurRadius: 3.0,
+                color: Colors.black,
+              ),
+            ],
+          ),
           color: Colors.white,
           onPressed: () async {
             await AuthService().signOut(context);
             await FirebaseAuth.instance.signOut();
-
           },
         ),
       ],
@@ -88,5 +86,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

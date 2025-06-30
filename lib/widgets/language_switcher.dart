@@ -2,49 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:map_tracker/localization/localization_manager.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:map_tracker/utils/constants.dart';
 
 class LanguageSwitcher extends StatelessWidget {
   const LanguageSwitcher({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final currentLanguageCode = context.locale.languageCode;
-    final isEnglish = currentLanguageCode == 'en';
+    final currentLang = context.locale.languageCode;
+
+    String flagCode;
+    switch (currentLang) {
+      case 'tr':
+        flagCode = 'TR';
+        break;
+      case 'de':
+        flagCode = 'DE';
+        break;
+      case 'en':
+      default:
+        flagCode = 'US';
+        break;
+    }
 
     return GestureDetector(
       onTap: () => _showLanguageSelectionSheet(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+        padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(8),
+          color: basarsoft_color,
+          borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.15),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CountryFlag.fromCountryCode(
-              isEnglish ? 'US' : 'TR',
-              height: 16,
-              width: 24,
-              borderRadius: 4,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              isEnglish ? 'English' : 'Türkçe',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black54),
-          ],
+        child: CountryFlag.fromCountryCode(
+          flagCode,
+          height: 20,
+          width: 30,
+          borderRadius: 4,
         ),
       ),
     );
@@ -56,24 +57,42 @@ class LanguageSwitcher extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (BuildContext context) {
+      builder: (_) {
         return ListView(
           shrinkWrap: true,
           children: LanguageManager.instance.supportedLocales.map((locale) {
-            final isEnglish = locale.languageCode == 'en';
+            String flagCode;
+            String languageText;
+
+            switch (locale.languageCode) {
+              case 'tr':
+                flagCode = 'TR';
+                languageText = LocaleKeys.languageTurkish.tr();
+                break;
+              case 'de':
+                flagCode = 'DE';
+                languageText = LocaleKeys.languageGerman.tr();
+                break;
+              case 'en':
+              default:
+                flagCode = 'US';
+                languageText = LocaleKeys.languageEnglish.tr();
+                break;
+            }
+
             return ListTile(
               leading: CountryFlag.fromCountryCode(
-                isEnglish ? 'US' : 'TR',
+                flagCode,
                 height: 20,
                 width: 28,
                 borderRadius: 4,
               ),
-              title: Text(isEnglish ? 'English' : 'Türkçe'),
+              title: Text(languageText),
               onTap: () {
-                if (locale.languageCode != context.locale.languageCode) {
+                if (locale != context.locale) {
                   context.setLocale(locale);
                 }
-                Navigator.of(context).pop(); // Sheet kapat
+                Navigator.pop(context);
               },
             );
           }).toList(),

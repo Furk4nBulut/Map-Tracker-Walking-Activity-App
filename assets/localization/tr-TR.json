@@ -133,5 +133,9 @@
   "syncSuccess": "Veriler başarıyla senkronize edildi.",
   "logoutSuccess": "Başarıyla çıkış yapıldı.",
   "minuteUnitShort": "dk",
-  "secondUnitShort": "sn"
+  "secondUnitShort": "sn",
+
+  "languageEnglish": "İngilizce",
+  "languageTurkish": "Türkçe",
+  "languageGerman": "Almanca"
 }

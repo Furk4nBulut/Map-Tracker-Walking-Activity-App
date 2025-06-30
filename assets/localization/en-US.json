@@ -126,9 +126,9 @@
   "syncSuccess": "Data synced successfully.",
   "logoutSuccess": "Logged out successfully.",
   "minuteUnitShort": "min",
-  "secondUnitShort": "s"
+  "secondUnitShort": "s",
 
-
-
-
+  "languageEnglish": "English",
+  "languageTurkish": "Turkish",
+  "languageGerman": "German"
 }
