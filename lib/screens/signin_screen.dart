@@ -9,9 +9,6 @@ import 'package:map_tracker/widgets/custom_scaffold.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
-import 'package:map_tracker/localization/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:map_tracker/utils/localizaton_constants.dart';
 
 final locator = GetIt.instance;
 
@@ -30,24 +27,53 @@ class _SignInScreenState extends State<SignInScreen> {
 
   AuthService get _authService => locator<AuthService>();
   AuthProvider get _authProvider => locator<AuthProvider>();
+
   DatabaseHelper dbHelper = DatabaseHelper();
 
-  Future<void> login() async {
-    if (_formSignInKey.currentState!.validate()) {
-      try {
-        await _authService.signIn(
-          context,
+
+
+  login() async{
+    try {
+      await _authService.signIn(
+        context,
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
+    var response =  await DatabaseHelper().login(
+        LocalUser(
+          firstName: '',
+          lastName: '',
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
-        );
-      } catch (e) {
-        Fluttertoast.showToast(
-          msg: e.toString(),
-          toastLength: Toast.LENGTH_LONG,
-        );
-      }
+        ));
+
+    if(response==true){
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+      );
+    }else{
+      Fluttertoast.showToast(
+        msg: "Kullanıcı adı veya şifre hatalı",
+        toastLength: Toast.LENGTH_LONG,
+      );
     }
+
+
   }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +90,7 @@ class _SignInScreenState extends State<SignInScreen> {
               padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40.0),
                   topRight: Radius.circular(40.0),
                 ),
@@ -77,25 +103,25 @@ class _SignInScreenState extends State<SignInScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        LocaleKeys.signInTitle.tr(),
+                        'Giriş Yap',
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
-                          color: basarsoft_color,
+                          color: basarsoft_color, // Adjusted color
                         ),
                       ),
-                      const SizedBox(height: 20.0),
+                      const SizedBox(height: 40.0),
                       TextFormField(
                         controller: _emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return LocaleKeys.emailRequired.tr();
+                            return 'Lütfen bir e-posta adresi girin';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: LocaleKeys.emailLabel.tr(),
-                          hintText: LocaleKeys.emailHint.tr(),
+                          labelText: 'Email',
+                          hintText: 'Email',
                           hintStyle: const TextStyle(color: Colors.black),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -118,13 +144,13 @@ class _SignInScreenState extends State<SignInScreen> {
                         obscuringCharacter: '*',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return LocaleKeys.passwordRequired.tr();
+                            return 'Lütfen bir şifre girin';
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: LocaleKeys.passwordLabel.tr(),
-                          hintText: LocaleKeys.passwordHint.tr(),
+                          labelText: 'Şifre',
+                          hintText: 'Şifre',
                           hintStyle: const TextStyle(color: Colors.black),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(
@@ -144,21 +170,33 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: login,
+                          onPressed: () async {
+                            if (_formSignInKey.currentState!.validate()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Giriş Yapılıyor...'),
+                                ),
+                              );
+
+                              login();
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: basarsoft_color,
+                            backgroundColor: basarsoft_color, // Adjusted button color
                           ),
-                          child: Text(
-                            LocaleKeys.signInButton.tr(),
-                            style: const TextStyle(
+                          child: const Text(
+                            'Giriş Yap',
+                            style: TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.white, // Adjusted text color
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30.0),
+                      const SizedBox(
+                        height: 30.0,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -168,14 +206,14 @@ class _SignInScreenState extends State<SignInScreen> {
                               color: Colors.grey.withOpacity(0.5),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
                               vertical: 0,
                               horizontal: 10,
                             ),
                             child: Text(
-                              LocaleKeys.otherSignInMethods.tr(),
-                              style: const TextStyle(
+                              'Diğer Giriş Yöntemleri',
+                              style: TextStyle(
                                 color: Colors.black45,
                               ),
                             ),
@@ -188,7 +226,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 30.0),
+                      const SizedBox(
+                        height: 30.0,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -196,17 +236,14 @@ class _SignInScreenState extends State<SignInScreen> {
                             onTap: () async {
                               try {
                                 var user = await locator.get<AuthService>().signInWithGoogle();
-                                if (user != null && context.mounted) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const HomePage(),
-                                      settings: RouteSettings(arguments: user),
-                                    ),
-                                  );
+                                if (user != null) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => HomePage(),
+                                    settings: RouteSettings(arguments: user),
+                                  ));
                                 } else {
                                   Fluttertoast.showToast(
-                                    msg: LocaleKeys.googleSignInFailed.tr(),
+                                    msg: "Google ile giriş başarısız!",
                                     toastLength: Toast.LENGTH_LONG,
                                   );
                                 }
@@ -217,6 +254,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 );
                               }
                             },
+
                             child: Image.asset('assets/images/google.png'),
                           ),
                         ],
@@ -224,8 +262,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+
                         children: [
-                          Text(LocaleKeys.noAccount.tr()),
+                          const Text('Henüz Bir Hesabın Yok Mu? '),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -236,7 +275,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               );
                             },
                             child: Text(
-                              LocaleKeys.signUpLink.tr(),
+                              'Kayıt Ol!',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: basarsoft_color,

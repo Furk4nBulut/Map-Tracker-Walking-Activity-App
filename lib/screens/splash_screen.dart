@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/screens/welcome_screen.dart';
-import 'package:map_tracker/screens/homepage.dart';
-import 'package:map_tracker/services/local_db_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -15,32 +12,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkSessionAndNavigate();
+    _navigateToLogin();
   }
 
-  Future<void> _checkSessionAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 3)); // Splash screen delay
-    final dbHelper = DatabaseHelper();
-    bool isSessionValid = await dbHelper.isSessionValid();
-    if (isSessionValid) {
-      LocalUser? user = await dbHelper.getCurrentUser();
-      if (user != null && context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-        );
-      }
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-      );
-    }
+  Future<void> _navigateToLogin() async {
+    await Future.delayed(const Duration(seconds: 3));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+    );
   }
 
   @override

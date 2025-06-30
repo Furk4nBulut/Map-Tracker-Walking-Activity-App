@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -35,7 +36,7 @@ class DatabaseHelper {
   Future<Database> initDatabase() async {
     String path = await getDatabasesPath();
     return openDatabase(
-      join(path, 'veritabanhai.db'),
+      join(path, 'veritabanhahai.db'),
       onCreate: (db, version) {
         db.execute(
           "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, email TEXT, password TEXT)",
@@ -82,7 +83,6 @@ class DatabaseHelper {
     if (users.isNotEmpty) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt('currentUserId', users.first['id'] as int);
-      await prefs.setInt('loginTimestamp', DateTime.now().millisecondsSinceEpoch);
       return true;
     }
     return false;
@@ -105,27 +105,14 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<bool> isSessionValid() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? loginTimestamp = prefs.getInt('loginTimestamp');
-    int? currentUserId = prefs.getInt('currentUserId');
-    if (loginTimestamp != null && currentUserId != null) {
-      DateTime loginTime = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
-      Duration difference = DateTime.now().difference(loginTime);
-      return difference.inDays < 1; // Session valid for 1 day
-    }
-    return false;
-  }
-
   Future<void> logout() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove('currentUserId');
-      await prefs.remove('loginTimestamp');
+      await (await SharedPreferences.getInstance()).remove('currentUserId');
     } catch (e) {
       debugPrint('Error signing out: $e');
     }
   }
+
 
   Future<int> updateUser(LocalUser user) async {
     final db = await database;
