@@ -6,6 +6,8 @@ import 'package:map_tracker/services/local_db_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
 import '../model/user_model.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
@@ -75,7 +77,7 @@ class ActivityDetailScreen extends StatelessWidget {
       builder: (context, AsyncSnapshot<Activity?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
+            appBar: CustomAppBar(title: LocaleKeys.activityDetailTitle.tr(), automaticallyImplyLeading: true),
             body: const Center(
               child: CircularProgressIndicator(),
             ),
@@ -84,9 +86,9 @@ class ActivityDetailScreen extends StatelessWidget {
 
         if (snapshot.hasError || snapshot.data == null) {
           return Scaffold(
-            appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
-            body: const Center(
-              child: Text('Aktivite bulunamadı.'),
+            appBar: CustomAppBar(title: LocaleKeys.activityDetailTitle.tr(), automaticallyImplyLeading: true),
+            body: Center(
+              child: Text(LocaleKeys.noActivityFound.tr()),
             ),
           );
         }
@@ -104,7 +106,7 @@ class ActivityDetailScreen extends StatelessWidget {
         );
 
         return Scaffold(
-          appBar: CustomAppBar(title: 'Aktivite Detayı', automaticallyImplyLeading: true),
+          appBar: CustomAppBar(title: LocaleKeys.activityDetailTitle.tr(), automaticallyImplyLeading: true),
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -150,7 +152,7 @@ class ActivityDetailScreen extends StatelessWidget {
                             Expanded(
                               child: ListTile(
                                 leading: const Icon(Icons.timer, color: Colors.blue),
-                                title: const Text('Başlangıç Tarihi', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                title: Text(LocaleKeys.startDateLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                                 subtitle: Text(DateFormat('dd MMMM yyyy, HH:mm').format(startTime)),
                               ),
                             ),
@@ -158,7 +160,7 @@ class ActivityDetailScreen extends StatelessWidget {
                               Expanded(
                                 child: ListTile(
                                   leading: const Icon(Icons.timer_off, color: Colors.red),
-                                  title: const Text('Bitiş Tarihi', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                  title: Text(LocaleKeys.endDateLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                                   subtitle: Text(DateFormat('dd MMMM yyyy, HH:mm').format(endTime)),
                                 ),
                               ),
@@ -172,15 +174,15 @@ class ActivityDetailScreen extends StatelessWidget {
                             Expanded(
                               child: ListTile(
                                 leading: const Icon(Icons.directions_walk, color: Colors.green),
-                                title: const Text('Toplam Mesafe', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                subtitle: Text('${totalDistance.toStringAsFixed(2)} km'),
+                                title: Text(LocaleKeys.distanceLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                subtitle: Text('${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}'),
                               ),
                             ),
                             Expanded(
                               child: ListTile(
                                 leading: const Icon(Icons.speed, color: Colors.deepOrange),
-                                title: const Text('Ortalama Hız', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                subtitle: Text('${activity.averageSpeed} km/s'),
+                                title: Text(LocaleKeys.averageSpeedLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                subtitle: Text('${activity.averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}'),
                               ),
                             ),
                           ],

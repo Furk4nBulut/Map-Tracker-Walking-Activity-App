@@ -96,5 +96,11 @@
   "averageSpeedLabel": "Average Speed",
   "statusCompleted": "Status: Completed",
   "statusOngoing": "Status: Ongoing",
-  "detailsLabel": "Details"
+  "detailsLabel": "Details",
+
+  "activityDetailTitle": "Activity Detail",
+  "noActivityFound": "Activity not found.",
+  "startDateLabel": "Start Date",
+  "endDateLabel": "End Date"
+
 }

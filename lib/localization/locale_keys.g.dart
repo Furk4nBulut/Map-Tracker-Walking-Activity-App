@@ -92,5 +92,9 @@ abstract class  LocaleKeys {
   static const statusCompleted = 'statusCompleted';
   static const statusOngoing = 'statusOngoing';
   static const detailsLabel = 'detailsLabel';
+  static const activityDetailTitle = 'activityDetailTitle';
+  static const noActivityFound = 'noActivityFound';
+  static const startDateLabel = 'startDateLabel';
+  static const endDateLabel = 'endDateLabel';
 
 }
