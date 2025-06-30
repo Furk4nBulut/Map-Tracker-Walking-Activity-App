@@ -96,6 +96,9 @@ abstract class  LocaleKeys {
   static const noActivityFound = 'noActivityFound';
   static const startDateLabel = 'startDateLabel';
   static const endDateLabel = 'endDateLabel';
+  static const languageEnglish = 'languageEnglish';
+  static const languageTurkish = 'languageTurkish';
+  static const languageGerman = 'languageGerman';
   static const profileTitle = 'profileTitle';
   static const userStatsError = 'userStatsError';
   static const unknown = 'unknown';
@@ -113,8 +116,5 @@ abstract class  LocaleKeys {
   static const logoutSuccess = 'logoutSuccess';
   static const minuteUnitShort = 'minuteUnitShort';
   static const secondUnitShort = 'secondUnitShort';
-  static const languageEnglish = 'languageEnglish';
-  static const languageTurkish = 'languageTurkish';
-  static const languageGerman = 'languageGerman';
 
 }
