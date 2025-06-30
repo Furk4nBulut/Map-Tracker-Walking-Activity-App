@@ -9,6 +9,8 @@ import 'package:map_tracker/services/auth_service.dart';
 import 'package:map_tracker/screens/homepage.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
 
 final locator = GetIt.instance;
 
@@ -39,12 +41,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       if (_formSignupKey.currentState!.validate() && agreePersonalData) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kayıt olunuyor...'),
+          SnackBar(
+            content: Text(LocaleKeys.signUpInProgress.tr()),
           ),
         );
 
-        // Online kayıt işlemi
         await locator.get<AuthService>().signUp(
           context,
           name: firstName,
@@ -53,19 +54,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: password,
         );
 
-        // Kayıt başarılıysa WelcomeScreen'e yönlendir
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Lütfen formu doğru şekilde doldurun ve sözleşmeyi kabul edin.'),
+          SnackBar(
+            content: Text(LocaleKeys.formValidationError.tr()),
           ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Kayıt olma sırasında bir hata oluştu: $e'),
+          content: Text(LocaleKeys.signUpError.tr(args: [e.toString()])),
         ),
       );
     }
@@ -104,7 +104,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Kayıt Formu',
+                        LocaleKeys.signUpTitle.tr(),
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
@@ -119,13 +119,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: _firstNameController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Ad Giriniz';
+                                  return LocaleKeys.firstNameRequired.tr();
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                labelText: 'Ad',
-                                hintText: 'Adınızı Giriniz',
+                                labelText: LocaleKeys.firstNameLabel.tr(),
+                                hintText: LocaleKeys.firstNameHint.tr(),
                                 hintStyle: const TextStyle(color: Colors.black26),
                                 border: OutlineInputBorder(
                                   borderSide: const BorderSide(color: basarsoft_color),
@@ -144,13 +144,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: _lastNameController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Soyad Giriniz';
+                                  return LocaleKeys.lastNameRequired.tr();
                                 }
                                 return null;
                               },
                               decoration: InputDecoration(
-                                labelText: 'Soyad',
-                                hintText: 'Soyadınızı Giriniz',
+                                labelText: LocaleKeys.lastNameLabel.tr(),
+                                hintText: LocaleKeys.lastNameHint.tr(),
                                 hintStyle: const TextStyle(color: Colors.black26),
                                 border: OutlineInputBorder(
                                   borderSide: const BorderSide(color: basarsoft_color),
@@ -170,13 +170,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         controller: _emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Email Adresi Giriniz';
+                            return LocaleKeys.emailRequired.tr();
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Email Adresi Giriniz',
+                          labelText: LocaleKeys.emailLabel.tr(),
+                          hintText: LocaleKeys.emailRequiredHint.tr(),
                           hintStyle: const TextStyle(color: Colors.black26),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(color: basarsoft_color),
@@ -195,13 +195,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         obscuringCharacter: '*',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Şifre Giriniz';
+                            return LocaleKeys.passwordRequired.tr();
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: 'Şifre',
-                          hintText: 'Şifre Giriniz',
+                          labelText: LocaleKeys.passwordLabel.tr(),
+                          hintText: LocaleKeys.passwordHint.tr(),
                           hintStyle: const TextStyle(color: Colors.black26),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(color: basarsoft_color),
@@ -225,15 +225,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             },
                             activeColor: basarsoft_color,
                           ),
-                          const Text(
-                            'Bilgilerimin işlenmesini ',
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                          Text(
-                            'Kabul Ediyorum.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: basarsoft_color,
+                          Flexible(
+                            child: Text(
+                              LocaleKeys.agreePersonalData.tr(),
+                              style: TextStyle(
+                                color: Colors.black45,
+                              ),
                             ),
                           ),
                         ],
@@ -250,9 +247,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               borderRadius: BorderRadius.circular(20.0),
                             ),
                           ),
-                          child: const Text(
-                            'Kayıt Ol',
-                            style: TextStyle(
+                          child: Text(
+                            LocaleKeys.signUpButton.tr(),
+                            style: const TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -270,11 +267,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               color: Colors.black,
                             ),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                             child: Text(
-                              'Diğer Kayıt Yöntemleri',
-                              style: TextStyle(color: Colors.black45),
+                              LocaleKeys.otherSignUpMethods.tr(),
+                              style: const TextStyle(color: Colors.black45),
                             ),
                           ),
                           Expanded(
@@ -297,13 +294,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   // Navigation is handled in AuthService
                                 } else {
                                   Fluttertoast.showToast(
-                                    msg: "Google ile giriş başarısız!",
+                                    msg: LocaleKeys.googleSignInFailed.tr(),
                                     toastLength: Toast.LENGTH_LONG,
                                   );
                                 }
                               } catch (e) {
                                 Fluttertoast.showToast(
-                                  msg: "Google ile giriş hatası: $e",
+                                  msg: LocaleKeys.googleSignInError.tr(args: [e.toString()]),
                                   toastLength: Toast.LENGTH_LONG,
                                 );
                               }
@@ -316,9 +313,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'Zaten Bir Hesabın Var Mı? ',
-                            style: TextStyle(color: Colors.black45),
+                          Text(
+                            LocaleKeys.alreadyHaveAccount.tr(),
+                            style: const TextStyle(color: Colors.black45),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -328,7 +325,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               );
                             },
                             child: Text(
-                              'Giriş Yap',
+                              LocaleKeys.signInLink.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: basarsoft_color,

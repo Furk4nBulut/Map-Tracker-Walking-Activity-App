@@ -4,6 +4,7 @@
   "emailLabel": "Email",
   "emailHint": "Enter your email",
   "emailRequired": "Please enter an email address",
+  "emailRequiredHint": "Enter your email address",
   "passwordLabel": "Password",
   "passwordHint": "Enter your password",
   "passwordRequired": "Please enter a password",
@@ -12,6 +13,7 @@
   "noAccount": "Don't have an account? ",
   "signUpLink": "Sign Up!",
   "googleSignInFailed": "Google sign-in failed!",
+  "invalidCredentials": "Invalid username or password",
   "signUpTitle": "Sign Up Form",
   "firstNameLabel": "First Name",
   "firstNameHint": "Enter your first name",
@@ -29,5 +31,6 @@
   "formValidationError": "Please fill out the form correctly and agree to the terms.",
   "welcomeAppName": "Map Tracker",
   "welcomeSubtitle": "Hiking Activity Assistant",
-  "languageToggle": "Switch Language"
+  "languageToggle": "Switch Language",
+  "googleSignInError": "Google sign-in error: {error}"
 }

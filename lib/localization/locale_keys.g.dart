@@ -8,6 +8,7 @@ abstract class  LocaleKeys {
   static const emailLabel = 'emailLabel';
   static const emailHint = 'emailHint';
   static const emailRequired = 'emailRequired';
+  static const emailRequiredHint = 'emailRequiredHint';
   static const passwordLabel = 'passwordLabel';
   static const passwordHint = 'passwordHint';
   static const passwordRequired = 'passwordRequired';
@@ -16,6 +17,7 @@ abstract class  LocaleKeys {
   static const noAccount = 'noAccount';
   static const signUpLink = 'signUpLink';
   static const googleSignInFailed = 'googleSignInFailed';
+  static const invalidCredentials = 'invalidCredentials';
   static const signUpTitle = 'signUpTitle';
   static const firstNameLabel = 'firstNameLabel';
   static const firstNameHint = 'firstNameHint';
@@ -34,5 +36,6 @@ abstract class  LocaleKeys {
   static const welcomeAppName = 'welcomeAppName';
   static const welcomeSubtitle = 'welcomeSubtitle';
   static const languageToggle = 'languageToggle';
+  static const googleSignInError = 'googleSignInError';
 
 }
