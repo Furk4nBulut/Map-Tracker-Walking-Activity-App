@@ -83,5 +83,14 @@ abstract class  LocaleKeys {
   static const speedLabel = 'speedLabel';
   static const startButton = 'startButton';
   static const stopButton = 'stopButton';
+  static const activityHistoryTitle = 'activityHistoryTitle';
+  static const errorOccurred = 'errorOccurred';
+  static const loginRequired = 'loginRequired';
+  static const noActivitiesFound = 'noActivitiesFound';
+  static const dateLabel = 'dateLabel';
+  static const averageSpeedLabel = 'averageSpeedLabel';
+  static const statusCompleted = 'statusCompleted';
+  static const statusOngoing = 'statusOngoing';
+  static const detailsLabel = 'detailsLabel';
 
 }

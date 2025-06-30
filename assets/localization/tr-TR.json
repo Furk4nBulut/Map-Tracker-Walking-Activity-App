@@ -89,8 +89,18 @@
   "durationLabel": "Süre",
   "speedLabel": "Hız",
   "startButton": "Başlat",
-  "stopButton": "Bitir"
+  "stopButton": "Bitir",
 
+
+  "activityHistoryTitle": "Aktivite Geçmişi",
+  "errorOccurred": "Bir hata oluştu: {error}",
+  "loginRequired": "Kullanıcı girişi gereklidir.",
+  "noActivitiesFound": "Aktivite bulunamadı.",
+  "dateLabel": "Tarih",
+  "averageSpeedLabel": "Ortalama Hız",
+  "statusCompleted": "Durum: Tamamlandı",
+  "statusOngoing": "Durum: Devam Ediyor",
+  "detailsLabel": "Detaylar"
 
 
 

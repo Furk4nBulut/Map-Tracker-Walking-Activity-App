@@ -8,12 +8,14 @@ import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:map_tracker/localization/locale_keys.g.dart';
 
 class ActivityHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Aktivite Geçmişi", automaticallyImplyLeading: true),
+      appBar: CustomAppBar(title: LocaleKeys.activityHistoryTitle.tr(), automaticallyImplyLeading: true),
       body: FutureBuilder<LocalUser?>(
         future: DatabaseHelper().getCurrentUser(),
         builder: (context, AsyncSnapshot<LocalUser?> localUserSnapshot) {
@@ -22,7 +24,7 @@ class ActivityHistoryScreen extends StatelessWidget {
           }
 
           if (localUserSnapshot.hasError) {
-            return Center(child: Text('Bir hata oluştu: ${localUserSnapshot.error}'));
+            return Center(child: Text(LocaleKeys.errorOccurred.tr(args: [localUserSnapshot.error.toString()])));
           }
 
           if (localUserSnapshot.data != null) {
@@ -35,7 +37,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                 }
 
                 if (activitiesSnapshot.hasError) {
-                  return Center(child: Text('Bir hata oluştu: ${activitiesSnapshot.error}'));
+                  return Center(child: Text(LocaleKeys.errorOccurred.tr(args: [activitiesSnapshot.error.toString()])));
                 }
 
                 final activities = activitiesSnapshot.data;
@@ -52,8 +54,8 @@ class ActivityHistoryScreen extends StatelessWidget {
 
             if (firebaseUser == null) {
               return Scaffold(
-                appBar: CustomAppBar(title: "Aktivite Geçmişi", automaticallyImplyLeading: true),
-                body: Center(child: Text('Kullanıcı girişi gereklidir.')),
+                appBar: CustomAppBar(title: LocaleKeys.activityHistoryTitle.tr(), automaticallyImplyLeading: true),
+                body: Center(child: Text(LocaleKeys.loginRequired.tr())),
               );
             }
 
@@ -74,7 +76,7 @@ class ActivityHistoryScreen extends StatelessWidget {
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Bir hata oluştu: ${snapshot.error.toString()}'));
+          return Center(child: Text(LocaleKeys.errorOccurred.tr(args: [snapshot.error.toString()])));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -82,7 +84,7 @@ class ActivityHistoryScreen extends StatelessWidget {
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(child: Text('Aktivite bulunamadı.'));
+          return Center(child: Text(LocaleKeys.noActivitiesFound.tr()));
         }
 
         return buildFirestoreActivityList(snapshot.data!.docs);
@@ -124,7 +126,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                   Icon(Icons.calendar_today, color: Color(0xFF02205C)),
                   SizedBox(width: 10),
                   Text(
-                    'Tarih: $formattedDate',
+                    '${LocaleKeys.dateLabel.tr()}: $formattedDate',
                     style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -138,7 +140,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Icon(Icons.directions_walk, color: Colors.green),
                       SizedBox(width: 10),
                       Text(
-                        'Mesafe: ${totalDistance.toStringAsFixed(2)} km',
+                        '${LocaleKeys.distanceLabel.tr()}: ${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
                         style: TextStyle(fontSize: 14.0),
                       ),
                     ],
@@ -149,7 +151,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Icon(Icons.timer_outlined, color: Colors.blue),
                       SizedBox(width: 10),
                       Text(
-                        'Süre: ${doc['elapsedTime']} saniye',
+                        '${LocaleKeys.durationLabel.tr()}: ${doc['elapsedTime']} ${LocaleKeys.secondUnit.tr()}',
                         style: TextStyle(fontSize: 14.0),
                       ),
                     ],
@@ -160,14 +162,14 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Icon(Icons.speed, color: Colors.deepOrange),
                       SizedBox(width: 10),
                       Text(
-                        'Ortalama Hız: ${averageSpeed.toStringAsFixed(2)} km/s',
+                        '${LocaleKeys.averageSpeedLabel.tr()}: ${averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}',
                         style: TextStyle(fontSize: 14.0),
                       ),
                     ],
                   ),
                   SizedBox(height: 8),
                   Text(
-                    isCompleted ? 'Durum: Tamamlandı' : 'Durum: Devam Ediyor',
+                    isCompleted ? LocaleKeys.statusCompleted.tr() : LocaleKeys.statusOngoing.tr(),
                     style: TextStyle(
                       fontSize: 14.0,
                       color: isCompleted ? Colors.green : Colors.orange,
@@ -176,7 +178,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              trailing: Icon(Icons.arrow_forward_ios, color: basarsoft_color, size: 20.0, semanticLabel: 'Detaylar'),
+              trailing: Icon(Icons.arrow_forward_ios, color: basarsoft_color, size: 20.0, semanticLabel: LocaleKeys.detailsLabel.tr()),
               onTap: () {
                 Navigator.push(
                   context,
@@ -214,7 +216,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                   Icon(Icons.calendar_today, color: Color(0xFF02205C)),
                   SizedBox(width: 10),
                   Text(
-                    'Tarih: ${DateFormat('dd MMM yyyy, HH:mm').format(activity.startTime)}',
+                    '${LocaleKeys.dateLabel.tr()}: ${DateFormat('dd MMM yyyy, HH:mm').format(activity.startTime)}',
                     style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -228,7 +230,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Icon(Icons.directions_walk, color: Colors.green),
                       SizedBox(width: 10),
                       Text(
-                        'Mesafe: ${activity.totalDistance.toStringAsFixed(2)} km',
+                        '${LocaleKeys.distanceLabel.tr()}: ${activity.totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
                         style: TextStyle(fontSize: 14.0),
                       ),
                     ],
@@ -239,7 +241,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Icon(Icons.timer_outlined, color: Colors.blue),
                       SizedBox(width: 10),
                       Text(
-                        'Süre: ${activity.elapsedTime} saniye',
+                        '${LocaleKeys.durationLabel.tr()}: ${activity.elapsedTime} ${LocaleKeys.secondUnit.tr()}',
                         style: TextStyle(fontSize: 14.0),
                       ),
                     ],
@@ -250,14 +252,14 @@ class ActivityHistoryScreen extends StatelessWidget {
                       Icon(Icons.speed, color: Colors.deepOrange),
                       SizedBox(width: 10),
                       Text(
-                        'Ortalama Hız: ${activity.averageSpeed.toStringAsFixed(2)} km/s',
+                        '${LocaleKeys.averageSpeedLabel.tr()}: ${activity.averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}',
                         style: TextStyle(fontSize: 14.0),
                       ),
                     ],
                   ),
                   SizedBox(height: 8),
                   Text(
-                    activity.endTime != null ? 'Durum: Tamamlandı' : 'Durum: Devam Ediyor',
+                    activity.endTime != null ? LocaleKeys.statusCompleted.tr() : LocaleKeys.statusOngoing.tr(),
                     style: TextStyle(
                       fontSize: 14.0,
                       color: activity.endTime != null ? Colors.green : Colors.orange,
@@ -266,7 +268,7 @@ class ActivityHistoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              trailing: Icon(Icons.arrow_forward_ios, color: basarsoft_color, size: 20.0, semanticLabel: 'Detaylar'),
+              trailing: Icon(Icons.arrow_forward_ios, color: basarsoft_color, size: 20.0, semanticLabel: LocaleKeys.detailsLabel.tr()),
               onTap: () {
                 Navigator.push(
                   context,

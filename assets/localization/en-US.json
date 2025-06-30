@@ -86,7 +86,15 @@
   "durationLabel": "Duration",
   "speedLabel": "Speed",
   "startButton": "Start",
-  "stopButton": "Stop"
+  "stopButton": "Stop",
 
-
+  "activityHistoryTitle": "Activity History",
+  "errorOccurred": "An error occurred: {error}",
+  "loginRequired": "User login is required.",
+  "noActivitiesFound": "No activities found.",
+  "dateLabel": "Date",
+  "averageSpeedLabel": "Average Speed",
+  "statusCompleted": "Status: Completed",
+  "statusOngoing": "Status: Ongoing",
+  "detailsLabel": "Details"
 }
