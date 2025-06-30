@@ -4,6 +4,7 @@ import 'package:map_tracker/screens/signup_screen.dart';
 import 'package:map_tracker/theme/theme.dart';
 import 'package:map_tracker/utils/constants.dart';
 import 'package:map_tracker/widgets/custom_scaffold.dart';
+import 'package:map_tracker/widgets/language_switcher.dart';
 import 'package:map_tracker/widgets/welcome_button.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -107,19 +108,9 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20.0),
-                    ElevatedButton(
-                      onPressed: () => _toggleLanguage(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: basarsoft_color,
-                      ),
-                      child: Text(
-                        LocaleKeys.languageToggle.tr(),
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                    const LanguageSwitcher(transparentBackground: true,showLabel: true,),
+
+
                   ],
                 ),
               ),

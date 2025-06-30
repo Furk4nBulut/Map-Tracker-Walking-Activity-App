@@ -6,7 +6,14 @@ import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/utils/constants.dart';
 
 class LanguageSwitcher extends StatelessWidget {
-  const LanguageSwitcher({super.key});
+  final bool transparentBackground; // Arkaplan şeffaf mı?
+  final bool showLabel; // Bayrak altında yazı gözüksün mü?
+
+  const LanguageSwitcher({
+    super.key,
+    this.transparentBackground = false,
+    this.showLabel = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +38,11 @@ class LanguageSwitcher extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: basarsoft_color,
+          color: transparentBackground ? Colors.transparent : basarsoft_color,
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [
+          boxShadow: transparentBackground
+              ? null
+              : [
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
               blurRadius: 4,
@@ -41,11 +50,34 @@ class LanguageSwitcher extends StatelessWidget {
             ),
           ],
         ),
-        child: CountryFlag.fromCountryCode(
-          flagCode,
-          height: 20,
-          width: 30,
-          borderRadius: 4,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CountryFlag.fromCountryCode(
+              flagCode,
+              height: 20,
+              width: 30,
+              borderRadius: 4,
+            ),
+            if (showLabel) ...[
+              const SizedBox(height: 4),
+              Text(
+                LocaleKeys.languageToggle.tr(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black54,
+                      offset: Offset(1, 1),
+                      blurRadius: 2,
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
