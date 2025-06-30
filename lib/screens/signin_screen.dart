@@ -27,53 +27,25 @@ class _SignInScreenState extends State<SignInScreen> {
 
   AuthService get _authService => locator<AuthService>();
   AuthProvider get _authProvider => locator<AuthProvider>();
-
   DatabaseHelper dbHelper = DatabaseHelper();
 
-
-
-  login() async{
-    try {
-      await _authService.signIn(
-        context,
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        toastLength: Toast.LENGTH_LONG,
-      );
-    }
-    var response =  await DatabaseHelper().login(
-        LocalUser(
-          firstName: '',
-          lastName: '',
+  Future<void> login() async {
+    if (_formSignInKey.currentState!.validate()) {
+      try {
+        // Attempt Firebase login
+        await _authService.signIn(
+          context,
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
-        ));
-
-    if(response==true){
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(),
-        ),
-      );
-    }else{
-      Fluttertoast.showToast(
-        msg: "Kullanıcı adı veya şifre hatalı",
-        toastLength: Toast.LENGTH_LONG,
-      );
+        );
+      } catch (e) {
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
     }
-
-
   }
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
               padding: const EdgeInsets.fromLTRB(25.0, 50.0, 25.0, 20.0),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(40.0),
                   topRight: Radius.circular(40.0),
                 ),
@@ -107,7 +79,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.w900,
-                          color: basarsoft_color, // Adjusted color
+                          color: basarsoft_color,
                         ),
                       ),
                       const SizedBox(height: 40.0),
@@ -170,33 +142,21 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            if (_formSignInKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Giriş Yapılıyor...'),
-                                ),
-                              );
-
-                             login();
-                            }
-                          },
+                          onPressed: login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: basarsoft_color, // Adjusted button color
+                            backgroundColor: basarsoft_color,
                           ),
                           child: const Text(
                             'Giriş Yap',
                             style: TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white, // Adjusted text color
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
+                      const SizedBox(height: 30.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -226,9 +186,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
+                      const SizedBox(height: 30.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -236,11 +194,14 @@ class _SignInScreenState extends State<SignInScreen> {
                             onTap: () async {
                               try {
                                 var user = await locator.get<AuthService>().signInWithGoogle();
-                                if (user != null) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => HomePage(),
-                                    settings: RouteSettings(arguments: user),
-                                  ));
+                                if (user != null && context.mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HomePage(),
+                                      settings: RouteSettings(arguments: user),
+                                    ),
+                                  );
                                 } else {
                                   Fluttertoast.showToast(
                                     msg: "Google ile giriş başarısız!",
@@ -254,7 +215,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                 );
                               }
                             },
-
                             child: Image.asset('assets/images/google.png'),
                           ),
                         ],
@@ -262,7 +222,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(height: 25.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-
                         children: [
                           const Text('Henüz Bir Hesabın Yok Mu? '),
                           GestureDetector(

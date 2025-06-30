@@ -23,7 +23,9 @@ class AuthService {
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-        await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
+        LocalUser localUser = LocalUser(email: email, firstName: name, lastName: surname, password: password);
+        await dbHelper.insertUser(localUser);
+        await dbHelper.login(localUser); // Save session
         Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
 
         await _registerUser(name: name, surname: surname, email: email, password: password);
@@ -37,7 +39,6 @@ class AuthService {
   }
 
   Future<void> signIn(BuildContext context, {required String email, required String password}) async {
-    final navigator = Navigator.of(context);
     try {
       final UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
@@ -46,12 +47,12 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
           await dbHelper.insertUser(localUser);
-
-          Fluttertoast.showToast(msg: "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz. Tekrar giriş yapınız!", toastLength: Toast.LENGTH_LONG);
-        } else {
-          await dbHelper.updateUser(localUser);
-          await _syncUserActivitiesFromFirestore(localUser);
-          navigator.push(MaterialPageRoute(builder: (context) => HomePage()));
+          Fluttertoast.showToast(msg: "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.", toastLength: Toast.LENGTH_LONG);
+        }
+        await dbHelper.login(localUser); // Save session
+        await _syncUserActivitiesFromFirestore(localUser);
+        if (context.mounted) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -60,21 +61,38 @@ class AuthService {
   }
 
   Future<User?> signInWithGoogle() async {
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
-    final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
-    final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
-    log(userCredential.user!.email.toString());
-    return userCredential.user;
+    try {
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+      if (gUser == null) return null; // User canceled Google Sign-In
+      final GoogleSignInAuthentication gAuth = await gUser.authentication;
+      final credential = GoogleAuthProvider.credential(accessToken: gAuth.accessToken, idToken: gAuth.idToken);
+      final UserCredential userCredential = await firebaseAuth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+      if (user != null) {
+        LocalUser localUser = LocalUser(
+          firstName: user.displayName?.split(' ')[0] ?? '',
+          lastName: user.displayName?.split(' ').last ?? '',
+          email: user.email ?? '',
+          password: '', // Google users don't need a password
+        );
+        await dbHelper.insertUser(localUser);
+        await dbHelper.login(localUser); // Save session
+        await _syncUserActivitiesFromFirestore(localUser);
+      }
+      return user;
+    } catch (e) {
+      log('Google Sign-In error: $e');
+      return null;
+    }
   }
 
   Future<void> signOut(BuildContext context) async {
-    dbHelper.logout();
+    await dbHelper.logout();
     await firebaseAuth.signOut();
-    await FirebaseAuth.instance.signOut();
-
-    Navigator.of(context).pop();
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => WelcomeScreen()));
+    await GoogleSignIn().signOut();
+    if (context.mounted) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
+    }
   }
 
   Future<void> _registerUser({required String name, required String surname, required String email, required String password}) async {
