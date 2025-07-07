@@ -15,6 +15,7 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import '../utils/constants.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
@@ -45,10 +46,7 @@ class AuthService {
       // İnternet bağlantısını kontrol et
       bool isConnected = await checkInternetConnection();
       if (!isConnected) {
-        Fluttertoast.showToast(
-          msg: "İnternet bağlantınızı kontrol edin ve tekrar deneyin.",
-          toastLength: Toast.LENGTH_LONG,
-        );
+        showErrorSnackbar(context, "İnternet bağlantınızı kontrol edin ve tekrar deneyin.");
         return;
       }
 
@@ -57,10 +55,10 @@ class AuthService {
         // Şifreyi hashle
         String hashedPassword = sha256.convert(utf8.encode(password)).toString();
         await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: hashedPassword));
-        Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
+        showErrorSnackbar(context, "Kullanıcı başarıyla kaydedildi.");
 
         await _registerUser(name: name, surname: surname, email: email); // Şifreyi Firestore'a gönderme
-        Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
+        showErrorSnackbar(context, "Kullanıcı online olarak kaydedildi.");
 
         // Oturum bayrağını ayarla
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -81,10 +79,10 @@ class AuthService {
         default:
           errorMessage = e.message ?? "Kayıt olurken hata oluştu.";
       }
-      Fluttertoast.showToast(msg: errorMessage, toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, errorMessage, debugMessage: e.toString());
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WelcomeScreen()));
     } catch (e) {
-      Fluttertoast.showToast(msg: "Kayıt olurken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, "Kayıt olurken bir hata oluştu. Lütfen tekrar deneyin.", debugMessage: e.toString());
     }
   }
 
@@ -94,25 +92,16 @@ class AuthService {
       // İnternet bağlantısını kontrol et
       bool isConnected = await checkInternetConnection();
       if (!isConnected) {
-        Fluttertoast.showToast(
-          msg: "İnternet bağlantınızı kontrol edin ve tekrar deneyin.",
-          toastLength: Toast.LENGTH_LONG,
-        );
+        showErrorSnackbar(context, "İnternet bağlantınızı kontrol edin ve tekrar deneyin.");
         // Çevrimdışı giriş denemesi
         String hashedPassword = sha256.convert(utf8.encode(password)).toString();
         var localUser = await dbHelper.getUserByEmail(email);
         if (localUser != null && localUser.password == hashedPassword && await dbHelper.login(LocalUser(email: email, firstName: localUser.firstName, lastName: localUser.lastName, password: hashedPassword, id: localUser.id))) {
           navigator.pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-          Fluttertoast.showToast(
-            msg: "Çevrimdışı giriş başarılı!",
-            toastLength: Toast.LENGTH_LONG,
-          );
+          showErrorSnackbar(context, "Çevrimdışı giriş başarılı.");
           return;
         } else {
-          Fluttertoast.showToast(
-            msg: "Çevrimdışı giriş başarısız. Lütfen internet bağlantısıyla giriş yapın.",
-            toastLength: Toast.LENGTH_LONG,
-          );
+          showErrorSnackbar(context, "Çevrimdışı giriş başarısız. Lütfen internet bağlantısıyla giriş yapın.");
           return;
         }
       }
@@ -125,10 +114,7 @@ class AuthService {
           var firstName = email.split('@')[0];
           localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: hashedPassword);
           await dbHelper.insertUser(localUser);
-          Fluttertoast.showToast(
-            msg: "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.",
-            toastLength: Toast.LENGTH_LONG,
-          );
+          showErrorSnackbar(context, "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.");
         } else {
           await dbHelper.updateUser(localUser);
           await _syncUserActivitiesFromFirestore(localUser);
@@ -136,7 +122,7 @@ class AuthService {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setBool('isLoggedIn', true);
           navigator.pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-          Fluttertoast.showToast(msg: "Giriş başarılı!", toastLength: Toast.LENGTH_LONG);
+          showErrorSnackbar(context, "Giriş başarılı.");
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -154,9 +140,9 @@ class AuthService {
         default:
           errorMessage = e.message ?? "Giriş yaparken hata oluştu.";
       }
-      Fluttertoast.showToast(msg: errorMessage, toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, errorMessage, debugMessage: e.toString());
     } catch (e) {
-      Fluttertoast.showToast(msg: "Giriş yaparken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, "Giriş yaparken bir hata oluştu. Lütfen tekrar deneyin.", debugMessage: e.toString());
     }
   }
 
@@ -165,10 +151,7 @@ class AuthService {
       // İnternet bağlantısını kontrol et
       bool isConnected = await checkInternetConnection();
       if (!isConnected) {
-        Fluttertoast.showToast(
-          msg: "İnternet bağlantınızı kontrol edin ve tekrar deneyin.",
-          toastLength: Toast.LENGTH_LONG,
-        );
+        showErrorSnackbar(context, "İnternet bağlantınızı kontrol edin ve tekrar deneyin.");
         return null;
       }
 
@@ -176,10 +159,7 @@ class AuthService {
       await googleSignIn.signOut(); // Önceki oturumu temizle
       final GoogleSignInAccount? gUser = await googleSignIn.signIn();
       if (gUser == null) {
-        Fluttertoast.showToast(
-          msg: "Google ile giriş iptal edildi.",
-          toastLength: Toast.LENGTH_LONG,
-        );
+        showErrorSnackbar(context, "Google ile giriş iptal edildi.");
         return null; // Kullanıcı girişi iptal etti
       }
 
@@ -201,23 +181,15 @@ class AuthService {
             password: '', // Google Sign-In için şifre yok
           );
           await dbHelper.insertUser(localUser);
-          Fluttertoast.showToast(
-            msg: "Kullanıcı yerele kaydedildi.",
-            toastLength: Toast.LENGTH_LONG,
-          );
+          showErrorSnackbar(context, "Kullanıcı yerele kaydedildi.");
         }
 
         // Oturum bayrağını ayarla
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
 
-
-
         // Başarılı giriş mesajı
-        Fluttertoast.showToast(
-          msg: "Google ile giriş başarılı!",
-          toastLength: Toast.LENGTH_LONG,
-        );
+        showErrorSnackbar(context, "Google ile giriş başarılı.");
 
         // HomePage'e yönlendir
         Navigator.of(context).pushReplacement(
@@ -226,8 +198,6 @@ class AuthService {
             settings: RouteSettings(arguments: userCredential.user),
           ),
         );
-        // Firestore'dan aktiviteleri senkronize et
-        await _syncUserActivitiesFromFirestore(localUser);
         log(userCredential.user!.email.toString());
         return userCredential.user;
       }
@@ -247,16 +217,10 @@ class AuthService {
         default:
           errorMessage = "Google ile giriş başarısız: ${e.message}";
       }
-      Fluttertoast.showToast(
-        msg: errorMessage,
-        toastLength: Toast.LENGTH_LONG,
-      );
+      showErrorSnackbar(context, errorMessage, debugMessage: e.toString());
       return null;
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Google ile giriş sırasında bilinmeyen bir hata oluştu: $e",
-        toastLength: Toast.LENGTH_LONG,
-      );
+      showErrorSnackbar(context, "Google ile giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.", debugMessage: e.toString());
       return null;
     }
   }
@@ -274,9 +238,9 @@ class AuthService {
         MaterialPageRoute(builder: (context) => WelcomeScreen()),
             (Route<dynamic> route) => false,
       );
-      Fluttertoast.showToast(msg: "Çıkış yapıldı.", toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, "Çıkış yapıldı.");
     } catch (e) {
-      Fluttertoast.showToast(msg: "Çıkış yaparken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, "Çıkış yaparken bir hata oluştu. Lütfen tekrar deneyin.", debugMessage: e.toString());
     }
   }
 
@@ -288,7 +252,8 @@ class AuthService {
         "surname": surname,
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: "Kullanıcı kaydı Firestore'a yapılırken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+      debugPrint("Kullanıcı kaydı Firestore'a yapılırken hata oluştu: $e");
+      throw Exception("Kullanıcı kaydı Firestore'a yapılırken hata oluştu.");
     }
   }
 
@@ -337,13 +302,13 @@ class AuthService {
             user: localUser,
             startTime: (data['startTime'] as Timestamp).toDate(),
             endTime: (data['endTime'] as Timestamp).toDate(),
-            totalDistance: data['totalDistance'],
-            elapsedTime: data['elapsedTime'],
-            averageSpeed: data['averageSpeed'],
-            startPositionLat: startPosition?.latitude,
-            startPositionLng: startPosition?.longitude,
-            endPositionLat: endPosition?.latitude,
-            endPositionLng: endPosition?.longitude,
+            totalDistance: (data['totalDistance'] ?? 0.0).toDouble(),
+            elapsedTime: (data['elapsedTime'] ?? 0).toInt(),
+            averageSpeed: (data['averageSpeed'] ?? 0.0).toDouble(),
+            startPositionLat: data['startPosition']?['latitude'],
+            startPositionLng: data['startPosition']?['longitude'],
+            endPositionLat: data['endPosition']?['latitude'],
+            endPositionLng: data['endPosition']?['longitude'],
             route: route,
             id: activityId,
           );
@@ -354,7 +319,7 @@ class AuthService {
       }
     } catch (e) {
       debugPrint('Aktiviteleri senkronize ederken hata oluştu: $e');
-      throw 'Aktiviteleri senkronize ederken hata oluştu: $e';
+      throw Exception('Aktiviteleri senkronize ederken hata oluştu.');
     }
   }
 
@@ -364,7 +329,7 @@ class AuthService {
       Fluttertoast.showToast(msg: "Aktiviteler senkronize edildi!", toastLength: Toast.LENGTH_LONG);
     } catch (e) {
       debugPrint("Aktiviteleri senkronize ederken hata oluştu: $e");
-      Fluttertoast.showToast(msg: "Aktiviteleri senkronize ederken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);
+      showErrorSnackbar(context, "Aktiviteleri senkronize ederken bir hata oluştu.", debugMessage: e.toString());
     }
   }
 }

@@ -25,6 +25,10 @@ class _WeatherWidgetState extends State<WeatherWidget> {
   }
 
   Future<void> _fetchUserLocation() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -32,7 +36,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     if (!serviceEnabled) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Konum servisleri devre dışı.';
+        _errorMessage = 'Konum servisleri devre dışı. Lütfen konum servislerini açın.';
       });
       return;
     }
@@ -43,7 +47,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
       if (permission == LocationPermission.denied) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Konum izinleri reddedildi.';
+          _errorMessage = 'Konum izni verilmedi. Lütfen uygulamaya konum izni verin.';
         });
         return;
       }
@@ -52,7 +56,7 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     if (permission == LocationPermission.deniedForever) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Konum izinleri kalıcı olarak reddedildi.';
+        _errorMessage = 'Konum izni kalıcı olarak reddedildi. Ayarlardan izin verin.';
       });
       return;
     }
@@ -63,8 +67,9 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Konum alınamadı: $e';
+        _errorMessage = 'Konum alınamadı. Lütfen tekrar deneyin.';
       });
+      debugPrint('Konum alınamadı: $e');
       return;
     }
 
@@ -76,28 +81,43 @@ class _WeatherWidgetState extends State<WeatherWidget> {
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
-        String country = placemark.country ?? "Bilinmeyen Ülke";
-        String city = placemark.locality ?? "Bilinmeyen Şehir";
-        String district = placemark.subLocality ?? "Bilinmeyen Bölge";
-
-        _fetchWeather(country, city, district);
+        String? city = placemark.locality;
+        if (city == null || city.isEmpty) {
+          city = placemark.subAdministrativeArea;
+        }
+        if (city == null || city.isEmpty) {
+          city = placemark.administrativeArea;
+        }
+        city = city ?? '';
+        city = normalizeCityName(city);
+        String countryCode = placemark.isoCountryCode ?? '';
+        debugPrint('OpenWeather Query: city=$city, countryCode=$countryCode');
+        if (city.isEmpty || countryCode.isEmpty) {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = 'Konumdan şehir bilgisi alınamadı. Lütfen konumunuzu kontrol edin veya manuel girin.';
+          });
+          return;
+        }
+        String location = '$city,$countryCode';
+        _fetchWeather(location);
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Konum belirlenemedi.';
+          _errorMessage = 'Konum belirlenemedi. Lütfen tekrar deneyin.';
         });
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Konum alınırken hata oluştu: $e';
+        _errorMessage = 'Konum alınırken hata oluştu. Lütfen tekrar deneyin.';
       });
+      debugPrint('Konum alınırken hata oluştu: $e');
     }
   }
 
-  Future<void> _fetchWeather(String country, String city, String district) async {
+  Future<void> _fetchWeather(String location) async {
     try {
-      String location = "$district, $city, $country";
       Weather weather = await _wf.currentWeatherByCityName(location);
       setState(() {
         _weather = weather;
@@ -107,8 +127,9 @@ class _WeatherWidgetState extends State<WeatherWidget> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Hava durumu getirilirken hata oluştu: $e';
+        _errorMessage = 'Hava durumu alınamadı. Lütfen tekrar deneyin.';
       });
+      debugPrint('Hava durumu getirilirken hata oluştu: $e');
     }
   }
 
@@ -291,5 +312,22 @@ class _WeatherWidgetState extends State<WeatherWidget> {
         ],
       ),
     );
+  }
+
+  String normalizeCityName(String city) {
+    return city
+        .replaceAll('İ', 'I')
+        .replaceAll('ı', 'i')
+        .replaceAll('Ğ', 'G')
+        .replaceAll('ğ', 'g')
+        .replaceAll('Ü', 'U')
+        .replaceAll('ü', 'u')
+        .replaceAll('Ş', 'S')
+        .replaceAll('ş', 's')
+        .replaceAll('Ö', 'O')
+        .replaceAll('ö', 'o')
+        .replaceAll('Ç', 'C')
+        .replaceAll('ç', 'c')
+        .trim();
   }
 }
