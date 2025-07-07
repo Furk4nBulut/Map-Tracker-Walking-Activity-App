@@ -14,9 +14,17 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    if (e.toString().contains('A Firebase App named "[DEFAULT]" already exists')) {
+      // ignore
+    } else {
+      rethrow;
+    }
+  }
   await EasyLocalization.ensureInitialized();
   setupLocator();
   await MobileAds.instance.initialize();
@@ -43,7 +51,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: LocaleKeys.appTitle.tr(),
+      title: "Map Tracker",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,

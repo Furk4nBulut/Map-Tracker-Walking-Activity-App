@@ -6,6 +6,8 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+apply plugin: 'com.google.gms.google-services'
+
 // 👉 Keystore bilgilerini key.properties dosyasından yükle
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file("key.properties")
@@ -60,4 +62,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-ads:23.0.0'
 }
