@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:map_tracker/widgets/admob_banner.dart';
 
 class StatisticPage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -187,12 +188,14 @@ class StatisticPage extends StatelessWidget {
                   subtitle: '$activityCount',
                   iconColor: Colors.white,
                 ),
-                SizedBox(height: 70.0), // Add space at the bottom
+                SizedBox(height: 16),
+                AdmobBanner(),
               ],
             ),
           );
         },
       ),
+      bottomNavigationBar: null,
     );
   }
 

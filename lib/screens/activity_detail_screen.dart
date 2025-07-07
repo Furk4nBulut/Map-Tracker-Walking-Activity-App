@@ -9,45 +9,60 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import '../model/user_model.dart';
+import 'package:map_tracker/widgets/admob_interstitial.dart';
 
-class ActivityDetailScreen extends StatelessWidget {
+class ActivityDetailScreen extends StatefulWidget {
   final String activityId;
 
   const ActivityDetailScreen({Key? key, required this.activityId}) : super(key: key);
 
+  @override
+  State<ActivityDetailScreen> createState() => _ActivityDetailScreenState();
+}
+
+class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
+  final AdmobInterstitial _admobInterstitial = AdmobInterstitial();
+  bool _adShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _admobInterstitial.loadAd(onLoaded: () {
+      if (!_adShown) {
+        _admobInterstitial.showAd();
+        _adShown = true;
+      }
+    });
+  }
+
   Future<Activity?> _fetchActivity() async {
-    final localActivity = await DatabaseHelper().getActivityById(activityId);
+    final localActivity = await DatabaseHelper().getActivityById(widget.activityId);
     if (localActivity != null) {
       return localActivity;
     }
-
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
       return null;
     }
-
     final doc = await FirebaseFirestore.instance
         .collection('user')
         .doc(firebaseUser.uid)
         .collection('activities')
-        .doc(activityId)
+        .doc(widget.activityId)
         .get();
-
     if (!doc.exists) {
       return null;
     }
-
     final data = doc.data()!;
     final routeData = data['route'] as List<dynamic>?;
     final route = routeData != null
         ? routeData
-        .map((point) => osm.GeoPoint(
-      latitude: point['lat'] as double,
-      longitude: point['lng'] as double,
-    ))
-        .toList()
+            .map((point) => osm.GeoPoint(
+                  latitude: point['lat'] as double,
+                  longitude: point['lng'] as double,
+                ))
+            .toList()
         : <osm.GeoPoint>[];
-
     return Activity(
       id: doc.id,
       user: LocalUser(

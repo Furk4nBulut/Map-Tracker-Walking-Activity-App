@@ -11,6 +11,7 @@ import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:map_tracker/widgets/admob_banner.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -237,6 +238,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             _buildSectionDivider(),
+            AdmobBanner(),
           ],
         ),
       ),

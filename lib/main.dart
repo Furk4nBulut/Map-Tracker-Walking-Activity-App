@@ -10,6 +10,7 @@ import 'utils/constants.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'localization/locale_keys.g.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
   );
   await EasyLocalization.ensureInitialized();
   setupLocator();
+  await MobileAds.instance.initialize();
   runApp(
     EasyLocalization(
       supportedLocales: LanguageManager.instance.supportedLocales,
