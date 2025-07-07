@@ -11,6 +11,8 @@ import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/services/local_db_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 final locator = GetIt.instance;
 
@@ -34,10 +36,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   login() async {
     try {
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+      String hashedPassword = sha256.convert(utf8.encode(password)).toString();
       await _authService.signIn(
         context,
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+        email: email,
+        password: password,
       );
     } catch (e) {
       Fluttertoast.showToast(
@@ -50,7 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
         firstName: '',
         lastName: '',
         email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+        password: sha256.convert(utf8.encode(_passwordController.text.trim())).toString(),
       ),
     );
 

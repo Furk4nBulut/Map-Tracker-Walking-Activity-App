@@ -13,6 +13,8 @@ import 'package:map_tracker/model/user_model.dart';
 import 'package:map_tracker/model/activity_model.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart' as osm;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("user");
@@ -52,10 +54,12 @@ class AuthService {
 
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
-        await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: password));
+        // Şifreyi hashle
+        String hashedPassword = sha256.convert(utf8.encode(password)).toString();
+        await dbHelper.insertUser(LocalUser(email: email, firstName: name, lastName: surname, password: hashedPassword));
         Fluttertoast.showToast(msg: "Yerele kaydedildi!", toastLength: Toast.LENGTH_LONG);
 
-        await _registerUser(name: name, surname: surname, email: email, password: password);
+        await _registerUser(name: name, surname: surname, email: email); // Şifreyi Firestore'a gönderme
         Fluttertoast.showToast(msg: "Online olarak kaydedildi!", toastLength: Toast.LENGTH_LONG);
 
         // Oturum bayrağını ayarla
@@ -95,8 +99,9 @@ class AuthService {
           toastLength: Toast.LENGTH_LONG,
         );
         // Çevrimdışı giriş denemesi
+        String hashedPassword = sha256.convert(utf8.encode(password)).toString();
         var localUser = await dbHelper.getUserByEmail(email);
-        if (localUser != null && await dbHelper.login(localUser)) {
+        if (localUser != null && localUser.password == hashedPassword && await dbHelper.login(LocalUser(email: email, firstName: localUser.firstName, lastName: localUser.lastName, password: hashedPassword, id: localUser.id))) {
           navigator.pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
           Fluttertoast.showToast(
             msg: "Çevrimdışı giriş başarılı!",
@@ -114,10 +119,11 @@ class AuthService {
 
       final UserCredential userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       if (userCredential.user != null) {
+        String hashedPassword = sha256.convert(utf8.encode(password)).toString();
         var localUser = await dbHelper.getUserByEmail(email);
         if (localUser == null) {
           var firstName = email.split('@')[0];
-          localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: password);
+          localUser = LocalUser(email: email, firstName: firstName, lastName: '', password: hashedPassword);
           await dbHelper.insertUser(localUser);
           Fluttertoast.showToast(
             msg: "Kullanıcı yerele kaydedildi. Çevrimdışı giriş yapabilirsiniz.",
@@ -274,13 +280,12 @@ class AuthService {
     }
   }
 
-  Future<void> _registerUser({required String name, required String surname, required String email, required String password}) async {
+  Future<void> _registerUser({required String name, required String surname, required String email}) async {
     try {
       await userCollection.doc(firebaseAuth.currentUser!.uid).set({
         "email": email,
         "name": name,
         "surname": surname,
-        "password": password,
       });
     } catch (e) {
       Fluttertoast.showToast(msg: "Kullanıcı kaydı Firestore'a yapılırken hata oluştu: $e", toastLength: Toast.LENGTH_LONG);

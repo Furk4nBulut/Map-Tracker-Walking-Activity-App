@@ -11,6 +11,8 @@ import 'package:map_tracker/services/local_db_service.dart';
 import 'package:map_tracker/model/user_model.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 final locator = GetIt.instance;
 
@@ -38,6 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final String lastName = _lastNameController.text.trim();
       final String email = _emailController.text.trim();
       final String password = _passwordController.text.trim();
+      final String hashedPassword = sha256.convert(utf8.encode(password)).toString();
 
       if (_formSignupKey.currentState!.validate() && agreePersonalData) {
         ScaffoldMessenger.of(context).showSnackBar(
