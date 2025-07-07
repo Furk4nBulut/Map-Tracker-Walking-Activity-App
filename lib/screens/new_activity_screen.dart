@@ -14,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
+import 'package:map_tracker/widgets/admob_banner.dart';
 
 class NewActivityScreen extends StatefulWidget {
   const NewActivityScreen({Key? key}) : super(key: key);
@@ -464,10 +465,20 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       appBar: CustomAppBar(title: LocaleKeys.newActivityTitle.tr()),
       body: Column(
         children: [
-          const WeatherWidget(),
-          _buildMap(),
-          _buildActivityStats(),
-          _buildActivityButtons(),
+          Expanded(
+            child: Column(
+              children: [
+                const WeatherWidget(),
+                _buildMap(),
+                _buildActivityStats(),
+                _buildActivityButtons(),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: AdmobBanner(),
+          ),
         ],
       ),
     );

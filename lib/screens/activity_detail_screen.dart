@@ -10,6 +10,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import '../model/user_model.dart';
 import 'package:map_tracker/widgets/admob_interstitial.dart';
+import 'package:map_tracker/widgets/admob_banner.dart';
 
 class ActivityDetailScreen extends StatefulWidget {
   final String activityId;
@@ -126,87 +127,96 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: osm.OSMFlutter(
-                  controller: mapController,
-                  osmOption: const osm.OSMOption(),
-                  mapIsLoading: const Center(child: CircularProgressIndicator()),
-                  onMapIsReady: (isReady) async {
-                    if (isReady && route.isNotEmpty) {
-                      await mapController.setZoom(zoomLevel: 15);
-                      if (route.length > 1) {
-                        await mapController.drawRoad(
-                          route.first,
-                          route.last,
-                          roadType: osm.RoadType.foot,
-                          roadOption: const osm.RoadOption(
-                            roadColor: Colors.blue,
-                            roadWidth: 5,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: osm.OSMFlutter(
+                        controller: mapController,
+                        osmOption: const osm.OSMOption(),
+                        mapIsLoading: const Center(child: CircularProgressIndicator()),
+                        onMapIsReady: (isReady) async {
+                          if (isReady && route.isNotEmpty) {
+                            await mapController.setZoom(zoomLevel: 15);
+                            if (route.length > 1) {
+                              await mapController.drawRoad(
+                                route.first,
+                                route.last,
+                                roadType: osm.RoadType.foot,
+                                roadOption: const osm.RoadOption(
+                                  roadColor: Colors.blue,
+                                  roadWidth: 5,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        color: Colors.blue.shade50,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ListTile(
+                                      leading: const Icon(Icons.timer, color: Colors.blue),
+                                      title: Text(LocaleKeys.startDateLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                      subtitle: Text(DateFormat('dd MMMM yyyy, HH:mm').format(startTime)),
+                                    ),
+                                  ),
+                                  if (endTime != null)
+                                    Expanded(
+                                      child: ListTile(
+                                        leading: const Icon(Icons.timer_off, color: Colors.red),
+                                        title: Text(LocaleKeys.endDateLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                        subtitle: Text(DateFormat('dd MMMM yyyy, HH:mm').format(endTime)),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              const Divider(),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ListTile(
+                                      leading: const Icon(Icons.directions_walk, color: Colors.green),
+                                      title: Text(LocaleKeys.distanceLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                      subtitle: Text('${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}'),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: ListTile(
+                                      leading: const Icon(Icons.speed, color: Colors.deepOrange),
+                                      title: Text(LocaleKeys.averageSpeedLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                      subtitle: Text('${activity.averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        );
-                      }
-                    }
-                  },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  color: Colors.blue.shade50,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ListTile(
-                                leading: const Icon(Icons.timer, color: Colors.blue),
-                                title: Text(LocaleKeys.startDateLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                subtitle: Text(DateFormat('dd MMMM yyyy, HH:mm').format(startTime)),
-                              ),
-                            ),
-                            if (endTime != null)
-                              Expanded(
-                                child: ListTile(
-                                  leading: const Icon(Icons.timer_off, color: Colors.red),
-                                  title: Text(LocaleKeys.endDateLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                  subtitle: Text(DateFormat('dd MMMM yyyy, HH:mm').format(endTime)),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        const Divider(),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ListTile(
-                                leading: const Icon(Icons.directions_walk, color: Colors.green),
-                                title: Text(LocaleKeys.distanceLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                subtitle: Text('${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}'),
-                              ),
-                            ),
-                            Expanded(
-                              child: ListTile(
-                                leading: const Icon(Icons.speed, color: Colors.deepOrange),
-                                title: Text(LocaleKeys.averageSpeedLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                subtitle: Text('${activity.averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                ),
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: AdmobBanner(),
               ),
             ],
           ),
