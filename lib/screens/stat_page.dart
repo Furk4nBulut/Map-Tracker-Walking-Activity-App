@@ -116,84 +116,87 @@ class StatisticPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: LocaleKeys.statisticsTitle.tr(),
-        automaticallyImplyLeading: true,
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _getUserStatistics(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
+      appBar: CustomAppBar(title: LocaleKeys.statisticsTitle.tr()),
+      body: Column(
+        children: [
+          AdmobBanner(),
+          Expanded(
+            child: FutureBuilder<Map<String, dynamic>>(
+              future: _getUserStatistics(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-          if (snapshot.hasError) {
-            return Center(child: Text(LocaleKeys.statsError.tr(args: [snapshot.error.toString()])));
-          }
+                if (snapshot.hasError) {
+                  return Center(child: Text(LocaleKeys.statsError.tr(args: [snapshot.error.toString()])));
+                }
 
-          if (!snapshot.hasData) {
-            return Center(child: Text(LocaleKeys.dataLoadFailed.tr()));
-          }
+                if (!snapshot.hasData) {
+                  return Center(child: Text(LocaleKeys.dataLoadFailed.tr()));
+                }
 
-          Map<String, dynamic> stats = snapshot.data!;
-          double totalDistance = stats['totalDistance'];
-          Duration totalDuration = stats['totalDuration'];
-          double averageDistance = stats['averageDistance'];
-          Duration averageDuration = stats['averageDuration'];
-          int activityCount = stats['activityCount'];
-          double averageSpeed = stats['averageSpeed'];
+                Map<String, dynamic> stats = snapshot.data!;
+                double totalDistance = stats['totalDistance'];
+                Duration totalDuration = stats['totalDuration'];
+                double averageDistance = stats['averageDistance'];
+                Duration averageDuration = stats['averageDuration'];
+                int activityCount = stats['activityCount'];
+                double averageSpeed = stats['averageSpeed'];
 
-          String formattedTotalDuration = _formatDuration(totalDuration);
-          String formattedAverageDuration = _formatDuration(averageDuration);
-          String formattedAverageSpeed = averageSpeed.toStringAsFixed(2); // Format average speed to show two decimal places
+                String formattedTotalDuration = _formatDuration(totalDuration);
+                String formattedAverageDuration = _formatDuration(averageDuration);
+                String formattedAverageSpeed = averageSpeed.toStringAsFixed(2); // Format average speed to show two decimal places
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildStatItem(
-                  icon: Icons.directions_walk,
-                  title: LocaleKeys.totalDistance.tr(),
-                  subtitle: '${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
-                  iconColor: Colors.green,
-                ),
-                _buildStatItem(
-                  icon: Icons.add_road,
-                  title: LocaleKeys.averageDistance.tr(),
-                  subtitle: '${averageDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
-                  iconColor: Colors.green,
-                ),
-                _buildStatItem(
-                  icon: Icons.timer_outlined,
-                  title: LocaleKeys.totalDuration.tr(),
-                  subtitle: formattedTotalDuration,
-                  iconColor: basarsoft_color_light,
-                ),
-                _buildStatItem(
-                  icon: Icons.timelapse_rounded,
-                  title: LocaleKeys.averageDuration.tr(),
-                  subtitle: formattedAverageDuration,
-                  iconColor: Colors.blueAccent,
-                ),
-                _buildStatItem(
-                  icon: Icons.speed_outlined,
-                  title: LocaleKeys.averageSpeed.tr(),
-                  subtitle: '${formattedAverageSpeed} ${LocaleKeys.kmPerHourUnit.tr()}',
-                  iconColor: Colors.red,
-                ),
-                _buildStatItem(
-                  icon: Icons.fitness_center,
-                  title: LocaleKeys.activityCount.tr(),
-                  subtitle: '$activityCount',
-                  iconColor: Colors.white,
-                ),
-                SizedBox(height: 16),
-                AdmobBanner(),
-              ],
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildStatItem(
+                        icon: Icons.directions_walk,
+                        title: LocaleKeys.totalDistance.tr(),
+                        subtitle: '${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
+                        iconColor: Colors.green,
+                      ),
+                      _buildStatItem(
+                        icon: Icons.add_road,
+                        title: LocaleKeys.averageDistance.tr(),
+                        subtitle: '${averageDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
+                        iconColor: Colors.green,
+                      ),
+                      _buildStatItem(
+                        icon: Icons.timer_outlined,
+                        title: LocaleKeys.totalDuration.tr(),
+                        subtitle: formattedTotalDuration,
+                        iconColor: basarsoft_color_light,
+                      ),
+                      _buildStatItem(
+                        icon: Icons.timelapse_rounded,
+                        title: LocaleKeys.averageDuration.tr(),
+                        subtitle: formattedAverageDuration,
+                        iconColor: Colors.blueAccent,
+                      ),
+                      _buildStatItem(
+                        icon: Icons.speed_outlined,
+                        title: LocaleKeys.averageSpeed.tr(),
+                        subtitle: '${formattedAverageSpeed} ${LocaleKeys.kmPerHourUnit.tr()}',
+                        iconColor: Colors.red,
+                      ),
+                      _buildStatItem(
+                        icon: Icons.fitness_center,
+                        title: LocaleKeys.activityCount.tr(),
+                        subtitle: '$activityCount',
+                        iconColor: Colors.white,
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
       bottomNavigationBar: null,
     );

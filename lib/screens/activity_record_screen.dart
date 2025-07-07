@@ -24,54 +24,18 @@ class ActivityHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: CustomAppBar(title: LocaleKeys.activityHistoryTitle.tr(), automaticallyImplyLeading: true),
-      body: FutureBuilder<LocalUser?>(
-        future: DatabaseHelper().getCurrentUser(),
-        builder: (context, AsyncSnapshot<LocalUser?> localUserSnapshot) {
-          if (localUserSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (localUserSnapshot.hasError) {
-            return Center(child: Text(LocaleKeys.errorOccurred.tr(args: [localUserSnapshot.error.toString()])));
-          }
-
-          if (localUserSnapshot.data != null) {
-            final localUser = localUserSnapshot.data!;
-            return FutureBuilder<List<Activity>>(
-              future: DatabaseHelper().getUserActivities(localUser.id!),
-              builder: (context, AsyncSnapshot<List<Activity>> activitiesSnapshot) {
-                if (activitiesSnapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                if (activitiesSnapshot.hasError) {
-                  return Center(child: Text(LocaleKeys.errorOccurred.tr(args: [activitiesSnapshot.error.toString()])));
-                }
-
-                final activities = activitiesSnapshot.data;
-
-                if (activities == null || activities.isEmpty) {
-                  return _fetchActivitiesFromFirestore(localUser.id!.toString());
-                }
-
-                return buildActivityList(activities, context);
-              },
-            );
-          } else {
-            final User? firebaseUser = FirebaseAuth.instance.currentUser;
-
-            if (firebaseUser == null) {
-              return Scaffold(
-                appBar: CustomAppBar(title: LocaleKeys.activityHistoryTitle.tr(), automaticallyImplyLeading: true),
-                body: Center(child: Text(LocaleKeys.loginRequired.tr())),
-              );
-            }
-
-            return _fetchActivitiesFromFirestore(firebaseUser.uid);
-          }
-        },
+      body: Column(
+        children: [
+          AdmobBanner(),
+          Expanded(
+            child: firebaseUser == null
+                ? Center(child: Text(LocaleKeys.loginRequired.tr()))
+                : _fetchActivitiesFromFirestore(firebaseUser.uid),
+          ),
+        ],
       ),
       bottomNavigationBar: null,
     );
@@ -207,7 +171,6 @@ class ActivityHistoryScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          AdmobBanner(),
         ],
       ),
     );
@@ -305,7 +268,6 @@ class ActivityHistoryScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          AdmobBanner(),
         ],
       ),
     );

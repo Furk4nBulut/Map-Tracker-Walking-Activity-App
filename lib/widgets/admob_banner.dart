@@ -46,10 +46,13 @@ class _AdmobBannerState extends State<AdmobBanner> {
   @override
   Widget build(BuildContext context) {
     if (!_isLoaded) return SizedBox.shrink();
-    return Container(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
+        width: _bannerAd!.size.width.toDouble(),
+        height: _bannerAd!.size.height.toDouble(),
+        child: AdWidget(ad: _bannerAd!),
+      ),
     );
   }
 } 

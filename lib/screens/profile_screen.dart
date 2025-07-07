@@ -136,210 +136,216 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: LocaleKeys.profileTitle.tr(), automaticallyImplyLeading: true),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: Future.wait([_fetchUserStatistics(), _fetchUserProfile()]),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          AdmobBanner(),
+          Expanded(
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: Future.wait([_fetchUserStatistics(), _fetchUserProfile()]),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-          if (snapshot.hasError) {
-            return Center(child: Text(LocaleKeys.userStatsError.tr(args: [snapshot.error.toString()])));
-          }
+                if (snapshot.hasError) {
+                  return Center(child: Text(LocaleKeys.userStatsError.tr(args: [snapshot.error.toString()])));
+                }
 
-          if (!snapshot.hasData) {
-            return Center(child: Text(LocaleKeys.dataLoadFailed.tr()));
-          }
+                if (!snapshot.hasData) {
+                  return Center(child: Text(LocaleKeys.dataLoadFailed.tr()));
+                }
 
-          final stats = snapshot.data![0];
-          final profile = snapshot.data![1];
+                final stats = snapshot.data![0];
+                final profile = snapshot.data![1];
 
-          double totalDistance = stats['totalDistance'];
-          Duration totalDuration = stats['totalDuration'];
-          double averageDistance = stats['averageDistance'];
-          Duration averageDuration = stats['averageDuration'];
-          int activityCount = stats['activityCount'];
-          double averageSpeed = stats['averageSpeed'];
+                double totalDistance = stats['totalDistance'];
+                Duration totalDuration = stats['totalDuration'];
+                double averageDistance = stats['averageDistance'];
+                Duration averageDuration = stats['averageDuration'];
+                int activityCount = stats['activityCount'];
+                double averageSpeed = stats['averageSpeed'];
 
-          String formattedTotalDuration = _formatDuration(totalDuration);
-          String formattedAverageDuration = _formatDuration(averageDuration);
+                String formattedTotalDuration = _formatDuration(totalDuration);
+                String formattedAverageDuration = _formatDuration(averageDuration);
 
-          return ListView(
-            padding: EdgeInsets.only(bottom: 90.0, top: 5.0),
-            children: [
-              Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                return ListView(
+                  padding: EdgeInsets.only(bottom: 90.0, top: 5.0),
                   children: [
-                    Hero(
-                      tag: 'userProfileImage',
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: basarsoft_color,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        padding: EdgeInsets.all(6),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: profile['photoURL'] != ''
-                              ? NetworkImage(profile['photoURL']!)
-                              : null,
-                          child: profile['photoURL'] == ''
-                              ? const Icon(Icons.person, size: 50)
-                              : null,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text(
-                      profile['name']!,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 4.0),
-                    Text(
-                      profile['email']!,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    SizedBox(height: 8.0),
-                    Card(
-                      color: Colors.white,
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                      shadowColor: basarsoft_color,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: _buildStatItem(
-                                    Icons.directions_walk,
-                                    LocaleKeys.totalDistanceLabel.tr(),
-                                    '${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
-                                    Colors.green,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _buildStatItem(
-                                    Icons.add_road,
-                                    LocaleKeys.averageDistanceLabel.tr(),
-                                    '${averageDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
-                                    Colors.green,
-                                  ),
-                                ),
-                              ],
+                    Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Hero(
+                            tag: 'userProfileImage',
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: basarsoft_color,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              padding: EdgeInsets.all(6),
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundImage: profile['photoURL'] != ''
+                                    ? NetworkImage(profile['photoURL']!)
+                                    : null,
+                                child: profile['photoURL'] == ''
+                                    ? const Icon(Icons.person, size: 50)
+                                    : null,
+                              ),
                             ),
-                            SizedBox(height: 8.0),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: _buildStatItem(
-                                    Icons.timer_outlined,
-                                    LocaleKeys.totalDurationLabel.tr(),
-                                    formattedTotalDuration,
-                                    basarsoft_color_light,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _buildStatItem(
-                                    Icons.timelapse_rounded,
-                                    LocaleKeys.averageDurationLabel.tr(),
-                                    formattedAverageDuration,
-                                    basarsoft_color_light,
-                                  ),
-                                ),
-                              ],
+                          ),
+                          SizedBox(height: 4.0),
+                          Text(
+                            profile['name']!,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
                             ),
-                            SizedBox(height: 8.0),
-                            _buildStatItem(
-                              Icons.fitness_center,
-                              LocaleKeys.activityCountLabel.tr(),
-                              '$activityCount',
-                              Colors.white,
+                          ),
+                          SizedBox(height: 4.0),
+                          Text(
+                            profile['email']!,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black54,
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: 8.0),
+                          Card(
+                            color: Colors.white,
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                            ),
+                            shadowColor: basarsoft_color,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: _buildStatItem(
+                                          Icons.directions_walk,
+                                          LocaleKeys.totalDistanceLabel.tr(),
+                                          '${totalDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
+                                          Colors.green,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: _buildStatItem(
+                                          Icons.add_road,
+                                          LocaleKeys.averageDistanceLabel.tr(),
+                                          '${averageDistance.toStringAsFixed(2)} ${LocaleKeys.kmUnit.tr()}',
+                                          Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: _buildStatItem(
+                                          Icons.timer_outlined,
+                                          LocaleKeys.totalDurationLabel.tr(),
+                                          formattedTotalDuration,
+                                          basarsoft_color_light,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: _buildStatItem(
+                                          Icons.timelapse_rounded,
+                                          LocaleKeys.averageDurationLabel.tr(),
+                                          formattedAverageDuration,
+                                          basarsoft_color_light,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  _buildStatItem(
+                                    Icons.fitness_center,
+                                    LocaleKeys.activityCountLabel.tr(),
+                                    '$activityCount',
+                                    Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10.0),
+                          _buildProfileButton(
+                            icon: Icons.add,
+                            text: LocaleKeys.newActivityButton.tr(),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => NewActivityScreen(),
+                              ));
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          _buildProfileButton(
+                            icon: Icons.history,
+                            text: LocaleKeys.activityHistoryButton.tr(),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ActivityHistoryScreen(),
+                              ));
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          _buildProfileButton(
+                            icon: Icons.sync,
+                            text: LocaleKeys.syncDataButton.tr(),
+                            onPressed: () async {
+                              try {
+                                final LocalUser? localUser = await dbHelper.getCurrentUser();
+                                if (localUser != null) {
+                                  await AuthService().syncUserActivities(context, localUser);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(LocaleKeys.syncSuccess.tr())),
+                                  );
+                                }
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(LocaleKeys.userStatsError.tr(args: [e.toString()]))),
+                                );
+                              }
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          _buildProfileButton(
+                            icon: Icons.logout,
+                            text: LocaleKeys.logoutButton.tr(),
+                            onPressed: () async {
+                              try {
+                                await FirebaseAuth.instance.signOut();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(LocaleKeys.logoutSuccess.tr())),
+                                );
+                                Navigator.of(context).popUntil((route) => route.isFirst);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(LocaleKeys.userStatsError.tr(args: [e.toString()]))),
+                                );
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    _buildProfileButton(
-                      icon: Icons.add,
-                      text: LocaleKeys.newActivityButton.tr(),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => NewActivityScreen(),
-                        ));
-                      },
-                    ),
-                    SizedBox(height: 8.0),
-                    _buildProfileButton(
-                      icon: Icons.history,
-                      text: LocaleKeys.activityHistoryButton.tr(),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ActivityHistoryScreen(),
-                        ));
-                      },
-                    ),
-                    SizedBox(height: 8.0),
-                    _buildProfileButton(
-                      icon: Icons.sync,
-                      text: LocaleKeys.syncDataButton.tr(),
-                      onPressed: () async {
-                        try {
-                          final LocalUser? localUser = await dbHelper.getCurrentUser();
-                          if (localUser != null) {
-                            await AuthService().syncUserActivities(context, localUser);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(LocaleKeys.syncSuccess.tr())),
-                            );
-                          }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(LocaleKeys.userStatsError.tr(args: [e.toString()]))),
-                          );
-                        }
-                      },
-                    ),
-                    SizedBox(height: 8.0),
-                    _buildProfileButton(
-                      icon: Icons.logout,
-                      text: LocaleKeys.logoutButton.tr(),
-                      onPressed: () async {
-                        try {
-                          await FirebaseAuth.instance.signOut();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(LocaleKeys.logoutSuccess.tr())),
-                          );
-                          Navigator.of(context).popUntil((route) => route.isFirst);
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(LocaleKeys.userStatsError.tr(args: [e.toString()]))),
-                          );
-                        }
-                      },
-                    ),
+                    SizedBox(height: 16),
                   ],
-                ),
-              ),
-              SizedBox(height: 16),
-              AdmobBanner(),
-            ],
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: null,
     );
