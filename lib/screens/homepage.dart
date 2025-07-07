@@ -25,11 +25,13 @@ class _HomePageState extends State<HomePage> {
   LocalUser? localUser;
   User? firebaseUser;
   int _selectedIndex = 0;
+  static int homePageVisitCount = 0;
 
   @override
   void initState() {
     super.initState();
     _loadCurrentUser();
+    homePageVisitCount++;
   }
 
   Future<void> _loadCurrentUser() async {
@@ -109,7 +111,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildWeatherWidget(),
-            AdmobBanner(),
+            if (homePageVisitCount > 1) AdmobBanner(),
             _buildSectionDivider(),
             _buildUserInfo(),
             _buildSectionDivider(),
