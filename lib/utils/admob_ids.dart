@@ -16,4 +16,12 @@ class AdmobIds {
       return 'ca-app-pub-9589008379442992/8122180327';
     }
   }
+
+  static String get rewardedAdUnitId {
+    if (kDebugMode) {
+      return 'ca-app-pub-3940256099942544/5224354917'; // AdMob test rewarded ID
+    } else {
+      return 'ca-app-pub-9589008379442992/1723458787';
+    }
+  }
 } 

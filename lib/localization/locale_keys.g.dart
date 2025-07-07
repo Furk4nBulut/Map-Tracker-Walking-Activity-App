@@ -116,5 +116,6 @@ abstract class  LocaleKeys {
   static const logoutSuccess = 'logoutSuccess';
   static const minuteUnitShort = 'minuteUnitShort';
   static const secondUnitShort = 'secondUnitShort';
+  static const supportByWatchingAd = 'supportByWatchingAd';
 
 }

@@ -13,6 +13,8 @@ import 'package:map_tracker/services/auth_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
+import 'package:map_tracker/widgets/admob_rewarded.dart';
+import 'package:flutter/foundation.dart';
 
 class ProfilePage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -280,6 +282,14 @@ class ProfilePage extends StatelessWidget {
                           ),
                           SizedBox(height: 10.0),
                           _buildProfileButton(
+                            icon: Icons.ondemand_video,
+                            text: LocaleKeys.supportByWatchingAd.tr(),
+                            onPressed: () {
+                              AdmobRewarded.loadAndShowRewardedAd(context);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          _buildProfileButton(
                             icon: Icons.add,
                             text: LocaleKeys.newActivityButton.tr(),
                             onPressed: () {
@@ -336,6 +346,7 @@ class ProfilePage extends StatelessWidget {
                               }
                             },
                           ),
+                          SizedBox(height: 8.0),
                         ],
                       ),
                     ),
