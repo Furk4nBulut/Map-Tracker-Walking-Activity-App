@@ -38,6 +38,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   osm.MapController? _mapController;
   bool _mapInitialized = false;
   String? _errorMessage;
+  Position? _lastAcceptedPosition; // Filtreleme için son kabul edilen konum
 
   LocalUser? _currentUser;
   User? _firebaseUser;
@@ -82,8 +83,9 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
       // Get initial position
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.bestForNavigation,
       );
+      _lastAcceptedPosition = _currentPosition; // İlk konumu kabul et
 
       // Initialize map controller
       _mapController = osm.MapController(
@@ -102,18 +104,36 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       // Start listening to position updates
       _positionStream = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 5,
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 2,
         ),
       ).listen((Position position) {
-        setState(() {
-          _currentPosition = position;
-          if (_activityStarted) {
-            _updateActivityStats(position);
-            _updateRoute(position);
-            _centerMapOnCurrentLocation();
-          }
-        });
+        // --- FİLTRELEME ---
+        bool accept = true;
+        if (_lastAcceptedPosition != null) {
+          double distance = Geolocator.distanceBetween(
+            _lastAcceptedPosition!.latitude,
+            _lastAcceptedPosition!.longitude,
+            position.latitude,
+            position.longitude,
+          );
+          // 50 metreden fazla sıçrama varsa ignore et
+          if (distance > 50) accept = false;
+          // Hız 0.5 m/s'den düşükse ignore et (kullanıcı duruyorsa)
+          if (position.speed < 0.5) accept = false;
+        }
+        if (accept) {
+          _lastAcceptedPosition = position;
+          setState(() {
+            _currentPosition = position;
+            if (_activityStarted) {
+              _updateActivityStats(position);
+              _updateRoute(position);
+              _centerMapOnCurrentLocation();
+            }
+          });
+        }
+        // --- FİLTRELEME SONU ---
       }, onError: (e) {
         setState(() => _errorMessage = LocaleKeys.locationUpdateError.tr(args: [e.toString()]));
       });
