@@ -120,9 +120,10 @@ class _HomePageState extends State<HomePage> {
             _buildSectionDivider(),
             _buildUserInfo(),
             _buildSectionDivider(),
-            _buildSupportDevButton(context),
+            _buildAppIntroSection(context), // Tanıtım yazısı butondan önceye alındı
             _buildSectionDivider(),
-            _buildAppIntroSection(context),
+            _buildSupportDevButton(context), // Destekle butonu en alta alındı
+            SizedBox(height: 32), // Navbar ile arasında ekstra boşluk
           ],
         ),
       ),
@@ -170,142 +171,126 @@ class _HomePageState extends State<HomePage> {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.shadow.withOpacity(0.07),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+      child: RichText(
+        textAlign: TextAlign.justify,
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: LocaleKeys.appDescription.tr(),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            TextSpan(
+              text: "\n\n",
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            WidgetSpan(
+              child: Icon(Icons.location_on, color: Colors.blue[800], size: 20),
+            ),
+            TextSpan(
+              text: " ${LocaleKeys.featureTrackingTitle.tr()}: ",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            TextSpan(
+              text: LocaleKeys.featureTrackingDescription.tr(),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            TextSpan(
+              text: "\n\n",
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            WidgetSpan(
+              child: Icon(Icons.access_time, color: Colors.green[800], size: 20),
+            ),
+            TextSpan(
+              text: " ${LocaleKeys.featureRealTimeDataTitle.tr()}: ",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            TextSpan(
+              text: LocaleKeys.featureRealTimeDataDescription.tr(),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            TextSpan(
+              text: "\n\n",
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            WidgetSpan(
+              child: Icon(Icons.storage, color: Colors.orange[800], size: 20),
+            ),
+            TextSpan(
+              text: " ${LocaleKeys.featureDataStorageTitle.tr()}: ",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            TextSpan(
+              text: LocaleKeys.featureDataStorageDescription.tr(),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            TextSpan(
+              text: "\n\n",
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            WidgetSpan(
+              child: Icon(Icons.wb_sunny, color: Colors.yellow[800], size: 20),
+            ),
+            TextSpan(
+              text: " ${LocaleKeys.featureWeatherTitle.tr()}: ",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            TextSpan(
+              text: LocaleKeys.featureWeatherDescription.tr(),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            TextSpan(
+              text: "\n\n${LocaleKeys.appSummary.tr()}",
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
             ),
           ],
-          border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 18),
-        child: RichText(
-          textAlign: TextAlign.justify,
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: LocaleKeys.appDescription.tr(),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              TextSpan(
-                text: "\n\n",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              WidgetSpan(
-                child: Icon(Icons.location_on, color: Colors.blue[800], size: 20),
-              ),
-              TextSpan(
-                text: " ${LocaleKeys.featureTrackingTitle.tr()}: ",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
-                ),
-              ),
-              TextSpan(
-                text: LocaleKeys.featureTrackingDescription.tr(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              TextSpan(
-                text: "\n\n",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              WidgetSpan(
-                child: Icon(Icons.access_time, color: Colors.green[800], size: 20),
-              ),
-              TextSpan(
-                text: " ${LocaleKeys.featureRealTimeDataTitle.tr()}: ",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
-                ),
-              ),
-              TextSpan(
-                text: LocaleKeys.featureRealTimeDataDescription.tr(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              TextSpan(
-                text: "\n\n",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              WidgetSpan(
-                child: Icon(Icons.storage, color: Colors.orange[800], size: 20),
-              ),
-              TextSpan(
-                text: " ${LocaleKeys.featureDataStorageTitle.tr()}: ",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
-                ),
-              ),
-              TextSpan(
-                text: LocaleKeys.featureDataStorageDescription.tr(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              TextSpan(
-                text: "\n\n",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              WidgetSpan(
-                child: Icon(Icons.wb_sunny, color: Colors.yellow[800], size: 20),
-              ),
-              TextSpan(
-                text: " ${LocaleKeys.featureWeatherTitle.tr()}: ",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
-                ),
-              ),
-              TextSpan(
-                text: LocaleKeys.featureWeatherDescription.tr(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-              TextSpan(
-                text: "\n\n${LocaleKeys.appSummary.tr()}",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
