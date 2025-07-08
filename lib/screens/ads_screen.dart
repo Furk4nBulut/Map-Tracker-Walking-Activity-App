@@ -29,8 +29,8 @@ class _AdsScreenState extends State<AdsScreen> {
   int _adsWatched = 0;
 
   static const int coinsRequired = 4; // 4 coin = 1 gün reklamsız
-  static const int bannerBlockCost = 1;
-  static const int interstitialBlockCost = 1;
+  static const int bannerBlockCost = 2;
+  static const int interstitialBlockCost = 4;
 
   Timer? _timer;
 
@@ -150,18 +150,41 @@ class _AdsScreenState extends State<AdsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? Constants.kykGray800 : Constants.white,
       appBar: CustomAppBar(
         title: LocaleKeys.ad_info_title.tr(),
         automaticallyImplyLeading: true,
       ),
       body: Column(
         children: [
-          // Üstte dil değiştirici
+          // COIN GÖSTERGESİ
           Padding(
-            padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: LanguageSwitcher(),
+            padding: const EdgeInsets.only(top: 18.0, left: 18, right: 18, bottom: 8),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: isDark ? Constants.kykGray700 : Constants.kykGray100,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark ? Colors.black.withOpacity(0.08) : Constants.kykGray400.withOpacity(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+                border: Border.all(color: isDark ? Constants.kykGray600 : Constants.kykGray200, width: 1),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.monetization_on_rounded, color: Constants.kykPrimary, size: 28),
+                  SizedBox(width: 8),
+                  Text('$_coins', style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 22, color: Constants.kykPrimary)),
+                  SizedBox(width: 8),
+                  Text(LocaleKeys.ad_info_coin.tr(), style: GoogleFonts.inter(fontSize: 16, color: isDark ? Constants.kykGray200 : Constants.kykGray700)),
+                ],
+              ),
             ),
           ),
           Expanded(

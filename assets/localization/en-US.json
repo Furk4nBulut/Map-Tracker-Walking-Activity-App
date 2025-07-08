@@ -120,6 +120,7 @@
   "activityHistoryButton": "Activity History",
   "syncDataButton": "Sync Data",
   "logoutButton": "Log Out",
+  "ad_management": "Ad Management",
 
 
 
@@ -162,5 +163,10 @@
   "ad_info_bug_desc": "Found a bug? Let us know!",
   "ad_info_warning_text": "Blocking ads may affect the sustainability of the app.",
   "ads_section_explanation": "You can manage your ad and coin settings here.",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "ad_info_total_coin": "Total Coins Earned",
+  "ad_info_ads_watched": "Ads Watched",
+  "ad_info_no_ads_experience": "Enjoy an ad-free experience!",
+  "ad_info_get_no_ads": "Get Ad-Free Experience",
+  "ad_info_no_ads_explanation": "You can remove ads by using your coins or by watching rewarded ads. Enjoy the app without interruptions!"
 }

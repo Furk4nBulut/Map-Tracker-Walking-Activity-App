@@ -150,5 +150,11 @@
   "ad_info_bug_desc": "Fehler gefunden? Sag uns Bescheid!",
   "ad_info_warning_text": "Das Blockieren von Werbung kann die Nachhaltigkeit der App beeinträchtigen.",
   "ads_section_explanation": "Hier kannst du deine Werbe- und Münzeinstellungen verwalten.",
-  "cancel": "Abbrechen"
+  "cancel": "Abbrechen",
+  "ad_management": "Werbeverwaltung",
+  "ad_info_total_coin": "Insgesamt verdiente Münzen",
+  "ad_info_ads_watched": "Gesehene Werbungen",
+  "ad_info_no_ads_experience": "Genieße ein werbefreies Erlebnis!",
+  "ad_info_get_no_ads": "Werbefreies Erlebnis erhalten",
+  "ad_info_no_ads_explanation": "Du kannst Werbung entfernen, indem du Münzen verwendest oder Belohnungsanzeigen ansiehst. Genieße die App ohne Unterbrechungen!"
 }

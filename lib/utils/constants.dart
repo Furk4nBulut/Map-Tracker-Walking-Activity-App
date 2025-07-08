@@ -16,8 +16,10 @@ class Constants {
   static const Color kykGray600 = Color(0xFF4B5563);
   static const Color kykGray500 = Color(0xFF6B7280);
   static const Color kykGray400 = Color(0xFF9CA3AF);
+  static const Color kykGray300 = Color(0xFFD1D5DB);
   static const Color kykGray200 = Color(0xFFE5E7EB);
   static const Color kykGray100 = Color(0xFFF3F4F6);
+  static const Color kykGray50 = Color(0xFFFAFAFA);
   static const Color kykGray900 = Color(0xFF111827);
   static const Color white = Colors.white;
   static const Color kykSuccess = Color(0xFF22C55E);

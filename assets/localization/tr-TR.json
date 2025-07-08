@@ -169,5 +169,11 @@
   "ad_info_bug_desc": "Bir hata mı buldun? Bize bildir!",
   "ad_info_warning_text": "Reklam engellemek uygulamanın sürdürülebilirliğini etkileyebilir.",
   "ads_section_explanation": "Buradan reklam ve coin ayarlarını yönetebilirsin.",
-  "cancel": "İptal"
+  "cancel": "İptal",
+  "ad_management": "Reklam Yönetimi",
+  "ad_info_total_coin": "Toplam Kazanılan Coin",
+  "ad_info_ads_watched": "İzlenen Reklam Sayısı",
+  "ad_info_no_ads_experience": "Reklamsız deneyimin tadını çıkar!",
+  "ad_info_get_no_ads": "Reklamsız Deneyim Al",
+  "ad_info_no_ads_explanation": "Coin kullanarak veya ödüllü reklam izleyerek reklamları kaldırabilirsin. Kesintisiz uygulama keyfi seni bekliyor!"
 }

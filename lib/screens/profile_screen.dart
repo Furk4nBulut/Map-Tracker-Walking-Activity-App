@@ -17,6 +17,7 @@ import 'package:map_tracker/widgets/admob_rewarded.dart';
 import 'package:flutter/foundation.dart';
 import 'package:map_tracker/screens/ads_screen.dart';
 import 'package:map_tracker/widgets/app_banner_ad.dart';
+import 'package:map_tracker/services/ad_service.dart';
 
 class ProfilePage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -284,8 +285,8 @@ class ProfilePage extends StatelessWidget {
                           ),
                           SizedBox(height: 10.0),
                           _buildProfileButton(
-                            icon: Icons.ondemand_video,
-                            text: LocaleKeys.supportByWatchingAd.tr(),
+                            icon: Icons.ad_units_rounded,
+                            text: LocaleKeys.ad_management.tr(),
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(builder: (context) => const AdsScreen()),
@@ -337,17 +338,19 @@ class ProfilePage extends StatelessWidget {
                             icon: Icons.logout,
                             text: LocaleKeys.logoutButton.tr(),
                             onPressed: () async {
-                              try {
-                                await FirebaseAuth.instance.signOut();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(LocaleKeys.logoutSuccess.tr())),
-                                );
-                                Navigator.of(context).popUntil((route) => route.isFirst);
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(LocaleKeys.userStatsError.tr(args: [e.toString()]))),
-                                );
-                              }
+                              await AdService.showInterstitialAd(context, onClosed: () async {
+                                try {
+                                  await FirebaseAuth.instance.signOut();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(LocaleKeys.logoutSuccess.tr())),
+                                  );
+                                  Navigator.of(context).popUntil((route) => route.isFirst);
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(LocaleKeys.userStatsError.tr(args: [e.toString()]))),
+                                  );
+                                }
+                              });
                             },
                           ),
                           SizedBox(height: 8.0),

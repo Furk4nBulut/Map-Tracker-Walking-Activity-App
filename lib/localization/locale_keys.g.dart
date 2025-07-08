@@ -148,5 +148,10 @@ abstract class  LocaleKeys {
   static const ad_info_warning_text = 'ad_info_warning_text';
   static const ads_section_explanation = 'ads_section_explanation';
   static const cancel = 'cancel';
-
+  static const ad_management = 'ad_management';
+  static const ad_info_total_coin = 'ad_info_total_coin';
+  static const ad_info_ads_watched = 'ad_info_ads_watched';
+  static const ad_info_no_ads_experience = 'ad_info_no_ads_experience';
+  static const ad_info_get_no_ads = 'ad_info_get_no_ads';
+  static const ad_info_no_ads_explanation = 'ad_info_no_ads_explanation';
 }
