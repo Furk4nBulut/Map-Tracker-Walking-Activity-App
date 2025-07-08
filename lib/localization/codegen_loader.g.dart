@@ -116,5 +116,37 @@ abstract class  LocaleKeys {
   static const logoutSuccess = 'logoutSuccess';
   static const minuteUnitShort = 'minuteUnitShort';
   static const secondUnitShort = 'secondUnitShort';
+  static const supportByWatchingAd = 'supportByWatchingAd';
+  static const ad_info_title = 'ad_info_title';
+  static const ad_info_about = 'ad_info_about';
+  static const ad_info_about_desc = 'ad_info_about_desc';
+  static const ad_info_banner = 'ad_info_banner';
+  static const ad_info_banner_desc = 'ad_info_banner_desc';
+  static const ad_info_interstitial = 'ad_info_interstitial';
+  static const ad_info_interstitial_desc = 'ad_info_interstitial_desc';
+  static const ad_info_coin = 'ad_info_coin';
+  static const ad_info_coin_desc = 'ad_info_coin_desc';
+  static const ads_section = 'ads_section';
+  static const ad_info_watch_ad = 'ad_info_watch_ad';
+  static const ad_info_watch_ad_desc = 'ad_info_watch_ad_desc';
+  static const ad_info_thanks = 'ad_info_thanks';
+  static const ad_info_block_banner = 'ad_info_block_banner';
+  static const ad_info_block_banner_desc = 'ad_info_block_banner_desc';
+  static const ad_info_block_banner_success = 'ad_info_block_banner_success';
+  static const ad_info_block_interstitial = 'ad_info_block_interstitial';
+  static const ad_info_block_interstitial_desc = 'ad_info_block_interstitial_desc';
+  static const ad_info_block_interstitial_success = 'ad_info_block_interstitial_success';
+  static const ad_info_none = 'ad_info_none';
+  static const ad_info_reset = 'ad_info_reset';
+  static const ad_info_reset_confirm = 'ad_info_reset_confirm';
+  static const ad_info_reset_success = 'ad_info_reset_success';
+  static const ad_info_support = 'ad_info_support';
+  static const ad_info_support_desc = 'ad_info_support_desc';
+  static const soon = 'soon';
+  static const ad_info_bug = 'ad_info_bug';
+  static const ad_info_bug_desc = 'ad_info_bug_desc';
+  static const ad_info_warning_text = 'ad_info_warning_text';
+  static const ads_section_explanation = 'ads_section_explanation';
+  static const cancel = 'cancel';
 
 }

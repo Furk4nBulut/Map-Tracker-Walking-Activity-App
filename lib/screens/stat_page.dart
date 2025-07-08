@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
+import 'package:map_tracker/widgets/app_banner_ad.dart';
 
 class StatisticPage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -119,7 +120,7 @@ class StatisticPage extends StatelessWidget {
       appBar: CustomAppBar(title: LocaleKeys.statisticsTitle.tr()),
       body: Column(
         children: [
-          AdmobBanner(),
+          AppBannerAd(),
           Expanded(
             child: FutureBuilder<Map<String, dynamic>>(
               future: _getUserStatistics(),

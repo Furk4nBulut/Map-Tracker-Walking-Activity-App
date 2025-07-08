@@ -12,6 +12,7 @@ import 'package:map_tracker/services/local_db_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
+import 'package:map_tracker/widgets/app_banner_ad.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _buildWeatherWidget(),
-            if (homePageVisitCount > 1) AdmobBanner(),
+            if (homePageVisitCount > 1) AppBannerAd(),
             _buildSectionDivider(),
             _buildUserInfo(),
             _buildSectionDivider(),

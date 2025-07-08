@@ -12,14 +12,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
 import 'package:map_tracker/widgets/admob_interstitial.dart';
+import 'package:map_tracker/services/ad_service.dart';
+import 'package:map_tracker/widgets/app_banner_ad.dart';
 
 class ActivityHistoryScreen extends StatelessWidget {
-  final AdmobInterstitial _admobInterstitial = AdmobInterstitial();
-
   void showInterstitialAdOnComplete(BuildContext context) {
-    _admobInterstitial.loadAd(onLoaded: () {
-      _admobInterstitial.showAd();
-    });
+    AdService.showInterstitialAd(context);
   }
 
   @override
@@ -29,7 +27,7 @@ class ActivityHistoryScreen extends StatelessWidget {
       appBar: CustomAppBar(title: LocaleKeys.activityHistoryTitle.tr(), automaticallyImplyLeading: true),
       body: Column(
         children: [
-          AdmobBanner(),
+          AppBannerAd(),
           Expanded(
             child: firebaseUser == null
                 ? Center(child: Text(LocaleKeys.loginRequired.tr()))

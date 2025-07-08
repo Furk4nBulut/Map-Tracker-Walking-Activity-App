@@ -15,6 +15,8 @@ import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
 import 'package:map_tracker/widgets/admob_rewarded.dart';
 import 'package:flutter/foundation.dart';
+import 'package:map_tracker/screens/ads_screen.dart';
+import 'package:map_tracker/widgets/app_banner_ad.dart';
 
 class ProfilePage extends StatelessWidget {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -140,7 +142,7 @@ class ProfilePage extends StatelessWidget {
       appBar: CustomAppBar(title: LocaleKeys.profileTitle.tr(), automaticallyImplyLeading: true),
       body: Column(
         children: [
-          AdmobBanner(),
+          AppBannerAd(),
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: Future.wait([_fetchUserStatistics(), _fetchUserProfile()]),
@@ -285,7 +287,9 @@ class ProfilePage extends StatelessWidget {
                             icon: Icons.ondemand_video,
                             text: LocaleKeys.supportByWatchingAd.tr(),
                             onPressed: () {
-                              AdmobRewarded.loadAndShowRewardedAd(context);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => const AdsScreen()),
+                              );
                             },
                           ),
                           SizedBox(height: 8.0),

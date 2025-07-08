@@ -11,6 +11,8 @@ import 'package:map_tracker/localization/locale_keys.g.dart';
 import '../model/user_model.dart';
 import 'package:map_tracker/widgets/admob_interstitial.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
+import 'package:map_tracker/services/ad_service.dart';
+import 'package:map_tracker/widgets/app_banner_ad.dart';
 
 class ActivityDetailScreen extends StatefulWidget {
   final String activityId;
@@ -22,18 +24,10 @@ class ActivityDetailScreen extends StatefulWidget {
 }
 
 class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
-  final AdmobInterstitial _admobInterstitial = AdmobInterstitial();
-  bool _adShown = false;
-
   @override
   void initState() {
     super.initState();
-    _admobInterstitial.loadAd(onLoaded: () {
-      if (!_adShown) {
-        _admobInterstitial.showAd();
-        _adShown = true;
-      }
-    });
+    AdService.showInterstitialAd(context);
   }
 
   Future<Activity?> _fetchActivity() async {
@@ -216,7 +210,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: AdmobBanner(),
+                child: AppBannerAd(),
               ),
             ],
           ),

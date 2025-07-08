@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         textTheme: Theme.of(context).textTheme.apply(
-          bodyColor: kPrimaryColor,
+          bodyColor: Constants.kykPrimary,
           fontFamily: 'Montserrat',
         ),
       ),
