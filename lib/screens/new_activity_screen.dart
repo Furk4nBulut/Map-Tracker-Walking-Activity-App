@@ -104,8 +104,8 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       // Start listening to position updates
       _positionStream = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.bestForNavigation,
-          distanceFilter: 2,
+          accuracy: LocationAccuracy.best, // daha sık ve hassas konum
+          distanceFilter: 0, // her hareketi al
         ),
       ).listen((Position position) {
         // --- FİLTRELEME ---
@@ -117,19 +117,21 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
             position.latitude,
             position.longitude,
           );
-          // 50 metreden fazla sıçrama varsa ignore et
-          if (distance > 50) accept = false;
-          // Hız 0.5 m/s'den düşükse ignore et (kullanıcı duruyorsa)
-          if (position.speed < 0.5) accept = false;
+          // 100 metreden fazla sıçrama varsa ignore et (daha toleranslı)
+          if (distance > 100) accept = false;
+          // Hız 0.1 m/s'den düşükse ignore et (daha toleranslı)
+          if (position.speed < 0.1) accept = false;
         }
         if (accept) {
           _lastAcceptedPosition = position;
           setState(() {
             _currentPosition = position;
+            // Harita ve rota güncellemesini her zaman yap
+            _updateRoute(position);
+            _centerMapOnCurrentLocation();
+            // Aktivite başladıysa istatistikleri de güncelle
             if (_activityStarted) {
               _updateActivityStats(position);
-              _updateRoute(position);
-              _centerMapOnCurrentLocation();
             }
           });
         }
