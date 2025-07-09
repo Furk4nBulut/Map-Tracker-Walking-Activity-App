@@ -15,7 +15,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:map_tracker/localization/locale_keys.g.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
-import 'package:map_tracker/widgets/app_banner_ad.dart';
 
 class NewActivityScreen extends StatefulWidget {
   const NewActivityScreen({Key? key}) : super(key: key);
@@ -38,7 +37,6 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
   osm.MapController? _mapController;
   bool _mapInitialized = false;
   String? _errorMessage;
-  Position? _lastAcceptedPosition; // Filtreleme için son kabul edilen konum
 
   LocalUser? _currentUser;
   User? _firebaseUser;
@@ -83,9 +81,8 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
 
       // Get initial position
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation,
+        desiredAccuracy: LocationAccuracy.high,
       );
-      _lastAcceptedPosition = _currentPosition; // İlk konumu kabul et
 
       // Initialize map controller
       _mapController = osm.MapController(
@@ -104,38 +101,18 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
       // Start listening to position updates
       _positionStream = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.best, // daha sık ve hassas konum
-          distanceFilter: 0, // her hareketi al
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 5,
         ),
       ).listen((Position position) {
-        // --- FİLTRELEME ---
-        bool accept = true;
-        if (_lastAcceptedPosition != null) {
-          double distance = Geolocator.distanceBetween(
-            _lastAcceptedPosition!.latitude,
-            _lastAcceptedPosition!.longitude,
-            position.latitude,
-            position.longitude,
-          );
-          // 100 metreden fazla sıçrama varsa ignore et (daha toleranslı)
-          if (distance > 100) accept = false;
-          // Hız 0.1 m/s'den düşükse ignore et (daha toleranslı)
-          if (position.speed < 0.1) accept = false;
-        }
-        if (accept) {
-          _lastAcceptedPosition = position;
-          setState(() {
-            _currentPosition = position;
-            // Harita ve rota güncellemesini her zaman yap
+        setState(() {
+          _currentPosition = position;
+          if (_activityStarted) {
+            _updateActivityStats(position);
             _updateRoute(position);
             _centerMapOnCurrentLocation();
-            // Aktivite başladıysa istatistikleri de güncelle
-            if (_activityStarted) {
-              _updateActivityStats(position);
-            }
-          });
-        }
-        // --- FİLTRELEME SONU ---
+          }
+        });
       }, onError: (e) {
         setState(() => _errorMessage = LocaleKeys.locationUpdateError.tr(args: [e.toString()]));
       });
@@ -500,7 +477,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
-            child: AppBannerAd(),
+            child: AdmobBanner(),
           ),
         ],
       ),
