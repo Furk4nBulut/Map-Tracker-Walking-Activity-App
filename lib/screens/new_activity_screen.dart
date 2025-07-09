@@ -365,6 +365,24 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
     );
   }
 
+  String formatDurationWithUnit(int seconds) {
+    final duration = Duration(seconds: seconds);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final secs = duration.inSeconds.remainder(60);
+    List<String> parts = [];
+    if (hours > 0) {
+      parts.add('$hours ${LocaleKeys.hourUnit.tr()}');
+    }
+    if (minutes > 0) {
+      parts.add('$minutes ${LocaleKeys.minuteUnit.tr()}');
+    }
+    if (secs > 0 || parts.isEmpty) {
+      parts.add('$secs ${LocaleKeys.secondUnit.tr()}');
+    }
+    return parts.join(' ');
+  }
+
   Widget _buildActivityStats() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -380,7 +398,7 @@ class _NewActivityScreenState extends State<NewActivityScreen> {
           _buildDivider(),
           _buildStatItem(
             LocaleKeys.durationLabel.tr(),
-            '$_elapsedSeconds ${LocaleKeys.secondUnit.tr()}',
+            formatDurationWithUnit(_elapsedSeconds),
             Icons.timer,
             Colors.blue,
           ),

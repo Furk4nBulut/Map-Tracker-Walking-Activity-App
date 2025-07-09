@@ -103,6 +103,39 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
     );
   }
 
+  String formatDuration(int seconds) {
+    final duration = Duration(seconds: seconds);
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final secs = duration.inSeconds.remainder(60);
+    if (hours > 0) {
+      return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(secs)}';
+    } else if (minutes > 0) {
+      return '${twoDigits(minutes)}:${twoDigits(secs)}';
+    } else {
+      return '${twoDigits(secs)}';
+    }
+  }
+
+  String formatDurationWithUnit(int seconds) {
+    final duration = Duration(seconds: seconds);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final secs = duration.inSeconds.remainder(60);
+    List<String> parts = [];
+    if (hours > 0) {
+      parts.add('$hours ${LocaleKeys.hourUnit.tr()}');
+    }
+    if (minutes > 0) {
+      parts.add('$minutes ${LocaleKeys.minuteUnit.tr()}');
+    }
+    if (secs > 0 || parts.isEmpty) {
+      parts.add('$secs ${LocaleKeys.secondUnit.tr()}');
+    }
+    return parts.join(' ');
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Activity?>(
@@ -226,9 +259,9 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                                   ),
                                   Expanded(
                                     child: ListTile(
-                                      leading: const Icon(Icons.speed, color: Colors.deepOrange),
-                                      title: Text(LocaleKeys.averageSpeedLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                                      subtitle: Text('${activity.averageSpeed.toStringAsFixed(2)} ${LocaleKeys.kmPerHourUnit.tr()}'),
+                                      leading: const Icon(Icons.timer_outlined, color: Colors.blue),
+                                      title: Text(LocaleKeys.durationLabel.tr(), style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                                      subtitle: Text(formatDurationWithUnit(activity.elapsedTime)),
                                     ),
                                   ),
                                 ],

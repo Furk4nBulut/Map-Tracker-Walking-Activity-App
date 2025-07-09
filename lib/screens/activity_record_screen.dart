@@ -127,7 +127,8 @@ class ActivityHistoryScreen extends StatelessWidget {
                             Icon(Icons.timer_outlined, color: Colors.blue),
                             SizedBox(width: 10),
                             Text(
-                              '${LocaleKeys.durationLabel.tr()}: ${doc['elapsedTime']} ${LocaleKeys.secondUnit.tr()}',
+                              '${LocaleKeys.durationLabel.tr()}: '
+                              '${formatDurationWithUnit(doc['elapsedTime'])}',
                               style: TextStyle(fontSize: 14.0),
                             ),
                           ],
@@ -224,7 +225,8 @@ class ActivityHistoryScreen extends StatelessWidget {
                             Icon(Icons.timer_outlined, color: Colors.blue),
                             SizedBox(width: 10),
                             Text(
-                              '${LocaleKeys.durationLabel.tr()}: ${activity.elapsedTime} ${LocaleKeys.secondUnit.tr()}',
+                              '${LocaleKeys.durationLabel.tr()}: '
+                              '${formatDurationWithUnit(activity.elapsedTime)}',
                               style: TextStyle(fontSize: 14.0),
                             ),
                           ],
@@ -270,4 +272,22 @@ class ActivityHistoryScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+String formatDurationWithUnit(int seconds) {
+  final duration = Duration(seconds: seconds);
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes.remainder(60);
+  final secs = duration.inSeconds.remainder(60);
+  List<String> parts = [];
+  if (hours > 0) {
+    parts.add('$hours ${LocaleKeys.hourUnit.tr()}');
+  }
+  if (minutes > 0) {
+    parts.add('$minutes ${LocaleKeys.minuteUnit.tr()}');
+  }
+  if (secs > 0 || parts.isEmpty) {
+    parts.add('$secs ${LocaleKeys.secondUnit.tr()}');
+  }
+  return parts.join(' ');
 }
