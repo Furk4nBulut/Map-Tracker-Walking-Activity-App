@@ -13,6 +13,7 @@ import 'package:map_tracker/widgets/admob_interstitial.dart';
 import 'package:map_tracker/widgets/admob_banner.dart';
 import 'package:map_tracker/services/ad_service.dart';
 import 'package:map_tracker/widgets/app_banner_ad.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ActivityDetailScreen extends StatefulWidget {
   final String activityId;
@@ -24,10 +25,32 @@ class ActivityDetailScreen extends StatefulWidget {
 }
 
 class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
+  Position? _currentPosition;
+
   @override
   void initState() {
     super.initState();
     AdService.showInterstitialAd(context);
+    _getCurrentLocation();
+  }
+
+  void _getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return;
+      }
+      if (permission == LocationPermission.deniedForever) return;
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      // Hata yönetimi
+    }
   }
 
   Future<Activity?> _fetchActivity() async {
@@ -132,16 +155,26 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                           if (isReady && route.isNotEmpty) {
                             await mapController.setZoom(zoomLevel: 15);
                             if (route.length > 1) {
-                              await mapController.drawRoad(
-                                route.first,
-                                route.last,
-                                roadType: osm.RoadType.foot,
-                                roadOption: const osm.RoadOption(
-                                  roadColor: Colors.blue,
-                                  roadWidth: 5,
+                              await mapController.drawMultipleRoad([
+                                osm.MultiRoadConfiguration(
+                                  startPoint: route.first,
+                                  destinationPoint: route.last,
+                                  intersectPoints: route.length > 2 ? route.sublist(1, route.length - 1) : [],
                                 ),
-                              );
+                              ]);
                             }
+                          }
+                          // Şu anki konumu marker olarak ekle
+                          if (isReady && _currentPosition != null) {
+                            await mapController.addMarker(
+                              osm.GeoPoint(
+                                latitude: _currentPosition!.latitude,
+                                longitude: _currentPosition!.longitude,
+                              ),
+                              markerIcon: const osm.MarkerIcon(
+                                icon: Icon(Icons.my_location, color: Colors.red, size: 40),
+                              ),
+                            );
                           }
                         },
                       ),
